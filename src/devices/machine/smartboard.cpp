@@ -83,8 +83,11 @@ tasc_sb30_device::tasc_sb30_device(const machine_config &mconfig, const char *ta
 
 void tasc_sb30_device::device_start()
 {
-	if (m_led_out.isunset())
+	m_led_out.resolve();
+	if (m_led_out.isnull())
 		m_out_leds.resolve();
+
+	m_data_out.resolve_safe();
 
 	// zerofill
 	m_data0 = 0;
@@ -301,7 +304,7 @@ void tasc_sb30_device::data0_w(int state)
 		else
 		{
 			// output board led(s)
-			if (m_led_out.isunset())
+			if (m_led_out.isnull())
 				m_out_leds[m_pos & 7][m_pos >> 3 & 7] = m_data1;
 			else
 				m_led_out(m_pos & 0x3f, m_data1);

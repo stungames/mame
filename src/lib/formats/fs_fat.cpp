@@ -141,12 +141,10 @@
 ****************************************************************************/
 
 #include "fs_fat.h"
-#include "fsblk.h"
 #include "pc_dsk.h"
-
 #include "strformat.h"
-
-#include <optional>
+#include "util/corestr.h"
+#include "util/strformat.h"
 
 using namespace fs;
 
@@ -185,14 +183,11 @@ public:
 	bool is_volume_label() const        { return (attributes() & 0x08) != 0x00; }
 	bool is_subdirectory() const        { return (attributes() & 0x10) != 0x00; }
 	bool is_archive() const             { return (attributes() & 0x20) != 0x00; }
-	bool is_deleted() const             { return m_block.r8(m_offset) == DELETED_FILE_MARKER; }
 
 	std::string name() const;
 	meta_data metadata() const;
 
 private:
-	static constexpr u8 DELETED_FILE_MARKER = 0xe5;
-
 	fsblk_t::block_t    m_block;
 	u32                 m_offset;
 };
@@ -454,8 +449,8 @@ std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, 
 
 std::string directory_entry::name() const
 {
-	std::string_view stem = filesystem_t::trim_end_spaces(raw_stem());
-	std::string_view ext = filesystem_t::trim_end_spaces(raw_ext());
+	std::string_view stem = strtrimrightspace(raw_stem());
+	std::string_view ext = strtrimrightspace(raw_ext());
 	return !ext.empty()
 		? util::string_format("%s.%s", stem, ext)
 		: std::string(stem);
@@ -713,11 +708,11 @@ void impl::iterate_directory_entries(const directory_span &dir, const std::funct
 		for (u32 index = 0; !done && (index < dirents_per_sector()); index++)
 		{
 			directory_entry dirent(block, index * 32);
-			if (dirent.raw_stem()[0] != 0x00 && !dirent.is_deleted())
+			if (dirent.raw_stem()[0] != 0x00)
 			{
 				// get the filename
-				std::string_view stem = trim_end_spaces(dirent.raw_stem());
-				std::string_view ext = trim_end_spaces(dirent.raw_ext());
+				std::string_view stem = strtrimrightspace(dirent.raw_stem());
+				std::string_view ext = strtrimrightspace(dirent.raw_ext());
 				if (ext.empty() && (stem == "." || stem == ".."))
 					continue;
 

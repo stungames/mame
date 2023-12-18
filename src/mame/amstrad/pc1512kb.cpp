@@ -225,11 +225,13 @@ pc1512_keyboard_device::pc1512_keyboard_device(const machine_config &mconfig, co
 
 void pc1512_keyboard_device::device_start()
 {
-	// resolve outputs
 	m_leds.resolve();
-
 	// allocate timers
 	m_reset_timer = timer_alloc(FUNC(pc1512_keyboard_device::reset_timer_tick), this);
+
+	// resolve callbacks
+	m_write_clock.resolve_safe();
+	m_write_data.resolve_safe();
 
 	// state saving
 	save_item(NAME(m_data_in));
@@ -268,7 +270,7 @@ TIMER_CALLBACK_MEMBER(pc1512_keyboard_device::reset_timer_tick)
 //  data_w - keyboard data input
 //-------------------------------------------------
 
-void pc1512_keyboard_device::data_w(int state)
+WRITE_LINE_MEMBER( pc1512_keyboard_device::data_w )
 {
 	m_data_in = state;
 }
@@ -278,7 +280,7 @@ void pc1512_keyboard_device::data_w(int state)
 //  clock_w - keyboard clock input
 //-------------------------------------------------
 
-void pc1512_keyboard_device::clock_w(int state)
+WRITE_LINE_MEMBER( pc1512_keyboard_device::clock_w )
 {
 	if (m_clock_in != state)
 	{
@@ -300,7 +302,7 @@ void pc1512_keyboard_device::clock_w(int state)
 //  m1_w - mouse button 1
 //-------------------------------------------------
 
-void pc1512_keyboard_device::m1_w(int state)
+WRITE_LINE_MEMBER( pc1512_keyboard_device::m1_w )
 {
 	m_m1 = state;
 }
@@ -310,7 +312,7 @@ void pc1512_keyboard_device::m1_w(int state)
 //  m2_w - mouse button 2
 //-------------------------------------------------
 
-void pc1512_keyboard_device::m2_w(int state)
+WRITE_LINE_MEMBER( pc1512_keyboard_device::m2_w )
 {
 	m_m2 = state;
 }
@@ -456,7 +458,7 @@ void pc1512_keyboard_device::kb_p2_w(uint8_t data)
 //  kb_t0_r -
 //-------------------------------------------------
 
-int pc1512_keyboard_device::kb_t0_r()
+READ_LINE_MEMBER( pc1512_keyboard_device::kb_t0_r )
 {
 	return m_m1;
 }
@@ -466,7 +468,7 @@ int pc1512_keyboard_device::kb_t0_r()
 //  kb_t1_r -
 //-------------------------------------------------
 
-int pc1512_keyboard_device::kb_t1_r()
+READ_LINE_MEMBER( pc1512_keyboard_device::kb_t1_r )
 {
 	return m_m2;
 }

@@ -249,7 +249,7 @@ void atarisy2_state::machine_reset()
  *
  *************************************/
 
-void atarisy2_state::vblank_int(int state)
+WRITE_LINE_MEMBER(atarisy2_state::vblank_int)
 {
 	if (state)
 	{

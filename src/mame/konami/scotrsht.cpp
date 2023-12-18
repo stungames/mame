@@ -99,7 +99,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void palette(palette_device &palette) const;
 
@@ -252,7 +252,7 @@ void scotrsht_state::ctrl_w(uint8_t data)
 	flip_screen_set(data & 0x08);
 }
 
-void scotrsht_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(scotrsht_state::vblank_irq)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);

@@ -45,7 +45,7 @@ private:
 	void dsp_pio_w(offs_t offset, u16 data);
 
 	// for synchronised DSP communication
-	void dsp_ock_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(dsp_ock_w);
 	u16 dsp_pio_r();
 	void set_dsp_ready(s32 param);
 	void set_cmd(s32 param);

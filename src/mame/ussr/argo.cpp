@@ -70,8 +70,8 @@ private:
 	void argo_videoram_w(offs_t offset, u8 data);
 	u8 argo_io_r(offs_t offset);
 	void argo_io_w(offs_t offset, u8 data);
-	void z0_w(int state);
-	void hrq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(z0_w);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	void argo_palette(palette_device &palette) const;
 	u8 dma_r(offs_t offset);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
@@ -223,7 +223,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( argo_state::kansas_r )
 	}
 }
 
-void argo_state::z0_w(int state)
+WRITE_LINE_MEMBER(argo_state::z0_w)
 {
 	// write - incoming 2400Hz
 	m_uart->write_txc(state);
@@ -243,7 +243,7 @@ u8 argo_state::dma_r(offs_t offset)
 		return m_vram[offset & 0x7ff];
 }
 
-void argo_state::hrq_w(int state)
+WRITE_LINE_MEMBER( argo_state::hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->hlda_w(state);

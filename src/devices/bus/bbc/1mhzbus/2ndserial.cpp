@@ -193,7 +193,7 @@ void bbc_2ndserial_device::jim_w(offs_t offset, uint8_t data)
 }
 
 
-void bbc_2ndserial_device::write_acia_clock(int state)
+WRITE_LINE_MEMBER(bbc_2ndserial_device::write_acia_clock)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

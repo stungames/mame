@@ -47,7 +47,7 @@ private:
 	required_region_ptr<uint16_t> m_rom;
 
 	uint32_t screen_update_hybrid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_vblank_hybrid(int state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_hybrid);
 
 	void megadriv_sunplus_map(address_map &map);
 };
@@ -113,7 +113,7 @@ uint32_t megadriv_sunplus_state::screen_update_hybrid(screen_device &screen, bit
 	return 0;
 }
 
-void megadriv_sunplus_state::screen_vblank_hybrid(int state)
+WRITE_LINE_MEMBER(megadriv_sunplus_state::screen_vblank_hybrid)
 {
 	if (m_md_is_running)
 	{

@@ -61,8 +61,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "formats/flopimg.h"
-
 
 /* Read/Write Handlers */
 
@@ -341,7 +339,7 @@ void xerox820ii_state::rdpio_pb_w(uint8_t data)
 	// TODO: LS74 Q
 }
 
-void xerox820ii_state::rdpio_pardy_w(int state)
+WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
 {
 	// TODO
 }
@@ -380,10 +378,10 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 
 QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 {
-	if (image.length() >= 0xfd00)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
-	address_space &prog_space = m_maincpu->space(AS_PROGRAM);
+	if (image.length() >= 0xfd00)
+		return image_init_result::FAIL;
 
 	m_view.select(0);
 
@@ -391,7 +389,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	if ((prog_space.read_byte(0) != 0xc3) || (prog_space.read_byte(5) != 0xc3))
 	{
 		machine_reset();
-		return std::make_pair(image_error::UNSUPPORTED, std::string());
+		return image_init_result::FAIL;
 	}
 
 	/* Load image to the TPA (Transient Program Area) */
@@ -400,7 +398,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	{
 		uint8_t data;
 		if (image.fread( &data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, std::string());
+			return image_init_result::FAIL;
 		prog_space.write_byte(i+0x100, data);
 	}
 
@@ -411,7 +409,7 @@ QUICKLOAD_LOAD_MEMBER(xerox820_state::quickload_cb)
 	m_maincpu->set_state_int(Z80_SP, 256 * prog_space.read_byte(7) - 300);
 	m_maincpu->set_pc(0x100);   // start program
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 
@@ -435,14 +433,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-void xerox820_state::fdc_intrq_w(int state)
+WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-void xerox820_state::fdc_drq_w(int state)
+WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 {
 	m_fdc_drq = state;
 

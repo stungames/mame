@@ -17,7 +17,6 @@
 
 #include "debugger.h"
 #include "fileio.h"
-#include "main.h"
 
 #include "corestr.h"
 
@@ -1086,7 +1085,7 @@ void debugger_console::print_core_wrap(std::string_view text, int wrapcol)
 //  the format to the debug console
 //-------------------------------------------------
 
-void debugger_console::vprintf(util::format_argument_pack<char> const &args)
+void debugger_console::vprintf(util::format_argument_pack<std::ostream> const &args)
 {
 	print_core(util::string_format(args));
 
@@ -1094,7 +1093,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> const &args)
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
-void debugger_console::vprintf(util::format_argument_pack<char> &&args)
+void debugger_console::vprintf(util::format_argument_pack<std::ostream> &&args)
 {
 	print_core(util::string_format(std::move(args)));
 
@@ -1108,7 +1107,7 @@ void debugger_console::vprintf(util::format_argument_pack<char> &&args)
 //  using the format to the debug console
 //-------------------------------------------------
 
-void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> const &args)
+void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> const &args)
 {
 	print_core_wrap(util::string_format(args), wrapcol);
 
@@ -1116,7 +1115,7 @@ void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char
 	m_machine.debug_view().update_all(DVT_CONSOLE);
 }
 
-void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<char> &&args)
+void debugger_console::vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args)
 {
 	print_core_wrap(util::string_format(std::move(args)), wrapcol);
 

@@ -150,21 +150,22 @@ static const char *ws_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::pair<std::error_condition, std::string> ws_cart_slot_device::call_load()
+image_init_result ws_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		u32 const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		u16 *ROM;
+		u32 size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		u32 nvram_size = 0;
 
 		m_cart->rom_alloc(size);
-		u16 *const ROM = m_cart->get_rom_base();
+		ROM = m_cart->get_rom_base();
 
 		if (!loaded_through_softlist())
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);
 
-		u32 nvram_size = 0;
 		if (!loaded_through_softlist())
 		{
 			// get cart type and nvram length
@@ -202,7 +203,7 @@ std::pair<std::error_condition, std::string> ws_cart_slot_device::call_load()
 		internal_header_logging(ROM, ((size >> 16) - 1) << 16, size);
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

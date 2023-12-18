@@ -138,7 +138,7 @@ public:
 	void init_pirates();
 	void init_genix();
 
-	int prot_r();
+	DECLARE_READ_LINE_MEMBER(prot_r);
 
 protected:
 	virtual void video_start() override;
@@ -305,7 +305,7 @@ void pirates_state::out_w(uint8_t data)
 	LOGOUT("%06x: out_w %04x\n", m_maincpu->pc(), data);
 }
 
-int pirates_state::prot_r()
+READ_LINE_MEMBER(pirates_state::prot_r)
 {
 //  static int prot = 0xa3;
 //  offs_t pc;

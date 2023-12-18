@@ -291,7 +291,7 @@ private:
 	bool m_sample_select;
 
 	void sound_bankswitch_w(uint8_t data);
-	void adpcm_int(int state);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void mstworld2_io_map(address_map &map);
 	void pangba_sound_map(address_map &map);
@@ -428,11 +428,14 @@ void mitchell_state::colorram_w(offs_t offset, uint8_t data)
 
 void mitchell_state::gfxctrl_w(uint8_t data)
 {
-	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-
+logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
+{
 #if 0
-	popmessage("%02x", data);
+	char baf[40];
+	sprintf(baf, "%02x", data);
+	popmessage(baf);
 #endif
+}
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -464,8 +467,11 @@ void mitchell_state::gfxctrl_w(uint8_t data)
 void mstworld_state::gfxctrl_w(uint8_t data)
 {
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-
-	// popmessage("%02x", data);
+{
+	char baf[40];
+	sprintf(baf, "%02x", data);
+//  popmessage(baf);
+}
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
@@ -1879,7 +1885,7 @@ static GFXDECODE_START( gfx_mstworld2 )
 	GFXDECODE_ENTRY( "sprites", 0, mstworld_spritelayout, 0, 0x40 )
 GFXDECODE_END
 
-void spangbl_state::adpcm_int(int state)
+WRITE_LINE_MEMBER(spangbl_state::adpcm_int)
 {
 	if (!state)
 		return;

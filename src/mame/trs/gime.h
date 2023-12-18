@@ -9,14 +9,14 @@
 
 ***************************************************************************/
 
-#ifndef MAME_TRS_GIME_H
-#define MAME_TRS_GIME_H
+#ifndef MAME_VIDEO_GIME_H
+#define MAME_VIDEO_GIME_H
 
 #pragma once
 
-#include "machine/6883sam.h"
-#include "machine/ram.h"
 #include "video/mc6847.h"
+#include "6883sam.h"
+#include "machine/ram.h"
 
 
 //**************************************************************************
@@ -290,4 +290,4 @@ public:
 DECLARE_DEVICE_TYPE(GIME_NTSC, gime_ntsc_device)
 DECLARE_DEVICE_TYPE(GIME_PAL, gime_pal_device)
 
-#endif //MAME_TRS_GIME_H
+#endif //MAME_VIDEO_GIME_H

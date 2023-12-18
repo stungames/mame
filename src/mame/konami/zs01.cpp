@@ -99,7 +99,7 @@ void zs01_device::device_reset()
 	m_previous_byte = 0;
 }
 
-void zs01_device::write_rst(int state)
+WRITE_LINE_MEMBER( zs01_device::write_rst )
 {
 	if( m_rst != state )
 	{
@@ -117,7 +117,7 @@ void zs01_device::write_rst(int state)
 	m_rst = state;
 }
 
-void zs01_device::write_cs(int state)
+WRITE_LINE_MEMBER( zs01_device::write_cs )
 {
 	if( m_cs != state )
 	{
@@ -337,7 +337,7 @@ int zs01_device::data_offset()
 	return m_write_buffer[ 1 ] * SIZE_DATA_BUFFER;
 }
 
-void zs01_device::write_scl(int state)
+WRITE_LINE_MEMBER( zs01_device::write_scl )
 {
 	if( m_scl != state )
 	{
@@ -597,7 +597,7 @@ void zs01_device::write_scl(int state)
 	m_scl = state;
 }
 
-void zs01_device::write_sda(int state)
+WRITE_LINE_MEMBER( zs01_device::write_sda )
 {
 	if( m_sdaw != state )
 	{
@@ -637,7 +637,7 @@ void zs01_device::write_sda(int state)
 	m_sdaw = state;
 }
 
-int zs01_device::read_sda()
+READ_LINE_MEMBER( zs01_device::read_sda )
 {
 	if( m_cs != 0 )
 	{

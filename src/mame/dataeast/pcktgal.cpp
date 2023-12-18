@@ -81,7 +81,7 @@ private:
 	void sound_w(uint8_t data);
 	void adpcm_data_w(uint8_t data);
 	uint8_t sound_unk_r();
-	void adpcm_int(int state);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -193,7 +193,7 @@ void pcktgal_state::sound_w(uint8_t data)
 }
 
 
-void pcktgal_state::adpcm_int(int state)
+WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;

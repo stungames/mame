@@ -514,7 +514,7 @@ u16 asic65_device::stat_r()
 }
 
 
-int asic65_device::get_bio()
+READ_LINE_MEMBER( asic65_device::get_bio )
 {
 	if (!machine().side_effects_disabled())
 	{

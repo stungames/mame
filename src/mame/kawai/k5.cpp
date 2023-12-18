@@ -10,9 +10,6 @@
 #include "cpu/nec/v5x.h"
 #include "video/t6963c.h"
 
-
-namespace {
-
 class kawai_k5_state : public driver_device
 {
 public:
@@ -77,9 +74,6 @@ ROM_START(k5m)
 
 	ROM_REGION(0x400, "lcdc:cgrom", ROMREGION_ERASE00)
 ROM_END
-
-} // anonymous namespace
-
 
 SYST(1987, k5,  0,  0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
 SYST(1987, k5m, k5, 0, k5, k5, kawai_k5_state, empty_init, "Kawai Musical Instrument Manufacturing", "K5m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)

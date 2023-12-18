@@ -1490,15 +1490,17 @@ void namcos22_state::simulate_slavedsp()
 
 			default:
 			{
-				std::ostringstream polydata;
+				std::string polydata;
 				int i = 0;
 				for (; i < len && i < 0x20; i++)
 				{
-					util::stream_format(polydata ," %06x", src[i] & 0xffffff);
+					char h[8];
+					sprintf(h, " %06x", src[i] & 0xffffff);
+					polydata += h;
 				}
 				if (i < len)
-					polydata << " (...)";
-				logerror("simulate_slavedsp unknown 3d data: len=0x%x code=0x%x addr=0x%x!%s\n", len, code, index, std::move(polydata).str());
+					polydata += " (...)";
+				logerror("simulate_slavedsp unknown 3d data: len=0x%x code=0x%x addr=0x%x!%s\n", len, code, index, polydata);
 				return;
 			}
 		}
@@ -1547,7 +1549,7 @@ void namcos22_state::render_frame_active()
 	m_render_refresh = false;
 }
 
-void namcos22_state::screen_vblank(int state)
+WRITE_LINE_MEMBER(namcos22_state::screen_vblank)
 {
 	if (state)
 	{

@@ -339,8 +339,6 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 
 #include "utf8.h"
 
-//#define VERBOSE 1
-#include "logmacro.h"
 
 
 //**************************************************************************
@@ -348,6 +346,8 @@ Y11       104 103 102 101 100 99  98  97      kN/A k.   k00  k0   RGHT LEFT PAUS
 //**************************************************************************
 
 #define I8021_TAG   "z3"
+
+#define LOG         0
 
 
 
@@ -569,6 +569,10 @@ victor_9000_keyboard_device::victor_9000_keyboard_device(const machine_config &m
 
 void victor_9000_keyboard_device::device_start()
 {
+	// resolve callbacks
+	m_kbrdy_cb.resolve_safe();
+	m_kbdata_cb.resolve_safe();
+
 	// state saving
 	save_item(NAME(m_p1));
 	save_item(NAME(m_keylatch));
@@ -584,9 +588,9 @@ void victor_9000_keyboard_device::device_start()
 //  kback_w -
 //-------------------------------------------------
 
-void victor_9000_keyboard_device::kback_w(int state)
+WRITE_LINE_MEMBER( victor_9000_keyboard_device::kback_w )
 {
-	LOG("KBACK %u\n", state);
+	if (LOG) logerror("KBACK %u\n", state);
 
 	m_kback = !state;
 }
@@ -660,7 +664,7 @@ void victor_9000_keyboard_device::kb_p2_w(uint8_t data)
 //  kb_t1_r -
 //-------------------------------------------------
 
-int victor_9000_keyboard_device::kb_t1_r()
+READ_LINE_MEMBER( victor_9000_keyboard_device::kb_t1_r )
 {
 	return m_kback;
 }

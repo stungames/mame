@@ -5,22 +5,19 @@
     Galivan - Cosmo Police
 
 ***************************************************************************/
-#ifndef MAME_NICHIBUTSU_GALIVAN_H
-#define MAME_NICHIBUTSU_GALIVAN_H
+#ifndef MAME_INCLUDES_GALIVAN_H
+#define MAME_INCLUDES_GALIVAN_H
 
 #pragma once
 
 #include "nb1412m2.h"
 #include "nb1414m4.h"
-
 #include "machine/gen_latch.h"
-#include "video/bufsprite.h"
 #include "sound/flt_biquad.h"
-
+#include "video/bufsprite.h"
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
-
 
 class galivan_state : public driver_device
 {
@@ -41,6 +38,7 @@ public:
 		, m_rombank(*this, "rombank")
 	{ }
 
+	void galivan_common(machine_config &config);
 	void galivan(machine_config &config);
 	void ninjemak(machine_config &config);
 	void youmab(machine_config &config);
@@ -49,8 +47,6 @@ public:
 
 protected:
 	void io_map(address_map &map);
-
-	void galivan_common(machine_config &config);
 	void video_config(machine_config &config);
 
 	required_device<cpu_device> m_maincpu;
@@ -135,4 +131,4 @@ private:
 	void dangarj_io_map(address_map &map);
 };
 
-#endif // MAME_NICHIBUTSU_GALIVAN_H
+#endif // MAME_INCLUDES_GALIVAN_H

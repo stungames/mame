@@ -92,7 +92,7 @@ public:
 	// EEPROM
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
-	void eeprom_cs_write(int state);
+	DECLARE_WRITE_LINE_MEMBER(eeprom_cs_write);
 
 	// PIC
 	u8 pic_status_r();
@@ -265,7 +265,7 @@ public:
 	// EEPROM
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
-	void eeprom_cs_write(int state);
+	DECLARE_WRITE_LINE_MEMBER(eeprom_cs_write);
 
 	u8 get_cart() const { return m_cart; }
 
@@ -548,7 +548,7 @@ void galgames_cart_device::eeprom_w(u8 data)
 	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void galgames_cart_device::eeprom_cs_write(int state)
+WRITE_LINE_MEMBER(galgames_cart_device::eeprom_cs_write)
 {
 	if (!m_eeprom)
 		return;
@@ -714,13 +714,10 @@ void galgames_slot_device::eeprom_w(u8 data)
 {
 	m_carts[m_cart]->eeprom_w(data);
 }
-void galgames_slot_device::eeprom_cs_write(int state)
+WRITE_LINE_MEMBER(galgames_slot_device::eeprom_cs_write)
 {
 	m_carts[m_cart]->eeprom_cs_write(state);
 }
-
-
-namespace {
 
 /***************************************************************************
 
@@ -742,7 +739,7 @@ public:
 		m_okiram(*this, "okiram")
 	{ }
 
-	void blitter_irq_callback(int state);
+	DECLARE_WRITE_LINE_MEMBER(blitter_irq_callback);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -780,7 +777,7 @@ protected:
 	u8 m_palette_data[3]{};
 };
 
-void galgames_state::blitter_irq_callback(int state)
+WRITE_LINE_MEMBER(galgames_state::blitter_irq_callback)
 {
 //  logerror("%s: Blitter IRQ callback state = %x\n", machine().describe_context(), state);
 	m_maincpu->set_input_line(2, state);
@@ -1233,8 +1230,6 @@ ROM_START(galgame4)
 
 	GALGAMES_MB_PALS
 ROM_END
-
-} // anonymous namespace
 
 
 GAME(1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)

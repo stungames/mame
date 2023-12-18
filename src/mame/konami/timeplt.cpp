@@ -109,9 +109,9 @@ private:
 	// misc
 	uint8_t m_nmi_enable = 0;
 
-	void nmi_enable_w(int state);
-	void video_enable_w(int state);
-	template <uint8_t Which> void coin_counter_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(video_enable_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	uint8_t scanline_r();
@@ -119,7 +119,7 @@ private:
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 };
 
 class psurge_state : public timeplt_state
@@ -145,7 +145,7 @@ public:
 
 	void bikkuric(machine_config &config);
 
-	int hopper_status_r();
+	DECLARE_READ_LINE_MEMBER(hopper_status_r);
 
 protected:
 	virtual void video_start() override;
@@ -330,7 +330,7 @@ void timeplt_state::colorram_w(offs_t offset, uint8_t data)
 }
 
 
-void timeplt_state::video_enable_w(int state)
+WRITE_LINE_MEMBER(timeplt_state::video_enable_w)
 {
 	m_video_enable = state;
 }
@@ -396,14 +396,14 @@ uint32_t timeplt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-void timeplt_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(timeplt_state::vblank_irq)
 {
 	if (state && m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-void timeplt_state::nmi_enable_w(int state)
+WRITE_LINE_MEMBER(timeplt_state::nmi_enable_w)
 {
 	m_nmi_enable = state;
 	if (!m_nmi_enable)
@@ -419,7 +419,7 @@ void timeplt_state::nmi_enable_w(int state)
  *************************************/
 
 template <uint8_t Which>
-void timeplt_state::coin_counter_w(int state)
+WRITE_LINE_MEMBER(timeplt_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }
@@ -443,7 +443,7 @@ void chkun_state::sound_w(uint8_t data)
 		m_tc8830f->reset();
 }
 
-int bikkuric_state::hopper_status_r()
+READ_LINE_MEMBER(bikkuric_state::hopper_status_r)
 {
 	// temp workaround, needs hopper
 	return machine().rand();

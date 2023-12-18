@@ -74,7 +74,6 @@ mame_machine_manager::mame_machine_manager(emu_options &options,osd_interface &o
 
 mame_machine_manager::~mame_machine_manager()
 {
-	m_autoboot_script.reset();
 	m_lua.reset();
 	s_manager = nullptr;
 }
@@ -267,15 +266,17 @@ int mame_machine_manager::execute()
 			mame_options::parse_standard_inis(m_options, errors, system);
 		}
 
-		// otherwise, perform validity checks before anything else
 		bool is_empty = (system == &GAME_NAME(___empty));
+
+		/*
+		// otherwise, perform validity checks before anything else		
 		if (!is_empty)
 		{
 			validity_checker valid(m_options, true);
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
-
+		*/
 		// create the machine configuration
 		machine_config config(*system, m_options);
 
@@ -337,7 +338,7 @@ TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
 		strreplace(cmd, "'", "\\'");
 		std::string val = std::string("emu.keypost('").append(cmd).append("')");
 		auto &l(*lua());
-		l.invoke(l.load_string(val).get<sol::protected_function>());
+		l.invoke(l.load_string(val));
 	}
 }
 
@@ -353,6 +354,8 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui->init();
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
+
+	m_ui->set_startup_text("Initializing...", true);
 
 	return m_ui.get();
 }
@@ -459,9 +462,9 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 	return start_frontend(options, osd, args);
 }
 
-bool emulator_info::draw_user_interface(running_machine& machine)
+void emulator_info::draw_user_interface(running_machine& machine)
 {
-	return mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
+	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()

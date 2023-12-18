@@ -1,18 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton, Jonathan Gevaryahu, Sandro Ronco, hap
-/*******************************************************************************
+/******************************************************************************
 
 Fidelity Voice Chess Challenger series hardware
-- Voice Chess Challenger (VCC) (2 revisions)
+- Voice Chess Challenger (VCC) (version A and B?)
 - Advanced Voice Chess Challenger (UVC)
-- Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
-- Decorator Challenger (FCC)
+- *Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
+- *Decorator Challenger (FCC)
 
-Grandmaster and FCC are verified to be the same PCB + ROMs as UVC. So even though
-they have a large wooden chessboard attached instead of a small plastic one, from
-MAME's perspective there's nothing to emulate on top of UVC.
+*: not dumped yet
 
-********************************************************************************
+*******************************************************************************
 
 RE notes by Kevin Horton
 
@@ -30,7 +28,7 @@ number, but the contents are identical.
 
 Memory map (VCC):
 -----------
-0000-0FFF: 4K 2332 ROM VCC1 or 101-32013
+0000-0FFF: 4K 2332 ROM 101-32013
 1000-1FFF: 4K 2332 ROM VCC2
 2000-2FFF: 4K 2332 ROM VCC3
 4000-5FFF: 1K RAM (2114 SRAM x2)
@@ -39,7 +37,7 @@ Memory map (VCC):
 Memory map (UVC):
 -----------
 0000-1FFF: 8K 2364 ROM 101-64017
-2000-2FFF: 4K 2332 ROM 101-32010 or VCC3
+2000-2FFF: 4K 2332 ROM 101-32010
 4000-5FFF: 1K RAM (2114 SRAM x2)
 6000-FFFF: empty
 
@@ -100,19 +98,17 @@ This way, the game can then detect which secondary language is present, and then
 automatically select the correct ROM(s).  I have to test whether it will do automatic
 determination and give you a language option on power up or something.
 
-*******************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/s14001a.h"
 #include "video/pwm.h"
-
 #include "speaker.h"
 
 // internal artwork
-#include "fidel_vcc.lh"
+#include "fidel_vcc.lh" // clickable
 
 
 namespace {
@@ -150,11 +146,6 @@ private:
 	required_region_ptr<u8> m_language;
 	required_ioport_array<4> m_inputs;
 
-	u8 m_led_select = 0;
-	u8 m_7seg_data = 0;
-	u8 m_inp_mux = 0;
-	u8 m_speech_bank = 0;
-
 	// address maps
 	void main_map(address_map &map);
 	void main_io(address_map &map);
@@ -167,6 +158,11 @@ private:
 	void ppi_portb_w(u8 data);
 	u8 ppi_portc_r();
 	void ppi_portc_w(u8 data);
+
+	u8 m_led_select = 0;
+	u8 m_7seg_data = 0;
+	u8 m_inp_mux = 0;
+	u8 m_speech_bank = 0;
 };
 
 void vcc_state::machine_start()
@@ -184,9 +180,9 @@ void vcc_state::machine_start()
 
 
 
-/*******************************************************************************
+/******************************************************************************
     I/O
-*******************************************************************************/
+******************************************************************************/
 
 // misc handlers
 
@@ -264,9 +260,9 @@ void vcc_state::ppi_portc_w(u8 data)
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Address Maps
-*******************************************************************************/
+******************************************************************************/
 
 void vcc_state::main_map(address_map &map)
 {
@@ -283,9 +279,9 @@ void vcc_state::main_io(address_map &map)
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Input Ports
-*******************************************************************************/
+******************************************************************************/
 
 static INPUT_PORTS_START( vcc )
 	PORT_START("IN.0")
@@ -318,13 +314,13 @@ INPUT_PORTS_END
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Machine Configs
-*******************************************************************************/
+******************************************************************************/
 
 void vcc_state::vcc(machine_config &config)
 {
-	// basic machine hardware
+	/* basic machine hardware */
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vcc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vcc_state::main_io);
@@ -338,12 +334,12 @@ void vcc_state::vcc(machine_config &config)
 	m_ppi8255->in_pc_callback().set(FUNC(vcc_state::ppi_portc_r));
 	m_ppi8255->out_pc_callback().set(FUNC(vcc_state::ppi_portc_w));
 
-	// video hardware
+	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 8);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_fidel_vcc);
 
-	// sound hardware
+	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
 	m_speech->ext_read().set(FUNC(vcc_state::speech_r));
@@ -352,9 +348,9 @@ void vcc_state::vcc(machine_config &config)
 
 
 
-/*******************************************************************************
+/******************************************************************************
     ROM Definitions
-*******************************************************************************/
+******************************************************************************/
 
 ROM_START( vcc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -413,10 +409,10 @@ ROM_END
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Drivers
-*******************************************************************************/
+******************************************************************************/
 
-//    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1979, vcc,  0,      0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-SYST( 1980, uvc,  vcc,    0,      vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME  PARENT CMP MACHINE  INPUT  STATE      INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1979, vcc,  0,      0, vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvc,  vcc,    0, vcc,     vcc,   vcc_state, empty_init, "Fidelity Electronics", "Advanced Voice Chess Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

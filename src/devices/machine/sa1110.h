@@ -96,7 +96,7 @@ protected:
 	void icp_uart_begin_of_break();
 	void icp_uart_end_of_break();
 
-	void uart3_irq_callback(int state);
+	DECLARE_WRITE_LINE_MEMBER(uart3_irq_callback);
 	void uart_recalculate_divisor();
 	void uart_update_eif_status();
 	void uart_write_receive_fifo(uint16_t data_and_flags);
@@ -112,7 +112,7 @@ protected:
 	void uart_set_receive_irq_enabled(bool enabled);
 	void uart_set_transmit_irq_enabled(bool enabled);
 
-	void mcp_irq_callback(int state);
+	DECLARE_WRITE_LINE_MEMBER(mcp_irq_callback);
 	TIMER_CALLBACK_MEMBER(mcp_audio_tx_callback);
 	TIMER_CALLBACK_MEMBER(mcp_telecom_tx_callback);
 	void mcp_update_sample_rate();

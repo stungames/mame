@@ -64,7 +64,7 @@ public:
 
 	huc1_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual std::error_condition load(std::string &message) override ATTR_COLD;
+	virtual image_init_result load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
@@ -91,13 +91,13 @@ huc1_device::huc1_device(
 }
 
 
-std::error_condition huc1_device::load(std::string &message)
+image_init_result huc1_device::load(std::string &message)
 {
 	// check for valid ROM/RAM regions
 	set_bank_bits_rom(2, 6);
 	set_bank_bits_ram(2);
 	if (!check_rom(message) || !check_ram(message))
-		return image_error::BADSOFTWARE;
+		return image_init_result::FAIL;
 
 	// if that checked out, install memory
 	install_rom();
@@ -106,25 +106,25 @@ std::error_condition huc1_device::load(std::string &message)
 	// install memory controller handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			emu::rw_delegate(*this, FUNC(huc1_device::infrared_select)));
+			write8smo_delegate(*this, FUNC(huc1_device::infrared_select)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			emu::rw_delegate(*this, FUNC(huc1_device::bank_switch_fine)));
+			write8smo_delegate(*this, FUNC(huc1_device::bank_switch_fine)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			emu::rw_delegate(*this, FUNC(huc1_device::bank_switch_coarse)));
+			write8smo_delegate(*this, FUNC(huc1_device::bank_switch_coarse)));
 
 	// install infrared handlers
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ir);
 	m_view_ir[0].install_read_handler(
 			0xa000, 0xbfff,
-			emu::rw_delegate(*this, FUNC(huc1_device::read_ir)));
+			read8mo_delegate(*this, FUNC(huc1_device::read_ir)));
 	m_view_ir[0].install_write_handler(
 			0xa000, 0xbfff,
-			emu::rw_delegate(*this, FUNC(huc1_device::write_ir)));
+			write8smo_delegate(*this, FUNC(huc1_device::write_ir)));
 
 	// all good
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 

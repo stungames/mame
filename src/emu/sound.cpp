@@ -12,7 +12,6 @@
 
 #include "config.h"
 #include "emuopts.h"
-#include "main.h"
 #include "speaker.h"
 
 #include "wavwrite.h"
@@ -33,11 +32,19 @@
 #define LOG_OUTPUT_WAV  (0)
 
 
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
 const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
+
 
 
 //**************************************************************************
@@ -704,7 +711,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 	if (start > end)
 		start = end;
 
-	auto profile = g_profiler.start(PROFILER_SOUND);
+	g_profiler.start(PROFILER_SOUND);
 
 	// reposition our start to coincide with the current buffer end
 	attotime update_start = m_output[outputnum].end_time();
@@ -752,6 +759,7 @@ read_stream_view sound_stream::update_view(attotime start, attotime end, u32 out
 #endif
 		}
 	}
+	g_profiler.stop();
 
 	// return the requested view
 	return read_stream_view(m_output_view[outputnum], start);
@@ -1369,42 +1377,18 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 
 	// master volume attenuation
 	if (util::xml::data_node const *node = parentnode->get_child("attenuation"))
-	{
-		// treat source INI files or more specific as higher priority than CFG
-		// FIXME: leaky abstraction - this depends on a front-end implementation detail
-		if ((OPTION_PRIORITY_NORMAL + 5) > machine().options().get_entry(OPTION_VOLUME)->priority())
-			set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
-	}
+		set_attenuation(std::clamp(int(node->get_attribute_int("value", 0)), -32, 0));
 
 	// iterate over channel nodes
-	for (util::xml::data_node const *node = parentnode->get_child("channel"); node != nullptr; node = node->get_next_sibling("channel"))
+	for (util::xml::data_node const *channelnode = parentnode->get_child("channel"); channelnode != nullptr; channelnode = channelnode->get_next_sibling("channel"))
 	{
 		mixer_input info;
-		if (indexed_mixer_input(node->get_attribute_int("index", -1), info))
+		if (indexed_mixer_input(channelnode->get_attribute_int("index", -1), info))
 		{
-			// note that this doesn't disallow out-of-range values
-			float value = node->get_attribute_float("value", std::nanf(""));
-
-			if (!std::isnan(value))
-				info.stream->input(info.inputnum).set_user_gain(value);
-		}
-	}
-
-	// iterate over speaker panning nodes
-	for (util::xml::data_node const *node = parentnode->get_child("panning"); node != nullptr; node = node->get_next_sibling("panning"))
-	{
-		char const *const tag = node->get_attribute_string("tag", nullptr);
-		if (tag != nullptr)
-		{
-			for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
-			{
-				if (!strcmp(tag, speaker.tag()))
-				{
-					float value = node->get_attribute_float("value", speaker.defpan());
-					speaker.set_pan(value);
-					break;
-				}
-			}
+			float defvol = channelnode->get_attribute_float("defvol", 1.0f);
+			float newvol = channelnode->get_attribute_float("newvol", -1000.0f);
+			if (newvol != -1000.0f)
+				info.stream->input(info.inputnum).set_user_gain(newvol / defvol);
 		}
 	}
 }
@@ -1428,36 +1412,21 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 			node->set_attribute_int("value", m_attenuation);
 	}
 
-	// iterate over mixer channels for per-channel volume
+	// iterate over mixer channels
 	for (int mixernum = 0; ; mixernum++)
 	{
 		mixer_input info;
 		if (!indexed_mixer_input(mixernum, info))
 			break;
 
-		float const value = info.stream->input(info.inputnum).user_gain();
-		if (value != 1.0f)
+		float const newvol = info.stream->input(info.inputnum).user_gain();
+		if (newvol != 1.0f)
 		{
-			util::xml::data_node *const node = parentnode->add_child("channel", nullptr);
-			if (node)
+			util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
+			if (channelnode)
 			{
-				node->set_attribute_int("index", mixernum);
-				node->set_attribute_float("value", value);
-			}
-		}
-	}
-
-	// iterate over speakers for panning
-	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
-	{
-		float const value = speaker.pan();
-		if (value != speaker.defpan())
-		{
-			util::xml::data_node *const node = parentnode->add_child("panning", nullptr);
-			if (node)
-			{
-				node->set_attribute("tag", speaker.tag());
-				node->set_attribute_float("value", value);
+				channelnode->set_attribute_int("index", mixernum);
+				channelnode->set_attribute_float("newvol", newvol);
 			}
 		}
 	}
@@ -1508,11 +1477,11 @@ stream_buffer::sample_t sound_manager::adjust_toward_compressor_scale(stream_buf
 //  and send it to the OSD layer
 //-------------------------------------------------
 
-void sound_manager::update(s32 param)
+void sound_manager::update(int param)
 {
 	LOG("sound_update\n");
 
-	auto profile = g_profiler.start(PROFILER_SOUND);
+	g_profiler.start(PROFILER_SOUND);
 
 	// determine the duration of this update
 	attotime update_period = machine().time() - m_last_update;
@@ -1648,4 +1617,6 @@ void sound_manager::update(s32 param)
 
 	// notify that new samples have been generated
 	emulator_info::sound_hook();
+
+	g_profiler.stop();
 }

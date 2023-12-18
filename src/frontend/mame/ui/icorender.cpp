@@ -30,7 +30,9 @@
 // need to set LOG_OUTPUT_FUNC or LOG_OUTPUT_STREAM because there's no logerror outside devices
 #define LOG_OUTPUT_FUNC osd_printf_verbose
 
-//#define VERBOSE (LOG_GENERAL)
+#define LOG_GENERAL (1U << 0)
+
+//#define VERBOSE (LOG_GENERAL | LOG_DIB)
 
 #include "logmacro.h"
 
@@ -177,7 +179,7 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 {
 	// read the directory entry
 	std::error_condition err;
-	size_t actual;
+	size_t actual=0;
 	icon_dir_entry_t dir;
 	err = fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
 	if (!err)
@@ -210,8 +212,8 @@ int images_in_ico(util::core_file &fp)
 {
 	// read and check the icon file header
 	std::error_condition err;
-	size_t actual;
-	icon_dir_t header;
+	size_t actual=0;
+	icon_dir_t header = { 0 };
 	err = fp.seek(0, SEEK_SET);
 	if (!err)
 		err = fp.read(&header, sizeof(header), actual);

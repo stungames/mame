@@ -303,7 +303,7 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-void dynduke_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(dynduke_state::vblank_irq)
 {
 	if (state)
 	{

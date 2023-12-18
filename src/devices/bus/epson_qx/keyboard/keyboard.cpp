@@ -50,6 +50,8 @@ keyboard_port_device::keyboard_port_device(const machine_config &mconfig, const 
 
 void keyboard_port_device::device_start()
 {
+	// resolve callbacks
+	m_txd_handler.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -62,7 +64,7 @@ void keyboard_port_device::device_reset()
 	m_kbd = get_card_device();
 }
 
-void keyboard_port_device::txd_w(int state)
+WRITE_LINE_MEMBER( keyboard_port_device::txd_w )
 {
 	m_txd_handler(state);
 }
@@ -72,13 +74,13 @@ void keyboard_port_device::txd_w(int state)
 //  host to module interface
 //-------------------------------------------------
 
-void keyboard_port_device::rxd_w(int state)
+WRITE_LINE_MEMBER( keyboard_port_device::rxd_w )
 {
 	if (m_kbd)
 		m_kbd->rxd_w(state);
 }
 
-void keyboard_port_device::clk_w(int state)
+WRITE_LINE_MEMBER( keyboard_port_device::clk_w )
 {
 	if (m_kbd)
 		m_kbd->clk_w(state);
@@ -148,12 +150,12 @@ void keyboard_device::mcu_p2_w(uint8_t data)
 	}
 }
 
-void keyboard_device::rxd_w(int state)
+WRITE_LINE_MEMBER(keyboard_device::rxd_w)
 {
 	m_rxd = state;
 }
 
-void keyboard_device::clk_w(int state)
+WRITE_LINE_MEMBER(keyboard_device::clk_w)
 {
 	m_clk_state = !state;
 }

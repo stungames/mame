@@ -248,8 +248,6 @@ dgc (dg(no!spam)cx@mac.com)
 #include "speaker.h"
 
 
-namespace {
-
 class dectalk_state : public driver_device
 {
 public:
@@ -293,7 +291,7 @@ private:
 	required_device<scn2681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	void duart_txa(int state);
+	DECLARE_WRITE_LINE_MEMBER(duart_txa);
 	uint8_t duart_input();
 	void duart_output(uint8_t data);
 	uint8_t nvram_recall(offs_t offset);
@@ -308,7 +306,7 @@ private:
 	void spc_latch_outfifo_error_stats(uint16_t data);
 	uint16_t spc_infifo_data_r();
 	void spc_outfifo_data_w(uint16_t data);
-	int spc_semaphore_r();
+	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
 	virtual void machine_start() override;
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	emu_timer *m_outfifo_read_timer = nullptr;
@@ -316,7 +314,7 @@ private:
 	void clear_all_fifos();
 	void dsp_semaphore_w(bool state);
 	uint16_t dsp_outfifo_r();
-	void dectalk_reset(int state);
+	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
 
 	void m68k_mem(address_map &map);
 	void tms32010_io(address_map &map);
@@ -343,7 +341,7 @@ void dectalk_state::duart_output(uint8_t data)
 #endif
 }
 
-void dectalk_state::duart_txa(int state)
+WRITE_LINE_MEMBER(dectalk_state::duart_txa)
 {
 	//TODO: this needs to be plumbed so it shows up optionally on a second terminal somehow, or connects to diserial
 	// it is the second 'alternate' serial connection on the DTC-01, used for a serial passthru and other stuff.
@@ -419,7 +417,7 @@ uint16_t dectalk_state::dsp_outfifo_r (  )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-void dectalk_state::dectalk_reset(int state)
+WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
 {
 	m_hack_self_test_is_second_read = false; // hack
 	// stuff that is DIRECTLY affected by the RESET line
@@ -730,7 +728,7 @@ void dectalk_state::spc_outfifo_data_w(uint16_t data)
 	//outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
-int dectalk_state::spc_semaphore_r()// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
 #ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore); // commented due to extreme annoyance factor
@@ -975,10 +973,8 @@ ROM_START( dectalk )
 	ROM_FILL(0xfd, 0x01, 0x02) // "
 	ROM_FILL(0xfe, 0x01, 0x05) // "
 	ROM_FILL(0xff, 0x01, 0x0b) // "
+
 ROM_END
-
-} // anonymous namespace
-
 
 /******************************************************************************
  Drivers

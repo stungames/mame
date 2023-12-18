@@ -117,12 +117,12 @@ mb88_cpu_device::mb88_cpu_device(const machine_config &mconfig, device_type type
 	, m_program_config("program", ENDIANNESS_BIG, 8, program_width, 0, (program_width == 9) ? address_map_constructor(FUNC(mb88_cpu_device::program_9bit), this) : (program_width == 10) ? address_map_constructor(FUNC(mb88_cpu_device::program_10bit), this) : address_map_constructor(FUNC(mb88_cpu_device::program_11bit), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, data_width, 0, (data_width == 4) ? address_map_constructor(FUNC(mb88_cpu_device::data_4bit), this) : (data_width == 5) ? address_map_constructor(FUNC(mb88_cpu_device::data_5bit), this) : (data_width == 6) ? address_map_constructor(FUNC(mb88_cpu_device::data_6bit), this) : address_map_constructor(FUNC(mb88_cpu_device::data_7bit), this))
 	, m_PLA(nullptr)
-	, m_read_k(*this, 0)
+	, m_read_k(*this)
 	, m_write_o(*this)
 	, m_write_p(*this)
-	, m_read_r(*this, 0)
+	, m_read_r(*this)
 	, m_write_r(*this)
-	, m_read_si(*this, 0)
+	, m_read_si(*this)
 	, m_write_so(*this)
 {
 }
@@ -184,6 +184,14 @@ void mb88_cpu_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
+
+	m_read_k.resolve_safe(0);
+	m_write_o.resolve_safe();
+	m_write_p.resolve_safe();
+	m_read_r.resolve_all_safe(0);
+	m_write_r.resolve_all_safe();
+	m_read_si.resolve_safe(0);
+	m_write_so.resolve_safe();
 
 	m_serial = timer_alloc(FUNC(mb88_cpu_device::serial_timer), this);
 
@@ -415,9 +423,7 @@ void mb88_cpu_device::update_pio( int cycles )
 	/* process pending interrupts */
 	if (m_pending_interrupt & m_pio)
 	{
-		uint16_t intpc = GETPC();
-
-		m_SP[m_SI] = intpc;
+		m_SP[m_SI] = GETPC();
 		m_SP[m_SI] |= TEST_CF() << 15;
 		m_SP[m_SI] |= TEST_ZF() << 14;
 		m_SP[m_SI] |= TEST_ST() << 13;
@@ -428,7 +434,7 @@ void mb88_cpu_device::update_pio( int cycles )
 		if (m_pending_interrupt & m_pio & INT_CAUSE_EXTERNAL)
 		{
 			/* if we have a live external source, call the irqcallback */
-			standard_irq_callback( 0, intpc );
+			standard_irq_callback( 0 );
 			/* The datasheet doesn't mention if the interrupt flag
 			 * is cleared, but it seems to be only for this case. */
 			m_pio &= ~INT_CAUSE_EXTERNAL;
@@ -436,12 +442,10 @@ void mb88_cpu_device::update_pio( int cycles )
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_TIMER)
 		{
-			standard_irq_callback( 1, intpc );
 			m_PC = 0x04;
 		}
 		else if (m_pending_interrupt & m_pio & INT_CAUSE_SERIAL)
 		{
-			standard_irq_callback( 2, intpc );
 			m_PC = 0x06;
 		}
 
@@ -453,7 +457,7 @@ void mb88_cpu_device::update_pio( int cycles )
 	}
 }
 
-void mb88_cpu_device::clock_w(int state)
+WRITE_LINE_MEMBER( mb88_cpu_device::clock_w )
 {
 	if (state != m_ctr)
 	{

@@ -44,7 +44,7 @@
 #include "speaker.h"
 #include "utf8.h"
 
-void pc8001_base_state::crtc_reverse_w(int state)
+WRITE_LINE_MEMBER( pc8001_base_state::crtc_reverse_w )
 {
 	// rvv acts as a global flip for reverse attribute meaning
 	// (does not act on underlying palette)
@@ -271,12 +271,12 @@ void pc8001mk2_state::port31_w(uint8_t data)
 	membank("bank2")->set_entry(data & 1);
 }
 
-void pc8001_base_state::write_centronics_busy(int state)
+WRITE_LINE_MEMBER( pc8001_base_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
 }
 
-void pc8001_base_state::write_centronics_ack(int state)
+WRITE_LINE_MEMBER( pc8001_base_state::write_centronics_ack )
 {
 	m_centronics_ack = state;
 }
@@ -634,7 +634,7 @@ INPUT_PORTS_END
 
 /* 8257 Interface */
 
-void pc8001_base_state::hrq_w(int state)
+WRITE_LINE_MEMBER( pc8001_base_state::hrq_w )
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);

@@ -1089,6 +1089,7 @@ uint32_t v60_device::am1ImmediateQuick()
 uint32_t v60_device::am1Error1()
 {
 	fatalerror("CPU - AM1 - 1 (PC=%06x)\n", PC);
+	return 0;
 }
 
 uint32_t v60_device::bam1Error1()

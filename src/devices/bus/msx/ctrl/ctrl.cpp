@@ -16,7 +16,6 @@
 #include "sgadapt.h"
 #include "towns6b.h"
 #include "townspad.h"
-#include "vaus.h"
 #include "xe1ap.h"
 
 
@@ -54,6 +53,5 @@ void msx_general_purpose_port_devices(device_slot_interface &device)
 	device.option_add("sega", MSX_SEGACTRL);
 	device.option_add("towns6b", MSX_TOWNS6B);
 	device.option_add("townspad", MSX_TOWNSPAD);
-	device.option_add("vaus", MSX_VAUS);
 	device.option_add("xe1ap", MSX_XE1AP);
 }

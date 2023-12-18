@@ -107,9 +107,6 @@ TEST.TXT - suggests the content of a prototype version, which was expanded to ma
 #include "screen.h"
 #include "speaker.h"
 
-
-namespace {
-
 class bfm_swp_state : public driver_device
 {
 public:
@@ -149,7 +146,7 @@ uint16_t bfm_swp_state::bfm_swp_mem_r(offs_t offset, uint16_t mem_mask)
 	switch ( cs )
 	{
 		case 1:
-			return m_cpuregion[offset & 0x7ffff];
+			return m_cpuregion[offset & 0xfffff];
 		case 2:
 			return m_mainram[offset & 0x1fff];
 
@@ -294,7 +291,7 @@ ROM_START( c3_ppays )
 	DISK_IMAGE_READONLY( "cd or hdd", 0, NO_DUMP )
 ROM_END
 
-} // anonymous namespace
+
 
 
 GAME( 199?, c3_rtime, 0, bfm_swp, bfm_swp, bfm_swp_state, empty_init, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )

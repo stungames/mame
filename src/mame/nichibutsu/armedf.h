@@ -1,20 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
-#ifndef MAME_NICHIBUTSU_ARMEDF_H
-#define MAME_NICHIBUTSU_ARMEDF_H
+#ifndef MAME_INCLUDES_ARMEDF_H
+#define MAME_INCLUDES_ARMEDF_H
 
 #pragma once
 
 #include "nb1414m4.h"
-
 #include "machine/gen_latch.h"
-#include "sound/flt_biquad.h"
 #include "video/bufsprite.h"
-
+#include "sound/flt_biquad.h"
 #include "screen.h"
 #include "emupal.h"
 #include "tilemap.h"
-
 
 class armedf_state : public driver_device
 {
@@ -48,6 +45,7 @@ public:
 
 	void terraf(machine_config &config);
 	void terrafb(machine_config &config);
+	void legion_common(machine_config &config);
 	void legion(machine_config &config);
 	void legionjb(machine_config &config);
 	void legionjb2(machine_config &config);
@@ -59,8 +57,6 @@ public:
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	void legion_common(machine_config &config);
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
 	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
@@ -195,4 +191,4 @@ private:
 	void bigfghtr_mcu_map(address_map &map);
 };
 
-#endif // MAME_NICHIBUTSU_ARMEDF_H
+#endif // MAME_INCLUDES_ARMEDF_H

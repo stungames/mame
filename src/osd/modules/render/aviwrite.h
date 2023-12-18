@@ -6,19 +6,14 @@
 //
 //============================================================
 
-#ifndef MAME_RENDER_AVIWRITE_H
-#define MAME_RENDER_AVIWRITE_H
-
 #pragma once
 
-// emu
-#include "attotime.h"
+#ifndef __RENDER_AVIWRITE__
+#define __RENDER_AVIWRITE__
 
-// lib/util
 #include "aviio.h"
 
 #include <string_view>
-
 
 class running_machine;
 
@@ -54,4 +49,4 @@ private:
 	attotime                m_next_frame_time;
 };
 
-#endif // MAME_RENDER_AVIWRITE_H
+#endif // __RENDER_AVIWRITE__

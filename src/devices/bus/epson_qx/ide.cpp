@@ -41,8 +41,9 @@ INPUT_PORTS_END
 //  ide_device - constructor
 //-------------------------------------------------
 ide_device::ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ide_hdd_device_base(mconfig, EPSON_QX_OPTION_IDE, tag, owner, clock),
+	device_t(mconfig, EPSON_QX_OPTION_IDE, tag, owner, clock),
 	device_option_expansion_interface(mconfig, *this),
+	m_hdd(*this, "hdd"),
 	m_iobase(*this, "IOBASE"),
 	m_installed(false)
 {
@@ -57,12 +58,18 @@ ioport_constructor ide_device::device_input_ports() const
 }
 
 //-------------------------------------------------
+//  device_add_mconfig - device-specific config
+//-------------------------------------------------
+void ide_device::device_add_mconfig(machine_config &config)
+{
+	IDE_HARDDISK(config, m_hdd, 0);
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 void ide_device::device_start()
 {
-	ide_hdd_device_base::device_start();
-
 	m_installed = false;
 
 	save_item(NAME(m_installed));
@@ -73,8 +80,6 @@ void ide_device::device_start()
 //-------------------------------------------------
 void ide_device::device_reset()
 {
-	ide_hdd_device_base::device_reset();
-
 	if (!m_installed) {
 		address_space &space = m_bus->iospace();
 		offs_t iobase = m_iobase->read() & 0xf0;
@@ -86,9 +91,9 @@ void ide_device::device_reset()
 uint8_t ide_device::read(offs_t offset)
 {
 	if (offset < 8) {
-		return command_r(offset);
+		return m_hdd->read_cs0(offset);
 	} else if (offset == 14 || offset == 15) {
-		return control_r(offset & 7);
+		return m_hdd->read_cs1(offset & 7);
 	}
 	return 0xff;
 }
@@ -96,9 +101,9 @@ uint8_t ide_device::read(offs_t offset)
 void ide_device::write(offs_t offset, uint8_t data)
 {
 	if (offset < 8) {
-		command_w(offset, data);
+		m_hdd->write_cs0(offset, data);
 	} else if (offset == 14) {
-		control_w(offset & 7, data);
+		m_hdd->write_cs1(offset & 7, data);
 	}
 }
 

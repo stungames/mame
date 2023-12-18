@@ -4,8 +4,6 @@
 // Creation of unformatted floppy images
 
 #include "fs_unformatted.h"
-#include "flopimg.h"
-#include "fsblk.h"
 
 namespace fs {
 

@@ -98,7 +98,7 @@ upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag,
 	, m_upd_clock(0)
 	, m_out_hreq_cb(*this)
 	, m_out_eop_cb(*this)
-	, m_dma_read_cb(*this, 0)
+	, m_dma_read_cb(*this)
 	, m_dma_write_cb(*this)
 	, m_out_dack_cb(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -111,6 +111,11 @@ upd71071_device::upd71071_device(const machine_config &mconfig, const char *tag,
 
 void upd71071_device::device_start()
 {
+	m_out_hreq_cb.resolve_safe();
+	m_out_eop_cb.resolve_safe();
+	m_dma_read_cb.resolve_all_safe(0);
+	m_dma_write_cb.resolve_all_safe();
+	m_out_dack_cb.resolve_all_safe();
 	for (auto &elem : m_timer)
 		elem = timer_alloc(FUNC(upd71071_device::dma_transfer_timer), this);
 	m_selected_channel = 0;
@@ -163,7 +168,7 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 		case 1:
 		case 2:
 		case 3:
-			if (!m_dma_read_cb[channel].isunset())
+			if (!m_dma_read_cb[channel].isnull())
 				data = m_dma_read_cb[channel](0);
 			break;
 		}
@@ -218,7 +223,8 @@ TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
 		case 1:
 		case 2:
 		case 3:
-			m_dma_write_cb[channel](offs_t(0), data);
+			if (!m_dma_write_cb[channel].isnull())
+				m_dma_write_cb[channel](offs_t(0), data);
 			break;
 		}
 		if (m_reg.mode_control[channel] & 0x20)  // Address direction
@@ -468,7 +474,7 @@ void upd71071_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-void upd71071_device::set_hreq(int state)
+WRITE_LINE_MEMBER(upd71071_device::set_hreq)
 {
 	if (m_hreq != state)
 	{
@@ -477,7 +483,7 @@ void upd71071_device::set_hreq(int state)
 	}
 }
 
-void upd71071_device::set_eop(int state)
+WRITE_LINE_MEMBER(upd71071_device::set_eop)
 {
 	if (m_eop != state)
 	{

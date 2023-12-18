@@ -72,7 +72,7 @@ enum int_levels
  *
  *************************************/
 
-void jpmsys5v_state::generate_tms34061_interrupt(int state)
+WRITE_LINE_MEMBER(jpmsys5v_state::generate_tms34061_interrupt)
 {
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }
@@ -632,7 +632,7 @@ INPUT_PORTS_END
  *  6821 PIA
  *
  *************************************/
-void jpmsys5_state::pia_irq(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::pia_irq)
 {
 	m_maincpu->set_input_line(INT_6821PIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -664,13 +664,13 @@ void jpmsys5_state::u29_portb_w(uint8_t data)
 	}
 }
 
-void jpmsys5_state::u29_ca2_w(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::u29_ca2_w)
 {
 	//The 'CHOP' line controls power to the reel motors, without this the reels won't turn
 	m_chop = state;
 }
 
-void jpmsys5_state::u29_cb2_w(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::u29_cb2_w)
 {
 	//On a cabinet, this overrides the volume, we don't emulate this yet
 	logerror("Alarm override enabled \n");
@@ -682,12 +682,12 @@ void jpmsys5_state::u29_cb2_w(int state)
  *
  *************************************/
 
-void jpmsys5_state::ptm_irq(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 {
 	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void jpmsys5_state::u26_o1_callback(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
 {
 	if (m_mpxclk != state)
 	{
@@ -708,17 +708,17 @@ void jpmsys5_state::u26_o1_callback(int state)
  *
  *************************************/
 
-void jpmsys5_state::a0_tx_w(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::a0_tx_w)
 {
 	m_a0_data_out = state;
 }
 
-void jpmsys5_state::a1_tx_w(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::a1_tx_w)
 {
 	m_a1_data_out = state;
 }
 
-void jpmsys5_state::a2_tx_w(int state)
+WRITE_LINE_MEMBER(jpmsys5_state::a2_tx_w)
 {
 	m_a2_data_out = state;
 }
@@ -787,7 +787,7 @@ void jpmsys5_state::jpmsys5_common(machine_config& config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	S16LF01(config, m_vfd);
 
-	pia6821_device &pia(PIA6821(config, "6821pia"));
+	pia6821_device &pia(PIA6821(config, "6821pia", 0));
 	pia.readpa_handler().set(FUNC(jpmsys5_state::u29_porta_r));
 	pia.writepb_handler().set(FUNC(jpmsys5_state::u29_portb_w));
 	pia.ca2_handler().set(FUNC(jpmsys5_state::u29_ca2_w));

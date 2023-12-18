@@ -703,36 +703,36 @@ void laser2001_state::pia_pb_w(uint8_t data)
 	m_cent_data_out->write(data);
 }
 
-int laser2001_state::pia_ca1_r()
+READ_LINE_MEMBER( laser2001_state::pia_ca1_r )
 {
 	return (m_cassette->input() > 0.16) ? 0 : 1;
 }
 
-void laser2001_state::pia_ca2_w(int state)
+WRITE_LINE_MEMBER( laser2001_state::pia_ca2_w )
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }
 
 
-void laser2001_state::write_centronics_busy(int state)
+WRITE_LINE_MEMBER(laser2001_state::write_centronics_busy)
 {
 	m_centronics_busy = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-void laser2001_state::write_psg_ready(int state)
+WRITE_LINE_MEMBER(laser2001_state::write_psg_ready)
 {
 	m_psg_ready = state;
 	m_pia->cb1_w(pia_cb1_r());
 }
 
-int laser2001_state::pia_cb1_r()
+READ_LINE_MEMBER( laser2001_state::pia_cb1_r )
 {
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if no device is mounted -> Manager won't boot */
 	return m_psg_ready && (!m_centronics_busy || m_pia->ca2_output_z());
 }
 
-void laser2001_state::pia_cb2_w(int state)
+WRITE_LINE_MEMBER( laser2001_state::pia_cb2_w )
 {
 	if (m_pia->ca2_output_z())
 	{
@@ -802,7 +802,7 @@ void crvision_state::creativision(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crvision_state::crvision_map);
 
 	// devices
-	PIA6821(config, m_pia);
+	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
@@ -881,7 +881,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &laser2001_state::lasr2001_map);
 
 	// devices
-	PIA6821(config, m_pia);
+	PIA6821(config, m_pia, 0);
 	m_pia->readpa_handler().set(FUNC(laser2001_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(laser2001_state::pia_pb_r));
 	m_pia->readca1_handler().set(FUNC(laser2001_state::pia_ca1_r));

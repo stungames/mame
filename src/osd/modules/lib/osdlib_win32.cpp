@@ -218,7 +218,7 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 			GlobalFree(clip);
 			return win_error_to_error_condition(err);
 		}
-		if (!EmptyClipboard())
+		if (!OpenClipboard(nullptr))
 		{
 			DWORD const err(GetLastError());
 			CloseClipboard();
@@ -253,7 +253,7 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 //  osd_getpid
 //============================================================
 
-int osd_getpid() noexcept
+int osd_getpid()
 {
 	return GetCurrentProcessId();
 }
@@ -324,13 +324,13 @@ private:
 } // anonymous namespace
 
 
-bool invalidate_instruction_cache(void const *start, std::size_t size) noexcept
+bool invalidate_instruction_cache(void const *start, std::size_t size)
 {
 	return FlushInstructionCache(GetCurrentProcess(), start, size) != 0;
 }
 
 
-void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size) noexcept
+void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blocks, unsigned intent, std::size_t &size, std::size_t &page_size)
 {
 	SYSTEM_INFO info;
 	GetSystemInfo(&info);
@@ -349,19 +349,19 @@ void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blo
 	return result;
 }
 
-void virtual_memory_allocation::do_free(void *start, std::size_t size) noexcept
+void virtual_memory_allocation::do_free(void *start, std::size_t size)
 {
 	VirtualFree(start, 0, MEM_RELEASE);
 }
 
-bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access) noexcept
+bool virtual_memory_allocation::do_set_access(void *start, std::size_t size, unsigned access)
 {
-	DWORD p;
+	DWORD p, o;
 	if (access & EXECUTE)
 		p = (access & WRITE) ? PAGE_EXECUTE_READWRITE : (access & READ) ? PAGE_EXECUTE_READ : PAGE_EXECUTE;
 	else
 		p = (access & WRITE) ? PAGE_READWRITE : (access & READ) ? PAGE_READONLY : PAGE_NOACCESS;
-	return VirtualAlloc(start, size, MEM_COMMIT, p) != nullptr;
+	return VirtualProtect(start, size, p, &o) != 0;
 }
 
 

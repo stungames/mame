@@ -51,8 +51,6 @@
 #include "dlair.lh"
 
 
-namespace {
-
 class dlair_state : public driver_device
 {
 public:
@@ -70,8 +68,8 @@ public:
 	{
 	}
 
-	int laserdisc_status_r();
-	int laserdisc_command_r();
+	DECLARE_READ_LINE_MEMBER(laserdisc_status_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_command_r);
 	void init_fixed();
 	void init_variable();
 
@@ -130,7 +128,7 @@ private:
 	virtual void machine_reset() override;
 	void dleuro_palette(palette_device &palette) const;
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void write_speaker(int state);
+	DECLARE_WRITE_LINE_MEMBER(write_speaker);
 
 	void dleuro_io_map(address_map &map);
 	void dleuro_map(address_map &map);
@@ -181,7 +179,7 @@ static const uint8_t led_map[16] =
  *
  *************************************/
 
-void dlair_state::write_speaker(int state)
+WRITE_LINE_MEMBER(dlair_state::write_speaker)
 {
 	m_speaker->level_w(state);
 }
@@ -342,13 +340,13 @@ void dlair_state::led_den2_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-int dlair_state::laserdisc_status_r()
+READ_LINE_MEMBER(dlair_state::laserdisc_status_r)
 {
 	return laserdisc_status_strobe_r();
 }
 
 
-int dlair_state::laserdisc_command_r()
+READ_LINE_MEMBER(dlair_state::laserdisc_command_r)
 {
 	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
@@ -1028,7 +1026,6 @@ void dlair_state::init_variable()
 //  m_laserdisc_type = LASERDISC_TYPE_VARIABLE;
 }
 
-} // anonymous namespace
 
 
 /*************************************

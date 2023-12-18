@@ -114,14 +114,17 @@ void bbc_romslot_device::device_start()
 //  call load
 //-------------------------------------------------
 
-std::pair<std::error_condition, std::string> bbc_romslot_device::call_load()
+image_init_result bbc_romslot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size % 0x2000)
-			return std::make_pair(image_error::INVALIDLENGTH, "Invalid ROM size (must be a multiple of 8K)");
+		{
+			seterror(image_error::INVALIDIMAGE, "Invalid ROM size");
+			return image_init_result::FAIL;
+		}
 
 		m_cart->rom_alloc(size, tag());
 
@@ -139,7 +142,7 @@ std::pair<std::error_condition, std::string> bbc_romslot_device::call_load()
 			m_cart->nvram_alloc(get_software_region_length("nvram"));
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 //-------------------------------------------------

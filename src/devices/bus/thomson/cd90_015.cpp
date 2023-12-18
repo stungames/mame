@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// CD 90-015 - Floppy disk interface built from a MC6843 single-density controller
+// CD 90-015 - Floppy drive controller built from a MC6843
 //
-// Handles up to four 5.25 single-sided drives (UD 90-070). Formatted capacity is 80 KB.
-// The lack of a track zero sensor is confirmed from schematics.
+// Handles up to four 5.25 single-sided drives (UD 90-070)
 
 #include "emu.h"
 #include "cd90_015.h"

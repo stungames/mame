@@ -23,7 +23,7 @@ public:
 
 	void policetr(machine_config &config);
 
-	int bsmt_status_r();
+	DECLARE_READ_LINE_MEMBER(bsmt_status_r);
 
 protected:
 	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr) :
@@ -62,7 +62,7 @@ protected:
 
 	void video_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t video_r();
-	void vblank(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank);
 	void render_display_list(offs_t offset);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

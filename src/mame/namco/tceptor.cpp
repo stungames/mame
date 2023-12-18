@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "tceptor.h"
 
-#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
@@ -70,32 +69,54 @@ void tceptor_state::mcu_irq_disable_w(uint8_t data)
 /* fix dsw/input data to memory mapped data */
 uint8_t tceptor_state::fix_input0(uint8_t in1, uint8_t in2)
 {
-	return bitswap<4>(in1,1,3,5,7) | bitswap<4>(in2,1,3,5,7) << 4;
+	uint8_t r = 0;
+
+	r |= (in1 & 0x80) >> 7;
+	r |= (in1 & 0x20) >> 4;
+	r |= (in1 & 0x08) >> 1;
+	r |= (in1 & 0x02) << 2;
+	r |= (in2 & 0x80) >> 3;
+	r |= (in2 & 0x20) >> 0;
+	r |= (in2 & 0x08) << 3;
+	r |= (in2 & 0x02) << 6;
+
+	return r;
 }
 
 uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 {
-	return bitswap<4>(in1,0,2,4,6) | bitswap<4>(in2,0,2,4,6) << 4;
+	uint8_t r = 0;
+
+	r |= (in1 & 0x40) >> 6;
+	r |= (in1 & 0x10) >> 3;
+	r |= (in1 & 0x04) >> 0;
+	r |= (in1 & 0x01) << 3;
+	r |= (in2 & 0x40) >> 2;
+	r |= (in2 & 0x10) << 1;
+	r |= (in2 & 0x04) << 4;
+	r |= (in2 & 0x01) << 7;
+
+	return r;
 }
 
 uint8_t tceptor_state::dsw0_r()
 {
-	return fix_input0(m_dsw[0]->read(), m_dsw[1]->read());
+	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
 uint8_t tceptor_state::dsw1_r()
 {
-	return fix_input1(m_dsw[0]->read(), m_dsw[1]->read());
+	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
 uint8_t tceptor_state::input0_r()
 {
-	return fix_input0(m_inp[0]->read(), m_inp[1]->read());
+	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
 uint8_t tceptor_state::input1_r()
 {
-	return fix_input1(m_inp[0]->read(), m_inp[1]->read());
+	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
 /*******************************************************************/
@@ -155,6 +176,8 @@ void tceptor_state::m68k_map(address_map &map)
 
 void tceptor_state::mcu_map(address_map &map)
 {
+	map(0x0000, 0x001f).m("mcu", FUNC(hd63701v0_cpu_device::m6801_io));
+	map(0x0080, 0x00ff).ram();
 	map(0x1000, 0x13ff).rw(m_cus30, FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x1400, 0x154d).ram();
 	map(0x17c0, 0x17ff).ram();
@@ -165,9 +188,10 @@ void tceptor_state::mcu_map(address_map &map)
 	map(0x2201, 0x2201).r(FUNC(tceptor_state::input1_r));
 	map(0x8000, 0x8000).w(FUNC(tceptor_state::mcu_irq_disable_w));
 	map(0x8800, 0x8800).w(FUNC(tceptor_state::mcu_irq_enable_w));
-	map(0x8000, 0xbfff).rom().region("mcusub", 0);
+	map(0x8000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xdfff).ram().share("nvram"); // Battery Backup
+	map(0xf000, 0xffff).rom();
 }
 
 
@@ -175,20 +199,6 @@ void tceptor_state::mcu_map(address_map &map)
 /*******************************************************************/
 
 static INPUT_PORTS_START( tceptor )
-	PORT_START("IN0") // Memory Mapped Port
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shot
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shot
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bomb
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1") // Memory Mapped Port
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) // TEST SW
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("DSW1") // DSW 1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -219,6 +229,20 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x01, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("BUTTONS") // Memory Mapped Port
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shot
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shot
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bomb
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SERVICE") // Memory Mapped Port
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) // TEST SW
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PEDAL") // ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xd6) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_Z)
@@ -293,10 +317,10 @@ void tceptor_state::tceptor(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
-	R65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
+	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
 	m_audiocpu[0]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_a_map);
 
-	R65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
+	M65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
 	m_audiocpu[1]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_b_map);
 
 	M68000(config, m_subcpu, XTAL(49'152'000)/4);
@@ -309,7 +333,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	adc0809_device &adc(ADC0809(config, "adc", 768000)); // unknown clock
+	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
 	adc.in_callback<0>().set_constant(0); // unknown
 	adc.in_callback<1>().set_ioport("PEDAL");
 	adc.in_callback<2>().set_ioport("STICKX");
@@ -336,9 +360,7 @@ void tceptor_state::tceptor(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2151_device &ym(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
-	ym.add_route(0, "lspeaker", 1.0);
-	ym.add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
 	m_cus30->set_voices(8);
@@ -362,10 +384,10 @@ ROM_START( tceptor )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
@@ -373,11 +395,9 @@ ROM_START( tceptor )
 	ROM_LOAD16_BYTE( "tc1-3.10c",    0x000001, 0x08000, CRC(779a4b25) SHA1(8563213a1f1caee0eb88aa4bbd37c6004f16b309) )
 	// socket 8d and 10d are emtpy
 
-	ROM_REGION( 0x1000, "mcu", 0 )         // Custom 60A1
-	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
-
-	ROM_REGION( 0x4000, "mcusub", 0 )
-	ROM_LOAD( "tc1-2.3a",       0x0000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
+	ROM_REGION( 0x10000, "mcu", 0 )         // Custom 60A1
+	ROM_LOAD( "tc1-2.3a",       0x08000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
+	ROM_LOAD( "cus60-60a1.mcu", 0x0f000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    // text tilemap
 	ROM_LOAD( "tc1-18.6b",  0x00000, 0x02000, CRC(662b5650) SHA1(ba82fe5efd1011854a6d0d7d87075475b65c0601) )
@@ -420,10 +440,10 @@ ROM_START( tceptor2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
@@ -432,11 +452,9 @@ ROM_START( tceptor2 )
 	ROM_LOAD16_BYTE( "tc2-6.8d",     0x100000, 0x08000, CRC(20711f14) SHA1(39623592bb4be3b3be2bff4b3219ac16ba612761) )
 	ROM_LOAD16_BYTE( "tc2-5.10d",    0x100001, 0x08000, CRC(925f2560) SHA1(81fcef6a9c7e9dfb6884043cf2266854bc87cd69) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )         // Custom 60A1
-	ROM_LOAD( "cus60-60a1.mcu", 0x0000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
-
-	ROM_REGION( 0x4000, "mcusub", 0 )
-	ROM_LOAD( "tc1-2.3a",       0x0000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
+	ROM_REGION( 0x10000, "mcu", 0 )         // Custom 60A1
+	ROM_LOAD( "tc1-2.3a",       0x08000, 0x4000, CRC(b6def610) SHA1(d0eada92a25d0243206fb8239374f5757caaea47) ) /* subprogram for the mcu */
+	ROM_LOAD( "cus60-60a1.mcu", 0x0f000, 0x1000, CRC(076ea82a) SHA1(22b5e62e26390d7d5cacc0503c7aa5ed524204df) ) /* mcu internal code */
 
 	ROM_REGION( 0x02000, "gfx1", 0 )    // text tilemap
 	ROM_LOAD( "tc1-18.6b",  0x00000, 0x02000, CRC(662b5650) SHA1(ba82fe5efd1011854a6d0d7d87075475b65c0601) )

@@ -134,17 +134,17 @@ private:
 	bool m_nmi_sub = false;
 
 	void videoram_w(offs_t offset, uint8_t data);
-	void nmi_main_enable_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
 	void nmi_sub_enable_w(uint8_t data);
-	void coin_counter_1_w(int state);
-	void coin_counter_2_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	void bgcolor_w(uint8_t data);
 	void bg_scrollx_w(uint8_t data);
 	void fgpalette_w(uint8_t data);
 	void bg_scrolly_w(uint8_t data);
-	void fgbank_w(int state);
-	void bgbank_w(int state);
-	void flip_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(fgbank_w);
+	DECLARE_WRITE_LINE_MEMBER(bgbank_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_w);
 	uint8_t custom_r(offs_t offset);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -246,7 +246,7 @@ void pturn_state::videoram_w(offs_t offset, uint8_t data)
 }
 
 
-void pturn_state::nmi_main_enable_w(int state)
+WRITE_LINE_MEMBER(pturn_state::nmi_main_enable_w)
 {
 	m_nmi_main = state;
 	if (!m_nmi_main)
@@ -260,12 +260,12 @@ void pturn_state::nmi_sub_enable_w(uint8_t data)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void pturn_state::coin_counter_1_w(int state)
+WRITE_LINE_MEMBER(pturn_state::coin_counter_1_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-void pturn_state::coin_counter_2_w(int state)
+WRITE_LINE_MEMBER(pturn_state::coin_counter_2_w)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
@@ -293,19 +293,19 @@ void pturn_state::bg_scrolly_w(uint8_t data)
 	m_bgmap->set_scrollx(0, data);
 }
 
-void pturn_state::fgbank_w(int state)
+WRITE_LINE_MEMBER(pturn_state::fgbank_w)
 {
 	m_fgbank = state;
 	m_fgmap->mark_all_dirty();
 }
 
-void pturn_state::bgbank_w(int state)
+WRITE_LINE_MEMBER(pturn_state::bgbank_w)
 {
 	m_bgbank = state;
 	m_bgmap->mark_all_dirty();
 }
 
-void pturn_state::flip_w(int state)
+WRITE_LINE_MEMBER(pturn_state::flip_w)
 {
 	flip_screen_set(state);
 }

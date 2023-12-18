@@ -17,6 +17,7 @@
 #include "clipper.h"
 #include "clipperd.h"
 
+#define LOG_GENERAL   (1U << 0)
 #define LOG_EXCEPTION (1U << 1)
 #define LOG_SYSCALLS  (1U << 2)
 
@@ -183,7 +184,7 @@ void clipper_device::execute_run()
 	if (m_nmi)
 	{
 		// acknowledge non-maskable interrupt
-		standard_irq_callback(INPUT_LINE_NMI, m_pc);
+		standard_irq_callback(INPUT_LINE_NMI);
 
 		LOGMASKED(LOG_EXCEPTION, "non-maskable interrupt\n");
 		m_pc = intrap(EXCEPTION_INTERRUPT_BASE, m_pc);
@@ -196,7 +197,7 @@ void clipper_device::execute_run()
 		if ((m_ivec & IVEC_LEVEL) <= SSW(IL))
 		{
 			// acknowledge interrupt
-			standard_irq_callback(INPUT_LINE_IRQ0, m_pc);
+			standard_irq_callback(INPUT_LINE_IRQ0);
 
 			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_ivec * 8, m_pc);
 
@@ -308,9 +309,9 @@ device_memory_interface::space_config_vector clipper_device::memory_space_config
 	};
 }
 
-bool clipper_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+bool clipper_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	return (intention == TR_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address, target_space);
+	return ((intention & TRANSLATE_TYPE_MASK) == TRANSLATE_FETCH ? get_icammu() : get_dcammu()).memory_translate(m_ssw, spacenum, intention, address);
 }
 
 void clipper_device::set_exception(u16 data)

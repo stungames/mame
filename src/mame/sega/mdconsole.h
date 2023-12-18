@@ -10,7 +10,6 @@
 #include "mega32x.h"
 #include "megacd.h"
 
-#include "bus/generic/slot.h"
 #include "bus/megadrive/md_slot.h"
 #include "bus/megadrive/md_carts.h"
 #include "bus/sms_ctrl/smsctrl.h"
@@ -41,7 +40,7 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void screen_vblank_console(int state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 
@@ -78,11 +77,9 @@ public:
 		md_cons_state(mconfig, type, tag)
 	{ }
 
-	void ms_megadriv(machine_config &config);
-	void ms_megadrivj(machine_config &config);
 	void ms_megadpal(machine_config &config);
+	void ms_megadriv(machine_config &config);
 	void ms_megadriv2(machine_config &config);
-	void ms_nomad(machine_config &config);
 	void ms_megajet(machine_config &config);
 
 	void genesis_tmss(machine_config &config);

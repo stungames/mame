@@ -17,9 +17,6 @@
 
 #include "utf8.h"
 
-
-namespace {
-
 class eurit_state : public driver_device
 {
 public:
@@ -172,8 +169,7 @@ void eurit_state::eurit30(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(eurit_state::palette_init), 2);
 
-	hd44780_device &lcdc(SED1278(config, "lcdc", 250'000)); // TODO: clock not measured, datasheet typical clock used
-	lcdc.set_default_bios_tag("0b");
+	hd44780_device &lcdc(SED1278_0B(config, "lcdc", 0));
 	lcdc.set_lcd_size(2, 20);
 	lcdc.set_pixel_update_cb(FUNC(eurit_state::lcd_pixel_update));
 }
@@ -183,8 +179,6 @@ ROM_START(eurit30)
 	ROM_REGION16_LE(0x20000, "firmware", 0) // Firmware 2.210 deutsch
 	ROM_LOAD("d_2.210", 0x00000, 0x20000, CRC(c77be0ac) SHA1(1eaba66dcb4f64cc33565ca85de25341572ddb2e))
 ROM_END
-
-} // anonymous namespace
 
 
 SYST(1996, eurit30, 0, 0, eurit30, eurit30, eurit_state, empty_init, "Ascom", "Eurit 30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

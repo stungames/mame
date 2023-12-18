@@ -69,7 +69,7 @@ void mps1200_device::device_start()
 //  cbm_iec_atn - ATN line handler
 //-------------------------------------------------
 
-void mps1200_device::cbm_iec_atn(int state)
+WRITE_LINE_MEMBER(mps1200_device::cbm_iec_atn)
 {
 	// TODO
 }
@@ -79,7 +79,7 @@ void mps1200_device::cbm_iec_atn(int state)
 //  cbm_iec_data - serial data line handler
 //-------------------------------------------------
 
-void mps1200_device::cbm_iec_data(int state)
+WRITE_LINE_MEMBER(mps1200_device::cbm_iec_data)
 {
 	// TODO
 }
@@ -89,7 +89,7 @@ void mps1200_device::cbm_iec_data(int state)
 //  cbm_iec_reset - reset line handler
 //-------------------------------------------------
 
-void mps1200_device::cbm_iec_reset(int state)
+WRITE_LINE_MEMBER(mps1200_device::cbm_iec_reset)
 {
 	// TODO
 }

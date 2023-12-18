@@ -30,7 +30,7 @@ public:
 
 	u32 read(offs_t offset);
 	void write(offs_t offset, u32 data);
-	void set_reg(int state);
+	DECLARE_WRITE_LINE_MEMBER(set_reg);
 
 protected:
 	// device-level overrides

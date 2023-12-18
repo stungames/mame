@@ -5,7 +5,7 @@
  * IBM Research and Office Products Division Microprocessor (ROMP).
  *
  * Sources:
- *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
+ *   - http://bitsavers.org/pdf/ibm/pc/rt/75X0232_RT_PC_Technical_Reference_Volume_1_Jun87.pdf
  *
  * TODO:
  *   - configurable storage channel
@@ -18,6 +18,7 @@
 #include "romp.h"
 #include "rompdasm.h"
 
+#define LOG_GENERAL   (1U << 0)
 #define LOG_INTERRUPT (1U << 1)
 
 //#define VERBOSE     (LOG_INTERRUPT)
@@ -321,7 +322,7 @@ void romp_device::execute_run()
 					m_icount -= 4;
 					break;
 				case 0xcb: // ior: input/output read
-					if (((r3 + i) & 0xff00'0000U) || !m_mmu->pio_load(r3 + i, m_gpr[R2]))
+					if (((r3 + i) & 0xff00'0000U) || !m_mmu->ior(r3 + i, m_gpr[R2]))
 						program_check(PCS_PCK | PCS_DAE);
 					break;
 				case 0xcc: // ti: trap on condition immediate
@@ -432,7 +433,7 @@ void romp_device::execute_run()
 					m_icount -= 4;
 					break;
 				case 0xdb: // iow: input/output write
-					if (((r3 + i) & 0xff00'0000U) || !m_mmu->pio_store(r3 + i, m_gpr[R2]))
+					if (((r3 + i) & 0xff00'0000U) || !m_mmu->iow(r3 + i, m_gpr[R2]))
 						program_check(PCS_PCK | PCS_DAE);
 					m_icount--;
 					break;
@@ -1003,7 +1004,12 @@ void romp_device::execute_set_input(int irqline, int state)
 	default:
 		// interrupt lines are active low
 		if (!state)
+		{
 			m_reqi |= 1U << irqline;
+
+			// enable debugger interrupt breakpoints
+			standard_irq_callback(irqline);
+		}
 		else
 			m_reqi &= ~(1U << irqline);
 		break;
@@ -1015,9 +1021,8 @@ device_memory_interface::space_config_vector romp_device::memory_space_config() 
 	return space_config_vector { std::make_pair(AS_PROGRAM, &m_mem_config) };
 }
 
-bool romp_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+bool romp_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	target_space = &space(spacenum);
 	return true;
 }
 
@@ -1106,9 +1111,6 @@ void romp_device::interrupt_check()
 	{
 		if (BIT(m_reqi, irl) || BIT(m_scr[IRB], 15 - irl))
 		{
-			// enable debugger interrupt breakpoints
-			standard_irq_callback(irl, m_scr[IAR]);
-
 			LOGMASKED(LOG_INTERRUPT, "interrupt_check taking interrupt request level %d\n", irl);
 			interrupt_enter(irl, m_scr[IAR]);
 

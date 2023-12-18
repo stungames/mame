@@ -8,13 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef MAME_TRS_COCO12_H
-#define MAME_TRS_COCO12_H
+#ifndef MAME_INCLUDES_COCO12_H
+#define MAME_INCLUDES_COCO12_H
 
 #pragma once
 
 #include "coco.h"
-#include "machine/6883sam.h"
+#include "6883sam.h"
 #include "machine/mos6551.h"
 #include "sound/ay8910.h"
 #include "video/mc6847.h"
@@ -48,18 +48,21 @@ public:
 
 	uint8_t sam_read(offs_t offset);
 
-	void horizontal_sync(int state);
-	void field_sync(int state);
+	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
+	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
 	void coco(machine_config &config);
 	void cocoh(machine_config &config);
+	void cocoe(machine_config &config);
+	void cocoeh(machine_config &config);
+	void coco2(machine_config &config);
+	void coco2h(machine_config &config);
 	void coco2b(machine_config &config);
 	void coco2bh(machine_config &config);
 	void cp400(machine_config &config);
 	void t4426(machine_config &config);
 	void cd6809(machine_config &config);
 	void ms1600(machine_config &config);
-
 protected:
 	virtual void device_start() override;
 
@@ -106,4 +109,4 @@ protected:
 	required_device<ay8913_device> m_psg;
 };
 
-#endif // MAME_TRS_COCO12_H
+#endif // MAME_INCLUDES_COCO12_H

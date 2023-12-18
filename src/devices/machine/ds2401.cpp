@@ -169,7 +169,7 @@ TIMER_CALLBACK_MEMBER(ds2401_device::main_tick)
 	}
 }
 
-void ds2401_device::write(int state)
+WRITE_LINE_MEMBER( ds2401_device::write )
 {
 	verboselog(1, "write(%d)\n", state);
 
@@ -229,7 +229,7 @@ void ds2401_device::write(int state)
 	m_rx = state;
 }
 
-int ds2401_device::read()
+READ_LINE_MEMBER( ds2401_device::read )
 {
 	verboselog(2, "read %d\n", m_tx && m_rx);
 	return m_tx && m_rx;

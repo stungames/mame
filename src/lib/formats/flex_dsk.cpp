@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald, 68bit
 /*
- * flex_dsk.cpp  -  FLEX compatible disk images
+ * flex_dsk.c  -  FLEX compatible disk images
  *
  *  Created on: 24/06/2014
  *
@@ -60,17 +60,17 @@ flex_format::flex_format() : wd177x_format(formats)
 {
 }
 
-const char *flex_format::name() const noexcept
+const char *flex_format::name() const
 {
 	return "flex";
 }
 
-const char *flex_format::description() const noexcept
+const char *flex_format::description() const
 {
 	return "FLEX compatible disk image";
 }
 
-const char *flex_format::extensions() const noexcept
+const char *flex_format::extensions() const
 {
 	return "dsk";
 }

@@ -1144,19 +1144,11 @@ void i386_device::i386_repeat(int invert_flag)
 		m_segment_prefix=1;
 		break;
 		case 0x66:
-		if(!m_operand_prefix)
-		{
-			m_operand_size ^= 1;
-			m_xmm_operand_size ^= 1;
-			m_operand_prefix = 1;
-		}
+		m_operand_size ^= 1;
+		m_xmm_operand_size ^= 1;
 		break;
 		case 0x67:
-		if(!m_address_prefix)
-		{
-			m_address_size ^= 1;
-			m_address_prefix = 1;
-		}
+		m_address_size ^= 1;
 		break;
 		default:
 		prefix_flag=0;
@@ -2499,11 +2491,6 @@ void i386_device::i386_clts()              // Opcode 0x0f 0x06
 
 void i386_device::i386_wait()              // Opcode 0x9B
 {
-	if ((m_cr[0] & 0xa) == 0xa)
-	{
-		i386_trap(FAULT_NM, 0, 0);
-		return;
-	}
 	// TODO
 }
 

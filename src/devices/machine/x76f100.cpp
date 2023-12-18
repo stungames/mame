@@ -94,7 +94,7 @@ void x76f100_device::device_reset()
 	m_is_password_accepted = false;
 }
 
-void x76f100_device::write_cs(int state)
+WRITE_LINE_MEMBER( x76f100_device::write_cs )
 {
 	if( m_cs != state )
 	{
@@ -118,7 +118,7 @@ void x76f100_device::write_cs(int state)
 	m_cs = state;
 }
 
-void x76f100_device::write_rst(int state)
+WRITE_LINE_MEMBER( x76f100_device::write_rst )
 {
 	if( m_rst != state )
 	{
@@ -178,7 +178,7 @@ int x76f100_device::data_offset()
 	return offset;
 }
 
-void x76f100_device::write_scl(int state)
+WRITE_LINE_MEMBER( x76f100_device::write_scl )
 {
 	if( m_scl != state )
 	{
@@ -403,7 +403,7 @@ void x76f100_device::write_scl(int state)
 	m_scl = state;
 }
 
-void x76f100_device::write_sda(int state)
+WRITE_LINE_MEMBER( x76f100_device::write_sda )
 {
 	if( m_sdaw != state )
 	{
@@ -454,7 +454,7 @@ void x76f100_device::write_sda(int state)
 	m_sdaw = state;
 }
 
-int x76f100_device::read_sda()
+READ_LINE_MEMBER( x76f100_device::read_sda )
 {
 	if( m_cs != 0 )
 	{

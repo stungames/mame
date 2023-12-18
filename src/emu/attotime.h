@@ -38,10 +38,9 @@
 #include "emucore.h"
 #include "xtal.h"
 
-#include "eminline.h"
-
 #include <cmath>
-
+#undef min
+#undef max
 
 //**************************************************************************
 //  CONSTANTS

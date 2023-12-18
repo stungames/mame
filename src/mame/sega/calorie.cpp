@@ -90,8 +90,6 @@ Notes:
 #include "tilemap.h"
 
 
-namespace {
-
 class calorie_state : public driver_device
 {
 public:
@@ -590,8 +588,6 @@ void calorie_state::init_calorieb()
 {
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base() + 0x10000, 0x8000);
 }
-
-} // anonymous namespace
 
 
 /*************************************

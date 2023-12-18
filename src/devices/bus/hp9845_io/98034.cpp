@@ -291,7 +291,7 @@ uint8_t hp98034_io_card_device::int_ack_r()
 	return res;
 }
 
-void hp98034_io_card_device::ieee488_ctrl_w(int state)
+WRITE_LINE_MEMBER(hp98034_io_card_device::ieee488_ctrl_w)
 {
 	update_clr_hpib();
 }

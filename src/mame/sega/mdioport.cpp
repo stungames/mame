@@ -111,6 +111,7 @@ void megadrive_io_port_device_base::device_resolve_objects()
 
 	m_in_callback.resolve();
 	m_out_callback.resolve();
+	m_hl_callback.resolve_safe();
 }
 
 
@@ -315,7 +316,7 @@ megadrive_io_port_device::megadrive_io_port_device(
 }
 
 
-void megadrive_io_port_device::th_w(int state)
+WRITE_LINE_MEMBER(megadrive_io_port_device::th_w)
 {
 	u8 const th = state ? DATA_TH_MASK : 0x00;
 	if (th != m_th_in)
@@ -419,7 +420,7 @@ gamegear_io_port_device::gamegear_io_port_device(
 }
 
 
-void gamegear_io_port_device::th_w(int state)
+WRITE_LINE_MEMBER(gamegear_io_port_device::th_w)
 {
 	u8 const th = state ? DATA_TH_MASK : 0x00;
 	if (th != m_th_in)

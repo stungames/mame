@@ -782,24 +782,29 @@ void data_node::set_attribute_float(const char *name, float value)
 //  to ensure it doesn't contain embedded tags
 //-------------------------------------------------
 
-std::string normalize_string(std::string_view string)
+const char *normalize_string(const char *string)
 {
-	std::string result;
-	result.reserve(string.length());
+	static char buffer[1024];
+	char *d = &buffer[0];
 
-	for (char ch : string)
+	if (string != nullptr)
 	{
-		switch (ch)
+		while (*string)
 		{
-		case '\"':  result.append("&quot;");    break;
-		case '&':   result.append("&amp;");     break;
-		case '<':   result.append("&lt;");      break;
-		case '>':   result.append("&gt;");      break;
-		default:    result.append(1, ch);       break;
+			switch (*string)
+			{
+				case '\"' : d += sprintf(d, "&quot;"); break;
+				case '&'  : d += sprintf(d, "&amp;"); break;
+				case '<'  : d += sprintf(d, "&lt;"); break;
+				case '>'  : d += sprintf(d, "&gt;"); break;
+				default:
+					*d++ = *string;
+			}
+			++string;
 		}
 	}
-
-	return result;
+	*d++ = 0;
+	return buffer;
 }
 
 

@@ -25,6 +25,8 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "formats/pc_dsk.h"
+
 
 static void rmnimbus_floppies(device_slot_interface &device)
 {

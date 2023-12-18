@@ -11,6 +11,7 @@
 #include "midtunit_v.h"
 #include "midtunit_v.ipp"
 #include "screen.h"
+#include "render.h"
 #include "midtview.ipp"
 
 #include "debug/debugcon.h"
@@ -20,6 +21,7 @@
 #include "fileio.h" // Used by PNG logging
 #include "png.h" // Used by PNG logging
 
+#include <rapidjson/filereadstream.h> // Used by JSON logging
 #include <rapidjson/prettywriter.h> // Used by JSON logging
 #include <rapidjson/stringbuffer.h> // Used by JSON logging
 
@@ -180,6 +182,8 @@ void midtunit_video_device::device_start()
 
 	m_logged_rom.reset();
 	m_log_png = false;
+	m_log_json = false;
+	m_log_path = "output";
 
 	m_dma_timer = timer_alloc(FUNC(midtunit_video_device::dma_done), this);
 
@@ -687,6 +691,208 @@ uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
+#define MAX_4X_TEXTURES 1024
+#define MAX_REMAPS 2048
+
+typedef struct
+{
+	uint8_t Header[12];         // File Header To Determine File Type
+} TGAHeader;
+
+typedef struct
+{
+	uint8_t header[6];          // Holds The First 6 Useful Bytes Of The File
+	uint32_t bytesPerPixel;           // Number Of BYTES Per Pixel (3 Or 4)
+	uint32_t imageSize;           // Amount Of Memory Needed To Hold The Image
+	uint32_t type;                // The Type Of Image, GL_RGB Or GL_RGBA
+	uint32_t Height;              // Height Of Image                 
+	uint32_t Width;               // Width Of Image              
+	uint32_t Bpp;             // Number Of BITS Per Pixel (24 Or 32)
+} TGA;
+
+typedef struct
+{
+	int16_t x, y;
+	uint16_t texture;
+	uint8_t map, mod;
+} REMAPPEDBLOCK;
+
+typedef struct 
+{
+	uint32_t gfxoffset;//4
+	int16_t  x, y;//8
+	uint16_t map, flags;//12
+}BLOCKREMAPPING;
+
+
+static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
+static bitmap_argb32* tga_bitmaps[MAX_4X_TEXTURES] = { 0 };
+static uint16_t mod_textures[256] = { 0 };
+static REMAPPEDBLOCK addr2texture[64 * 256 * 256] = { 0 };
+static uint16_t tga_texture_count = 0;
+static uint8_t gfx_remaps_loaded[8] = { 0 };
+static BLOCKREMAPPING remapdata[MAX_REMAPS];
+int midtunit_bg_drawn_bg[16] = { 0 };
+int use_2x_bg = 0;
+
+static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
+{
+	REMAPPEDBLOCK* slot = &addr2texture[gfxoffset >> 6];
+
+	int bank = (gfxoffset >> 24) & 0x7;
+	if (gfx_remaps_loaded[bank] == 2) return slot;
+
+	if (gfx_remaps_loaded[bank] == 0)
+	{
+		char filename[128];
+
+		sprintf(filename, "C:/Projects/MK2Reboot/output/remap%d.bin", bank);
+		FILE* f = fopen(filename, "rb");
+		if (f == 0) {
+			gfx_remaps_loaded[bank] = 2;
+			return slot;
+		}
+
+		fread(remapdata, 1, sizeof(remapdata), f);
+		fclose(f);
+
+		for (size_t i = 0; i < MAX_REMAPS; i++)
+		{
+			uint32_t addr = remapdata[i].gfxoffset;
+			if (addr == 0xffffffff) break;
+			if (addr > 0x09ffffff) continue;
+			if (!use_2x_bg && remapdata[i].map) continue;
+
+			addr2texture[addr >> 6].x = remapdata[i].x;
+			addr2texture[addr >> 6].y = remapdata[i].y;
+			addr2texture[addr >> 6].map = (uint8_t)remapdata[i].map;
+			addr2texture[addr >> 6].mod = (uint8_t)remapdata[i].flags;
+		}
+
+		gfx_remaps_loaded[bank] = 1;
+	}
+
+	return slot;
+}
+
+render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP *rmap)
+{
+	if (tga_texture_count >= (MAX_4X_TEXTURES-1)) return 0;
+
+	REMAPPEDBLOCK* fmap = find_remap(gfxoffset);
+
+	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->texture;
+	BLOCKREMAPPING* remap = (BLOCKREMAPPING*)rmap;
+
+	remap->x = fmap->x;
+	remap->y = fmap->y;
+	remap->map = fmap->map;
+	remap->flags = fmap->mod;
+
+	if ((uint16_t)fmap->x == 0xcdcd) {
+		return 0;
+	}
+
+	if (texid != 0) {
+		if (texid == 0xffff) return 0;//missing texture
+		*outbitmap = tga_bitmaps[texid - 1];
+		return tga_textures[texid - 1];
+	}
+
+	char filename[128];
+	if (fmap->mod) {
+		sprintf(filename, "C:/Projects/MK2Reboot/images4x/Mod%d.tga", fmap->mod);
+	}
+	else {
+		sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
+	}
+	
+
+	TGAHeader tgaheader;
+	TGA tga;
+	FILE* f = fopen(filename, "rb");
+
+	if (f == 0) {
+		fmap->texture = 0xffff;//Mark missing
+		return NULL;
+	}
+
+	// Attempt To Read The File Header
+	if (fread(&tgaheader, sizeof(TGAHeader), 1, f) == 0)
+	{
+		return false;               // Return False If It Fails
+	}
+
+	// Attempt To Read Next 6 Bytes
+	if (fread(tga.header, sizeof(tga.header), 1, f) == 0)
+	{
+		return false;               // Return False
+	}
+
+	int ww = tga.header[1] * 256 + tga.header[0];   // Calculate Height
+	int hh = tga.header[3] * 256 + tga.header[2];   // Calculate The Width
+
+	int bits = tga.header[4];                // Calculate Bits Per Pixel
+	tga.Width = ww;              // Copy Width Into Local Structure
+	tga.Height = hh;                // Copy Height Into Local Structure
+	tga.Bpp = bits;
+	tga.bytesPerPixel = (tga.Bpp / 8);      // Calculate The BYTES Per Pixel
+	// Calculate Memory Needed To Store Image
+	tga.imageSize = (tga.bytesPerPixel * tga.Width * tga.Height);
+
+	uint8_t* pixels = new uint8_t[tga.Width * tga.Height * tga.bytesPerPixel];
+
+	if (bits == 32)
+	{
+		int pitch = tga.Width * tga.bytesPerPixel;
+
+		if (tga.header[5] & 0x20)
+		{
+			fread(pixels, 1, tga.Height * pitch, f);
+		}
+		else
+		{
+			// Attempt To Read All The Image Data			
+			int row = (tga.Height - 1) * pitch;
+
+			for (size_t i = 0; i < tga.Height; i++, row -= pitch)
+			{
+				fread(pixels + row, 1, pitch, f);
+			}
+		}
+
+	}
+	/*
+	for (int cswap = 0; cswap < (int)tga.imageSize; cswap += tga.bytesPerPixel)
+	{
+		// 1st Byte XOR 3rd Byte XOR 1st Byte XOR 3rd Byte
+		pixels[cswap] ^= pixels[cswap + 2] ^=
+			pixels[cswap] ^= pixels[cswap + 2];
+	}
+	*/
+
+	bitmap_argb32* bitmap = new bitmap_argb32((uint32_t*)pixels, ww, hh, ww);
+
+	render_texture *tex = machine().render().texture_alloc();
+
+	tex->set_bitmap(*bitmap, bitmap->cliprect(),TEXFORMAT_ARGB32);
+	fclose(f);                   // Close The File
+
+	int texind = ++tga_texture_count;
+
+	if (fmap->map) {
+		mod_textures[fmap->mod] = texind;
+	} else {
+		fmap->texture = texind;
+	}	
+	tga_textures[texind-1] = tex;
+	tga_bitmaps[texind - 1] = bitmap;
+	*outbitmap = bitmap;
+	
+	return tex;
+}
+
+
 void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	static const uint8_t register_map[2][16] =
@@ -711,7 +917,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	if (!(command & 0x8000))
 		return;
 
-	auto profile = g_profiler.start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	/* determine bpp */
 	int bpp = (command >> 12) & 7;
@@ -790,6 +996,72 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		m_dma_state.endskip = m_dma_register[DMA_LRSKIP];
 	}
 
+	int flipx = (command >> 4) & 1;
+
+	int skip_render = 0;
+
+	if (gfxoffset == 0)
+	{
+		running_machine::dma_item item;
+
+		item.x = m_dma_state.xpos;
+		item.x1 = item.x + m_dma_state.width;
+		item.tex = 0;
+		item.flags = 0;
+		item.y = m_dma_state.ypos - m_dma_state.topclip ;
+		item.y1 = item.y + m_dma_state.height;
+
+		machine().add_dma_item(item);
+		skip_render = 1;
+
+	}else
+	{
+		BLOCKREMAPPING remap = { 0 };
+		bitmap_argb32* bmp = 0;
+		render_texture* tex = map_gfx_texture(gfxoffset, &bmp, (BLOCKREMAP*)&remap);
+
+		if (tex)
+		{
+			if (remap.map == 0 || (!flipx && midtunit_bg_drawn_bg[remap.map] == 0))
+			{
+				running_machine::dma_item item;
+
+				int sdiv = remap.map ? 512 : 1024;
+
+				int width = (bmp->width() * (0x10000/m_dma_state.xstep)) / sdiv;
+				int height = (bmp->height() * (0x10000/m_dma_state.ystep)) / sdiv;
+
+				item.x = m_dma_state.xpos + (flipx ? remap.x : -remap.x);
+				item.x1 = item.x + (flipx ? -width : width);
+				item.tex = tex;
+				item.flags = (flipx ? 0x80 : 0x00) | (
+					(m_dma_state.palette == 0 && m_dma_state.color == 0xf) ? 0x100 : 0x00);//Font shadows
+
+				if (m_dma_state.height == 1 && (item.flags & 0x100)) {//Shadow?
+					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
+					item.y1 = item.y + height / 4;
+				}
+				else {
+					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y;
+					item.y1 = item.y + height;
+				}
+
+				machine().add_dma_item(item);
+				midtunit_bg_drawn_bg[remap.map]++;
+			}
+
+			skip_render = 1;
+		}
+		else if ((uint16_t)remap.x == 0xcdcd) {
+			skip_render = 1;
+		}
+		else if (m_dma_state.height == 1 && m_dma_state.palette == 0)//Skip player shadows
+		{
+			skip_render = 1;
+		}
+	}
+	
+	
 	if (m_log_png)
 	{
 		if (command & 0x80)
@@ -805,19 +1077,26 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	/* then draw */
 	if (m_dma_state.xstep == 0x100 && m_dma_state.ystep == 0x100)
 	{
-		if (command & 0x80)
-			((this)->*(m_dma_draw_skip_noscale[(command & 0x1f)*8 + bpp]))();
-		else
-			((this)->*(m_dma_draw_noskip_noscale[(command & 0x1f)*8 + bpp]))();
-
+		
+		if (!skip_render)
+		{
+			if (command & 0x80)
+				((this)->*(m_dma_draw_skip_noscale[(command & 0x1f) * 8 + bpp]))();
+			else
+				((this)->*(m_dma_draw_noskip_noscale[(command & 0x1f) * 8 + bpp]))();
+		}		
+		
 		pixels = m_dma_state.width * m_dma_state.height;
 	}
 	else
 	{
-		if (command & 0x80)
-			((this)->*(m_dma_draw_skip_scale[(command & 0x1f)*8 + bpp]))();
-		else
-			((this)->*(m_dma_draw_noskip_scale[(command & 0x1f)*8 + bpp]))();
+		if (!skip_render)
+		{
+			if (command & 0x80)
+				((this)->*(m_dma_draw_skip_scale[(command & 0x1f) * 8 + bpp]))();
+			else
+				((this)->*(m_dma_draw_noskip_scale[(command & 0x1f) * 8 + bpp]))();
+		}
 
 		if (m_dma_state.xstep && m_dma_state.ystep)
 			pixels = ((m_dma_state.width << 8) / m_dma_state.xstep) * ((m_dma_state.height << 8) / m_dma_state.ystep);
@@ -828,6 +1107,8 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	/* signal we're done */
 skipdma:
 	m_dma_timer->adjust(attotime::from_nsec(41 * pixels));
+
+	g_profiler.stop();
 }
 
 
@@ -860,11 +1141,18 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_video_device::scanline_update)
 		dest[x] = src[fulladdr++ & 0x1ff] & 0x7fff;
 }
 
+
 void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 {
+	if (m_dma_state.height < 3 || m_dma_state.palette == 0) return;
+
 	const uint32_t raw_offset = m_dma_register[DMA_OFFSETLO] | (m_dma_register[DMA_OFFSETHI] << 16);
-	if (m_logged_rom[raw_offset >> 6] & (1ULL << (raw_offset & 0x3f)))
-		return;
+
+	if (!m_logged_rom) {
+		m_logged_rom = make_unique_clear<uint64_t[]>(0x4000000);
+	}
+
+	if (m_logged_rom[raw_offset >> 6] & (1ULL << (raw_offset & 0x3f))) return;
 
 	int Zero = PIXEL_SKIP;
 	int NonZero = PIXEL_SKIP;
@@ -891,7 +1179,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	emu_file file(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 	char name_buf[256];
-	snprintf(name_buf, 255, "0x%08x.png", raw_offset);
+	snprintf(name_buf, 255, "%08x.png", raw_offset);
 	auto const filerr = file.open(name_buf);
 	if (filerr)
 	{
@@ -1013,11 +1301,12 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 	if (m_log_json)
 	{
-		rapidjson::StringBuffer s;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 		emu_file json(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
-		snprintf(name_buf, 255, "0x%08x.json", raw_offset);
+		char hex_buf[11];
+		rapidjson::StringBuffer s;
+		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
+		snprintf(name_buf, 255, "%08x.json", raw_offset);
 		auto const jsonerr = json.open(name_buf);
 		if (jsonerr)
 		{
@@ -1028,13 +1317,13 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		writer.Key("DMAState");
 		writer.StartObject();
 
-		auto hex_buf = util::string_format("0x%08x", raw_offset);
+		sprintf(hex_buf, "0x%08x", raw_offset);
 		writer.Key("MemoryAddress");
-		writer.String(hex_buf.c_str());
+		writer.String(hex_buf);
 
-		hex_buf = util::string_format("0x%08x", m_dma_state.offset >> 3);
+		sprintf(hex_buf, "0x%08x", m_dma_state.offset >> 3);
 		writer.Key("ROMSourceOffsetByte");
-		writer.String(hex_buf.c_str());
+		writer.String(hex_buf);
 
 		writer.Key("ROMSourceOffsetBit");
 		writer.Int(m_dma_state.offset & 7);

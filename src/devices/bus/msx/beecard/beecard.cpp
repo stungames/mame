@@ -27,7 +27,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override { }
 
-	virtual std::error_condition initialize_cartridge(std::string &message) override;
+	virtual image_init_result initialize_cartridge(std::string &message) override;
 
 };
 
@@ -38,19 +38,19 @@ bee_card_nomapper_device::bee_card_nomapper_device(const machine_config &mconfig
 {
 }
 
-std::error_condition bee_card_nomapper_device::initialize_cartridge(std::string &message)
+image_init_result bee_card_nomapper_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "bee_card_nomapper_device: Required region 'rom' was not found.";
-		return image_error::INTERNAL;
+		return image_init_result::FAIL;
 	}
 
 	page(1)->install_rom(0x4000, 0x7fff, cart_rom_region()->base());
 	if (cart_rom_region()->bytes() == 0x8000)
 		page(2)->install_rom(0x8000, 0xbfff, cart_rom_region()->base() + 0x4000);
 
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 } // anonymous namespace

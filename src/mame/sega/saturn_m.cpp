@@ -45,7 +45,14 @@
 
 #include "emu.h"
 #include "saturn.h"
+#include "cpu/sh/sh2.h"
 #include "cpu/scudsp/scudsp.h"
+
+/* TODO: do this in a verboselog style */
+#define LOG_CDB  0
+#define LOG_SCU  1
+#define LOG_IRQ  0
+#define LOG_IOGA 0
 
 
 
@@ -145,7 +152,7 @@ void saturn_state::saturn_backupram_w(offs_t offset, uint8_t data)
 }
 
 
-void saturn_state::m68k_reset_callback(int state)
+WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
 {
 	logerror("m68k RESET opcode triggered\n");
 	m_smpc_hle->m68k_reset_trigger();
@@ -319,30 +326,30 @@ GFXDECODE_START( gfx_stv )
 GFXDECODE_END
 
 
-void saturn_state::master_sh2_reset_w(int state)
+WRITE_LINE_MEMBER( saturn_state::master_sh2_reset_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void saturn_state::master_sh2_nmi_w(int state)
+WRITE_LINE_MEMBER(saturn_state::master_sh2_nmi_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void saturn_state::slave_sh2_reset_w(int state)
+WRITE_LINE_MEMBER( saturn_state::slave_sh2_reset_w )
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 //  m_smpc.slave_on = state;
 }
 
-void saturn_state::sound_68k_reset_w(int state)
+WRITE_LINE_MEMBER( saturn_state::sound_68k_reset_w )
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 	m_en_68k = state ^ 1;
 }
 
 // TODO: edge triggered?
-void saturn_state::system_reset_w(int state)
+WRITE_LINE_MEMBER( saturn_state::system_reset_w )
 {
 	if(!state)
 		return;
@@ -360,14 +367,14 @@ void saturn_state::system_reset_w(int state)
 	//A-Bus
 }
 
-void saturn_state::system_halt_w(int state)
+WRITE_LINE_MEMBER(saturn_state::system_halt_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_slave->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_audiocpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void saturn_state::dot_select_w(int state)
+WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
 	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 

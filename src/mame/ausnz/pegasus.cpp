@@ -89,12 +89,12 @@ private:
 	void pegasus_controls_w(u8 data);
 	void pegasus_keyboard_w(u8 data);
 	void pegasus_pcg_w(offs_t offset, u8 data);
-	int pegasus_cassette_r();
-	void pegasus_cassette_w(int state);
-	void pegasus_firq_clr(int state);
+	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
+	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
+	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
-	std::pair<std::error_condition, std::string> load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-void pegasus_state::pegasus_firq_clr(int state)
+WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -161,12 +161,12 @@ void pegasus_state::pegasus_controls_w(u8 data)
 	m_control_bits = data;
 }
 
-int pegasus_state::pegasus_cassette_r()
+READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
 {
 	return m_cass->input();
 }
 
-void pegasus_state::pegasus_cassette_w(int state)
+WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
 {
 	m_cass->output(state ? 1 : -1);
 }
@@ -416,13 +416,16 @@ void pegasus_state::pegasus_decrypt_rom(u8 *ROM)
 	}
 }
 
-std::pair<std::error_condition, std::string> pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
+image_init_result pegasus_state::load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag)
 {
 	u32 size = slot->common_get_size(reg_tag);
 	bool any_socket = false;
 
 	if (size > 0x1000)
-		return std::make_pair(image_error::INVALIDLENGTH, "Unsupported cartridge size (must be no larger than 4K)");
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
 
 	if (image.loaded_through_softlist() && size == 0)
 	{
@@ -433,21 +436,21 @@ std::pair<std::error_condition, std::string> pegasus_state::load_cart(device_ima
 
 		if (size == 0)
 		{
-			// FIXME: multi-line message may not be displayed properly
-			return std::make_pair(
-					image_error::INVALIDIMAGE,
+			std::string errmsg = string_format(
 					"Attempted to load a file that does not work in this socket.\n"
 					"Please check \"Usage\" field in the software list for the correct socket(s) to use.");
+			image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
+			return image_init_result::FAIL;
 		}
 	}
 
-	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc 0x1000 also for smaller ROMs!
+	slot->rom_alloc(0x1000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE); // we alloc 0x1000 also for smaller roms!
 	slot->common_load_rom(slot->get_rom_base(), size, any_socket ? "rom" : reg_tag);
 
 	// raw images have to be decrypted (in particular the ones from softlist)
 	pegasus_decrypt_rom(slot->get_rom_base());
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 void pegasus_state::machine_start()
@@ -505,7 +508,7 @@ void pegasus_state::pegasus(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* devices */
-	PIA6821(config, m_pia_s);
+	PIA6821(config, m_pia_s, 0);
 	m_pia_s->readpb_handler().set(FUNC(pegasus_state::pegasus_keyboard_r));
 	m_pia_s->readca1_handler().set(FUNC(pegasus_state::pegasus_cassette_r));
 	m_pia_s->writepa_handler().set(FUNC(pegasus_state::pegasus_keyboard_w));
@@ -515,7 +518,7 @@ void pegasus_state::pegasus(machine_config &config)
 	m_pia_s->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_s->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 
-	PIA6821(config, m_pia_u);
+	PIA6821(config, m_pia_u, 0);
 	m_pia_u->irqa_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 	m_pia_u->irqb_handler().set_inputline("maincpu", M6809_IRQ_LINE);
 

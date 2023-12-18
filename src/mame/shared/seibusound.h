@@ -24,8 +24,8 @@
     * = encrypted
 
 ***************************************************************************/
-#ifndef MAME_SHARED_SEIBU_H
-#define MAME_SHARED_SEIBU_H
+#ifndef MAME_AUDIO_SEIBU_H
+#define MAME_AUDIO_SEIBU_H
 
 #pragma once
 
@@ -64,7 +64,7 @@ public:
 	void ym_w(offs_t offset, u8 data);
 	void bank_w(u8 data);
 	void coin_w(u8 data);
-	void fm_irqhandler(int state);
+	WRITE_LINE_MEMBER( fm_irqhandler );
 	u8 soundlatch_r(offs_t offset);
 	u8 main_data_pending_r();
 	void main_data_w(offs_t offset, u8 data);
@@ -78,7 +78,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void update_irq_lines(s32 param);
+	void update_irq_lines(int param);
 	TIMER_CALLBACK_MEMBER(update_irq_synced);
 
 	// device callbacks
@@ -192,4 +192,4 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
-#endif // MAME_SHARED_SEIBU_H
+#endif // MAME_AUDIO_SEIBU_H

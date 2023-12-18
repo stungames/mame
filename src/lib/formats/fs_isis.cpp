@@ -9,12 +9,8 @@
 *********************************************************************/
 
 #include "fs_isis.h"
-#include "fsblk.h"
 #include "img_dsk.h"
-
-#include "multibyte.h"
 #include "strformat.h"
-
 #include <bitset>
 
 using namespace fs;
@@ -587,7 +583,7 @@ void isis_impl::ensure_dir_loaded()
 			// +11: bytes in last sector
 			auto remainder = i[ 11 ];
 			// +12..+13: size in sectors
-			unsigned sectors = get_u16le(&i[ 12 ]);
+			unsigned sectors = i[ 12 ] + (unsigned(i[ 13 ]) << 8);
 			if (remainder > SECTOR_SIZE) {
 				throw std::runtime_error("Invalid dir. entry");
 			}

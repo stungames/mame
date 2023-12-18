@@ -46,9 +46,9 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	void pit_out0(int state);
-	void pit_out1(int state);
-	void pit_out2(int state);
+	DECLARE_WRITE_LINE_MEMBER(pit_out0);
+	DECLARE_WRITE_LINE_MEMBER(pit_out1);
+	DECLARE_WRITE_LINE_MEMBER(pit_out2);
 
 	void prg_map(address_map &map);
 	void io_map(address_map &map);
@@ -61,19 +61,19 @@ private:
 
 ***************************************************************************/
 
-void eshockey_state::pit_out0(int state)
+WRITE_LINE_MEMBER(eshockey_state::pit_out0)
 {
 	// ?
 }
 
-void eshockey_state::pit_out1(int state)
+WRITE_LINE_MEMBER(eshockey_state::pit_out1)
 {
 	// NMI?
 	if (state)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void eshockey_state::pit_out2(int state)
+WRITE_LINE_MEMBER(eshockey_state::pit_out2)
 {
 	// ?
 }

@@ -2,7 +2,7 @@
 // copyright-holders:
 /****************************************************************************
 
-    Skeleton driver for 4th Generation "Super Chexx" bubble hockey
+    Skeleton driver for 4th Generation "Super Chexx" bubble jockey
     electromechanical machines
 
 ****************************************************************************/

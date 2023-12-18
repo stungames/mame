@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/*******************************************************************************
+/***************************************************************************
 
 Rockwell A/B5000 MCU series handhelds (before PPS-4/1)
 Mostly calculators on these MCUs, but also Mattel's first couple of handhelds.
@@ -11,7 +11,7 @@ ROM source notes when dumped from another title, but confident it's the same:
 - rw24k: Rockwell 14RD-II
 - misatk: Mattel Space Alert
 
-*******************************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 
@@ -22,10 +22,12 @@ ROM source notes when dumped from another title, but confident it's the same:
 #include "cpu/rw5000/b5500.h"
 #include "cpu/rw5000/b6000.h"
 #include "cpu/rw5000/b6100.h"
-#include "sound/spkrdev.h"
 #include "video/pwm.h"
+#include "sound/spkrdev.h"
 
 #include "speaker.h"
+
+#include "utf8.h"
 
 // internal artwork
 #include "autorace.lh"
@@ -39,8 +41,6 @@ ROM source notes when dumped from another title, but confident it's the same:
 
 //#include "hh_rw5000_test.lh" // common test-layout - use external artwork
 
-
-namespace {
 
 class hh_rw5000_state : public driver_device
 {
@@ -94,11 +94,11 @@ void hh_rw5000_state::machine_reset()
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Helper Functions
 
-*******************************************************************************/
+***************************************************************************/
 
 // generic input handlers
 
@@ -108,7 +108,7 @@ u8 hh_rw5000_state::read_inputs(int columns)
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
-		if (BIT(m_inp_mux, i))
+		if (m_inp_mux >> i & 1)
 			ret |= m_inputs[i]->read();
 
 	return ret;
@@ -137,13 +137,15 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
-*******************************************************************************/
+***************************************************************************/
 
-/*******************************************************************************
+namespace {
+
+/***************************************************************************
 
   Mattel Auto Race (model 9879)
   * B6000 MCU (label B6000CA, die label B6000-B)
@@ -155,7 +157,7 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
 
   A European version was released as "Ski Slalom", except it's upside-down.
 
-*******************************************************************************/
+***************************************************************************/
 
 class autorace_state : public hh_rw5000_state
 {
@@ -183,7 +185,7 @@ void autorace_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( autorace )
 	PORT_START("IN.0") // KB
@@ -207,8 +209,6 @@ static INPUT_PORTS_START( autorace )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_prev<0>, 0x0c) PORT_NAME("Gear Switch Down")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, switch_next<0>, 0x0c) PORT_NAME("Gear Switch Up")
 INPUT_PORTS_END
-
-// config
 
 void autorace_state::autorace(machine_config &config)
 {
@@ -242,7 +242,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Mattel Missile Attack (model 2048) / Space Alert (model 2448)
   * B6000 MCU (label B6001CA/EA, die label B6001)
@@ -254,7 +254,7 @@ ROM_END
   Space Alert"). In 1980, they advertised another rerelease, this time as
   "Flash Gordon", but that didn't come out.
 
-*******************************************************************************/
+***************************************************************************/
 
 class misatk_state : public hh_rw5000_state
 {
@@ -282,7 +282,7 @@ void misatk_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( misatk )
 	PORT_START("IN.0") // KB
@@ -299,8 +299,6 @@ static INPUT_PORTS_START( misatk )
 	PORT_START("POWER") // power switch
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_rw5000_state, power_button, 0) PORT_NAME("Arm / Off")
 INPUT_PORTS_END
-
-// config
 
 void misatk_state::misatk(machine_config &config)
 {
@@ -334,7 +332,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Mattel Football (model 2024)
   * B6100 MCU (label B6100EB/-15, die label B6100 A)
@@ -342,7 +340,7 @@ ROM_END
 
   When Football II came out, they renamed this one to Football I.
 
-*******************************************************************************/
+***************************************************************************/
 
 class mfootb_state : public hh_rw5000_state
 {
@@ -382,7 +380,7 @@ void mfootb_state::write_seg(u16 data)
 	update_display();
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( mfootb )
 	PORT_START("IN.0") // KB
@@ -401,8 +399,6 @@ static INPUT_PORTS_START( mfootb )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
-
-// config
 
 void mfootb_state::mfootb(machine_config &config)
 {
@@ -438,13 +434,13 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Mattel Baseball (model 2942)
   * B6100 MCU (label B6101-12, die label B6101 A)
   * 4-digit 7seg display, 28 other leds, 1-bit sound
 
-*******************************************************************************/
+***************************************************************************/
 
 class mbaseb_state : public hh_rw5000_state
 {
@@ -472,7 +468,7 @@ void mbaseb_state::write_seg(u16 data)
 	m_display->write_mx(bitswap<10>(data,7,8,9,6,5,4,3,2,1,0));
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( mbaseb )
 	PORT_START("IN.0") // KB
@@ -491,8 +487,6 @@ static INPUT_PORTS_START( mbaseb )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
-
-// config
 
 void mbaseb_state::mbaseb(machine_config &config)
 {
@@ -527,7 +521,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Mattel Gravity (model 8291)
   * B6100 MCU (label B6102-11, die label B6102 A)
@@ -541,7 +535,7 @@ ROM_END
   - Coin Drop (Quake Shock in Catastrophe)
   - Docking (Meteorite Shower in Catstrophe)
 
-*******************************************************************************/
+***************************************************************************/
 
 class gravity_state : public hh_rw5000_state
 {
@@ -569,7 +563,7 @@ void gravity_state::write_seg(u16 data)
 	m_display->write_mx(data);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( gravity )
 	PORT_START("IN.0") // KB
@@ -583,8 +577,6 @@ static INPUT_PORTS_START( gravity )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
-
-// config
 
 void gravity_state::gravity(machine_config &config)
 {
@@ -618,7 +610,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Rockwell 10R
   * A5000 MCU (label A5000PA, die label A5000)
@@ -630,7 +622,7 @@ ROM_END
 
   12R supports square root by pressing × after ÷ (or the other way around).
 
-*******************************************************************************/
+***************************************************************************/
 
 class rw10r_state : public hh_rw5000_state
 {
@@ -669,7 +661,7 @@ u8 rw10r_state::read_kb()
 	return read_inputs(4);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( rw10r )
 	PORT_START("IN.0") // STR4
@@ -696,8 +688,6 @@ static INPUT_PORTS_START( rw10r )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(u8"÷")
 INPUT_PORTS_END
-
-// config
 
 void rw10r_state::rw10r(machine_config &config)
 {
@@ -731,7 +721,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Rockwell 8R "Automatic Percent", Rockwell 18R "Memory"
   * B5000 MCU (label B5000CC, die label B5000)
@@ -742,7 +732,7 @@ ROM_END
 
   8R/9TR doesn't have the memory store/recall buttons.
 
-*******************************************************************************/
+***************************************************************************/
 
 class rw18r_state : public hh_rw5000_state
 {
@@ -781,7 +771,7 @@ u8 rw18r_state::read_kb()
 	return read_inputs(5);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( rw18r )
 	PORT_START("IN.0") // STR4
@@ -815,8 +805,6 @@ static INPUT_PORTS_START( rw18r )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
 
-// config
-
 void rw18r_state::rw18r(machine_config &config)
 {
 	// basic machine hardware
@@ -843,7 +831,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Rockwell 30R "Slide Rule Memory"
   * B5500 MCU (label B5500PA, die label B5500)
@@ -856,7 +844,7 @@ ROM_END
   30R and 31R have the exact same functionality, even though they are on
   different MCUs. There's also a 30R version on an A4600 MCU.
 
-*******************************************************************************/
+***************************************************************************/
 
 class rw30r_state : public hh_rw5000_state
 {
@@ -896,7 +884,7 @@ u8 rw30r_state::read_kb()
 	return read_inputs(5);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( rw30r )
 	PORT_START("IN.0") // STR4
@@ -915,7 +903,7 @@ static INPUT_PORTS_START( rw30r )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / x²")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(u8"× / x" UTF8_POW_2)
 
 	PORT_START("IN.3") // STR7
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
@@ -925,12 +913,10 @@ static INPUT_PORTS_START( rw30r )
 
 	PORT_START("IN.4") // STR8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("C / MC")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME(u8"X\u2194Y / X\u2194M" /* ↔ */)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME(u8"% / u221ax" /* √ */)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("X\xe2\x86\x94Y / X\xe2\x86\x94M")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% / " UTF8_SQUAREROOT "x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("= / MR")
 INPUT_PORTS_END
-
-// config
 
 void rw30r_state::rw30r(machine_config &config)
 {
@@ -975,7 +961,7 @@ ROM_END
 
 
 
-/*******************************************************************************
+/***************************************************************************
 
   Rockwell 24K aka "the 24K" (see below for more)
   * A5900 MCU (label A5901CA/A5903CB, die label A59__)
@@ -988,7 +974,7 @@ ROM_END
   of a 9th digit for minus sign and memory status. 24K has an extra button
   for register exchange. The difference between 24K and 24K II is unknown.
 
-*******************************************************************************/
+***************************************************************************/
 
 class rw24k_state : public hh_rw5000_state
 {
@@ -1026,7 +1012,7 @@ u8 rw24k_state::read_kb()
 	return read_inputs(9);
 }
 
-// inputs
+// config
 
 static INPUT_PORTS_START( rw24k )
 	PORT_START("IN.0") // STR0
@@ -1045,7 +1031,7 @@ static INPUT_PORTS_START( rw24k )
 	PORT_START("IN.3") // STR3
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("MC") // "
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(u8"\u221a" /* √ */) // "
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT) // "
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("MR") // "
 
 	PORT_START("IN.4") // STR4
@@ -1074,12 +1060,10 @@ static INPUT_PORTS_START( rw24k )
 
 	PORT_START("IN.8") // STR8
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE/C")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME(u8"\u2194" /* ↔ */) // register exchange - unpopulated on 14RD/24RD
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("\xe2\x86\x94") // register exchange - unpopulated on 14RD/24RD
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
 INPUT_PORTS_END
-
-// config
 
 void rw24k_state::rw24k(machine_config &config)
 {
@@ -1106,22 +1090,22 @@ ROM_END
 
 } // anonymous namespace
 
-/*******************************************************************************
+/***************************************************************************
 
   Game driver(s)
 
-*******************************************************************************/
+***************************************************************************/
 
-//    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1976, autorace,  0,       0,      autorace,  autorace,  autorace_state,  empty_init, "Mattel Electronics", "Auto Race", MACHINE_SUPPORTS_SAVE )
-SYST( 1977, misatk,    0,       0,      misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack / Space Alert", MACHINE_SUPPORTS_SAVE )
-SYST( 1977, mfootb,    0,       0,      mfootb,    mfootb,    mfootb_state,    empty_init, "Mattel Electronics", "Football (Mattel)", MACHINE_SUPPORTS_SAVE )
-SYST( 1978, mbaseb,    0,       0,      mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE )
-SYST( 1980, gravity,   0,       0,      gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1976, autorace,  0,       0, autorace,  autorace,  autorace_state,  empty_init, "Mattel Electronics", "Auto Race", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, misatk,    0,       0, misatk,    misatk,    misatk_state,    empty_init, "Mattel Electronics", "Missile Attack / Space Alert", MACHINE_SUPPORTS_SAVE )
+CONS( 1977, mfootb,    0,       0, mfootb,    mfootb,    mfootb_state,    empty_init, "Mattel Electronics", "Football (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1978, mbaseb,    0,       0, mbaseb,    mbaseb,    mbaseb_state,    empty_init, "Mattel Electronics", "Baseball (Mattel)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, gravity,   0,       0, gravity,   gravity,   gravity_state,   empty_init, "Mattel Electronics", "Gravity (Mattel)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1974, rw10r,     0,       0,      rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "10R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1975, rw12r,     0,       0,      rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "12R: Square Root", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1975, rw18r,     0,       0,      rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R: Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1974, rw30r,     0,       0,      rw30r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "30R: Slide Rule Memory (B5500 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1975, rw31r,     rw30r,   0,      rw31r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "31R: Slide Rule Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-SYST( 1976, rw24k,     0,       0,      rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1974, rw10r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "10R (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw12r,     0,       0, rw10r,     rw10r,     rw10r_state,     empty_init, "Rockwell", "12R: Square Root", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw18r,     0,       0, rw18r,     rw18r,     rw18r_state,     empty_init, "Rockwell", "18R: Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1974, rw30r,     0,       0, rw30r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "30R: Slide Rule Memory (B5500 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1975, rw31r,     rw30r,   0, rw31r,     rw30r,     rw30r_state,     empty_init, "Rockwell", "31R: Slide Rule Memory", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, rw24k,     0,       0, rw24k,     rw24k,     rw24k_state,     empty_init, "Rockwell", "24K (Rockwell)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

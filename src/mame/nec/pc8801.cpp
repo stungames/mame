@@ -1540,19 +1540,13 @@ uint8_t pc8801mk2sr_state::opn_portb_r()
 	return BIT(m_mouse_port->read(), 4, 2) | 0xfc;
 }
 
-void pc8801mk2sr_state::opn_portb_w(uint8_t data)
-{
-	m_mouse_port->pin_6_w(BIT(data, 0));
-	m_mouse_port->pin_7_w(BIT(data, 1));
-}
-
 // Cassette Configuration
-void pc8801_state::txdata_callback(int state)
+WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
 {
 	//m_cassette->output( (state) ? 1.0 : -1.0);
 }
 
-void pc8801_state::rxrdy_irq_w(int state)
+WRITE_LINE_MEMBER( pc8801_state::rxrdy_irq_w )
 {
 	if (state)
 		assert_irq(RXRDY_IRQ_LEVEL);
@@ -1580,7 +1574,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::int_ack_cb)
 	return (7 - level) * 2;
 }
 
-void pc8801_state::int4_irq_w(int state)
+WRITE_LINE_MEMBER(pc8801_state::int4_irq_w)
 {
 	bool irq_state = m_sound_irq_enable & state;
 
@@ -1594,7 +1588,7 @@ void pc8801_state::int4_irq_w(int state)
 	m_sound_irq_pending = state;
 }
 
-// FIXME: convert to pure write-line-style member
+// FIXME: convert to pure WRITE_LINE_MEMBER
 // Works with 0 -> 1 F/F transitions
 TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::clock_irq_w)
 {
@@ -1629,7 +1623,7 @@ void pc8801_state::assert_irq(u8 level)
 		m_irq_state.pending |= mask;
 }
 
-void pc8801_state::vrtc_irq_w(int state)
+WRITE_LINE_MEMBER(pc8801_state::vrtc_irq_w)
 {
 //  bool irq_state = m_vrtc_irq_enable & state;
 	if (state)
@@ -1638,7 +1632,7 @@ void pc8801_state::vrtc_irq_w(int state)
 	}
 }
 
-void pc8801_state::irq_w(int state)
+WRITE_LINE_MEMBER(pc8801_state::irq_w)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1747,7 +1741,6 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	m_opn->irq_handler().set(FUNC(pc8801mk2sr_state::int4_irq_w));
 	m_opn->port_a_read_callback().set(FUNC(pc8801mk2sr_state::opn_porta_r));
 	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
-	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 
 	for (auto &speaker : { m_lspeaker, m_rspeaker })
 	{
@@ -1776,7 +1769,6 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->irq_handler().set(FUNC(pc8801fh_state::int4_irq_w));
 	m_opna->port_a_read_callback().set(FUNC(pc8801fh_state::opn_porta_r));
 	m_opna->port_b_read_callback().set(FUNC(pc8801fh_state::opn_portb_r));
-	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
 	m_opna->add_route(0, m_lspeaker, 0.25);

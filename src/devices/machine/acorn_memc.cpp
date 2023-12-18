@@ -70,6 +70,12 @@ void acorn_memc_device::memc_map_debug_commands(const std::vector<std::string_vi
 		machine().debugger().console().printf("0x%08lx (PPL %x)\n", 0x02000000 | ((m_pages[page] * pagesize) + poffs), m_pages_ppl[page]);
 }
 
+void acorn_memc_device::device_resolve_objects()
+{
+	m_abort_w.resolve_safe();
+	m_sirq_w.resolve_safe();
+}
+
 void acorn_memc_device::device_start()
 {
 	m_space = &space();
@@ -397,20 +403,20 @@ void acorn_memc_device::do_sound_dma()
 	}
 }
 
-void acorn_memc_device::spvmd_w(int state)
+WRITE_LINE_MEMBER(acorn_memc_device::spvmd_w)
 {
 	m_spvmd = state;
 	m_abort_w(CLEAR_LINE);
 }
 
-void acorn_memc_device::sndrq_w(int state)
+WRITE_LINE_MEMBER(acorn_memc_device::sndrq_w)
 {
 	if (state && m_sound_dma_on)
 		do_sound_dma();
 }
 
 
-void acorn_memc_device::vidrq_w(int state)
+WRITE_LINE_MEMBER(acorn_memc_device::vidrq_w)
 {
 	if (state && m_video_dma_on)
 		do_video_dma();

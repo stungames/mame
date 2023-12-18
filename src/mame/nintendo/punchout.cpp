@@ -135,7 +135,7 @@ DIP locations verified for:
 
 // Z80 (main)
 
-void punchout_state::nmi_mask_w(int state)
+WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 {
 	m_nmi_mask = state;
 	if (!m_nmi_mask)
@@ -593,7 +593,7 @@ static GFXDECODE_START( gfx_armwrest )
 GFXDECODE_END
 
 
-void punchout_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(punchout_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

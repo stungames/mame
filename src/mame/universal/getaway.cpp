@@ -62,10 +62,14 @@ public:
 		, m_screen(*this, "screen")
 		, m_inputs(*this, "IN.%u", 0)
 		, m_dsw(*this, "DSW")
+		, m_wheel(*this, "WHEEL")
 	{ }
 
 	// machine configs
 	void getaway(machine_config &config);
+
+	// input functions
+	ioport_value read_wheel() { return (m_wheel->read() - 0x08) & 0xff; }
 
 protected:
 	virtual void machine_start() override;
@@ -77,12 +81,13 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport_array<3> m_inputs;
 	required_ioport m_dsw;
+	required_ioport m_wheel;
 
 	void main_map(address_map &map);
 	void io_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void io_w(offs_t offset, u8 data);
 	u8 dsw_r(offs_t offset);
@@ -141,7 +146,7 @@ u32 getaway_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
     I/O
 ******************************************************************************/
 
-void getaway_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(getaway_state::vblank_irq)
 {
 	if (state)
 		m_maincpu->pulse_input_line(INT_9900_INTREQ, 2 * m_maincpu->minimum_quantum_time());
@@ -331,7 +336,10 @@ static INPUT_PORTS_START( getaway )
 
 	PORT_START("IN.2")
 	// steering wheel, signed byte, absolute values larger than 8 ignored
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0xf8, 0x08) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(getaway_state, read_wheel)
+
+	PORT_START("WHEEL")
+	PORT_BIT( 0xff, 0x08, IPT_PADDLE ) PORT_MINMAX(0x00, 0x10) PORT_SENSITIVITY(5) PORT_KEYDELTA(15)
 
 	PORT_START("DSW")
 	// credit display is shown if both extended plays are on "None"

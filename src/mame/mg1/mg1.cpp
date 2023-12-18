@@ -37,6 +37,7 @@
 #include "bus/rs232/rs232.h"
 #include "imagedev/floppy.h"
 #include "formats/applix_dsk.h"
+#include "formats/pc_dsk.h"
 
 // video
 #include "screen.h"
@@ -63,6 +64,7 @@ public:
 		, m_ram(*this, "ram")
 		, m_sram(*this, "sram")
 		, m_iop(*this, "iop")
+		, m_iop_ram(*this, "iop_ram")
 		, m_iop_sram(*this, "iop_sram")
 		, m_iop_ctc(*this, "iop_ctc")
 		, m_dma(*this, "dma%u", 0U)
@@ -109,7 +111,8 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_sram;
 
-	required_device<mc68121_device> m_iop;
+	required_device<m6801_cpu_device> m_iop;
+	required_shared_ptr<u8> m_iop_ram;
 	required_device<nvram_device> m_iop_sram;
 
 	required_device<pit8253_device> m_iop_ctc;
@@ -186,14 +189,14 @@ template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 	map(0x308700, 0x3087ff).mirror(0xcf6000).umask16(0x00ff).lrw8(
 		[this](offs_t offset)
 		{
-			return m_iop->dpram_r(offset);
+			return m_iop_ram[offset];
 		}, "iop_ram_r",
 		[this](offs_t offset, u8 data)
 		{
-			if (offset == 18 + m_iop->dpram_r(3))
+			if (offset == 18 + m_iop_ram[3])
 				logerror("iop command %d\n", data);
 
-			m_iop->dpram_w(offset, data);
+			m_iop_ram[offset] = data;
 		}, "iop_ram_w");
 	//map(0x308800, 0x3089ff).mirror(0xcf6000); // ctc
 	//map(0x308a00, 0x308bff).mirror(0xcf6000); // raster-op function ctl
@@ -228,6 +231,7 @@ template <unsigned ST> void mg1_state::cpu_map(address_map &map)
 
 void mg1_state::iop_map(address_map &map)
 {
+	map(0x0000, 0x001f).m(m_iop, FUNC(m6801_cpu_device::m6801_io));
 	map(0x0017, 0x001c).lrw8(
 		[this](offs_t offset)
 		{
@@ -241,6 +245,8 @@ void mg1_state::iop_map(address_map &map)
 		{
 			m_sem[offset] &= ~0x80;
 		}, "iop_sem_w");
+
+	map(0x0080, 0x00ff).ram().share("iop_ram");
 
 	// i/o area
 	//map(0x2000, 0x201f).mirror(0x1e00).lw8([this](u8 data) { logerror("mouse x counter 0x%02x\n", data); }, "mouse_x"); // mouse x counter
@@ -339,7 +345,7 @@ void mg1_state::mg1(machine_config &config)
 
 	NVRAM(config, m_sram); // 2xTC5516AP 2048x8 SRAM
 
-	MC68121(config, m_iop, 8_MHz_XTAL / 8); // MC68121 (mode 2)
+	M6801(config, m_iop, 8_MHz_XTAL / 8); // TODO: MC68121 (mode 2)
 	m_iop->set_addrmap(0, &mg1_state::iop_map);
 	m_iop->in_p2_cb().set([this]() { return m_iop_p2; });
 

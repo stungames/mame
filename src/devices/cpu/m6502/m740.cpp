@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m740.cpp
+    m740.c
 
     Mitsubishi M740 series (M507xx/M509xx)
 
@@ -36,11 +36,19 @@ void m740_device::device_start()
 
 void m740_device::device_reset()
 {
-	m6502_device::device_reset();
-
+	inst_state_base = 0;
+	inst_state = STATE_RESET;
+	inst_substate = 0;
+	nmi_state = false;
 	irq_state = false;
 	m_irq_multiplex = 0;
 	m_irq_vector = 0xfffc;
+	apu_irq_state = false;
+	irq_taken = false;
+	nmi_pending = false;
+	v_state = false;
+	sync = false;
+	inhibit_interrupts = false;
 	SP = 0x00ff;
 }
 

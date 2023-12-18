@@ -99,7 +99,7 @@ public:
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
 
-	void write_stall(int state);
+	WRITE_LINE_MEMBER(write_stall);
 
 	void sharc_cfunc_unimplemented();
 	void sharc_cfunc_read_iop();

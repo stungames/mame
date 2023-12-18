@@ -36,8 +36,8 @@ public:
 	// configuration helpers
 	auto write_output() { return m_write_output.bind(); } // OUT pins
 
-	void data_w(int state);
-	void cp_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(data_w);
+	DECLARE_WRITE_LINE_MEMBER(cp_w);
 
 protected:
 	// device-level overrides

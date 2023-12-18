@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca, Vas Crabb
-#ifndef MAME_IGS_GOLDSTAR_H
-#define MAME_IGS_GOLDSTAR_H
+#ifndef MAME_INCLUDES_GOLDSTAR_H
+#define MAME_INCLUDES_GOLDSTAR_H
 
 #pragma once
 
@@ -58,8 +58,6 @@ public:
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
-	void init_animalhs();
-	void init_eldoraddoa();
 	void init_ladylinrb();
 	void init_ladylinrc();
 	void init_ladylinrd();
@@ -86,8 +84,6 @@ public:
 	void goldfrui(machine_config &config);
 	void goldstar(machine_config &config);
 	void goldstbl(machine_config &config);
-	void animalhs(machine_config &config);
-	void eldoraddoa(machine_config &config);
 	void bonusch_portmap(address_map &map);
 	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
@@ -107,9 +103,6 @@ public:
 	void nfm_map(address_map &map);
 	void pkrmast_portmap(address_map &map);
 	void ramdac_map(address_map &map);
-	void animalhs_map(address_map &map);
-	void animalhs_portmap(address_map &map);
-	void eldoraddoa_portmap(address_map &map);
 	void wcat3_map(address_map &map);
 	void wcherry_map(address_map &map);
 	void wcherry_readwriteport(address_map &map);
@@ -151,7 +144,6 @@ protected:
 	uint8_t m_cmaster_girl_pal = 0U;
 	uint8_t m_cm_enable_reg = 0U;
 	uint8_t m_cm_girl_scroll = 0U;
-	uint8_t m_reel_bank = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device_array<i8255_device, 3> m_ppi;
@@ -266,7 +258,7 @@ public:
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void masked_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(masked_irq);
 
 	void bingowng(machine_config &config);
 	void flaming7(machine_config &config);
@@ -408,14 +400,12 @@ public:
 	DECLARE_VIDEO_START(unkch);
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void megaline(machine_config &config);
 	void unkch(machine_config &config);
 	void bonusch(machine_config &config);
 	void feverch(machine_config &config);
-	void rolling(machine_config &config);
-
 	void bonusch_map(address_map &map);
 	void feverch_map(address_map &map);
 	void megaline_map(address_map &map);
@@ -437,4 +427,4 @@ private:
 	optional_device<ticket_dispenser_device> m_ticket_dispenser;
 };
 
-#endif // MAME_IGS_GOLDSTAR_H
+#endif // MAME_INCLUDES_GOLDSTAR_H

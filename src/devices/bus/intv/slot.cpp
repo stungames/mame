@@ -222,7 +222,7 @@ static const char *intv_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::error_condition intv_cart_slot_device::load_fullpath()
+image_init_result intv_cart_slot_device::load_fullpath()
 {
 	uint8_t temp;
 	uint8_t num_segments;
@@ -243,13 +243,13 @@ std::error_condition intv_cart_slot_device::load_fullpath()
 		// header
 		fread(&temp, 1);
 		if (temp != 0xa8)
-			return image_error::INVALIDIMAGE;
+			return image_init_result::FAIL;
 
 		fread(&num_segments, 1);
 
 		fread(&temp, 1);
 		if (temp != (num_segments ^ 0xff))
-			return image_error::INVALIDIMAGE;
+			return image_init_result::FAIL;
 
 		m_cart->rom_alloc(0x20000);
 		ROM = (uint8_t *)m_cart->get_rom_base();
@@ -281,7 +281,7 @@ std::error_condition intv_cart_slot_device::load_fullpath()
 		{
 			fread(&temp, 1);
 		}
-		return std::error_condition();
+		return image_init_result::PASS;
 	}
 	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
 	else
@@ -372,16 +372,16 @@ std::error_condition intv_cart_slot_device::load_fullpath()
 			}
 		}
 
-		return std::error_condition();
+		return image_init_result::PASS;
 	}
 }
 
-std::pair<std::error_condition, std::string> intv_cart_slot_device::call_load()
+image_init_result intv_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		if (!loaded_through_softlist())
-			return std::make_pair(load_fullpath(), std::string());
+			return load_fullpath();
 		else
 		{
 			uint16_t offset[] = { 0x400, 0x2000, 0x4000, 0x4800, 0x5000, 0x6000, 0x7000, 0x8000, 0x8800, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0xf000};
@@ -424,11 +424,11 @@ std::pair<std::error_condition, std::string> intv_cart_slot_device::call_load()
 				m_cart->ram_alloc(get_software_region_length("ram"));
 
 			//printf("Type: %s\n", intv_get_slot(m_type));
-			return std::make_pair(std::error_condition(), std::string());
+			return image_init_result::PASS;
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 

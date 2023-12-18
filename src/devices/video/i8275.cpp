@@ -149,8 +149,13 @@ void i8275_device::device_start()
 	// get the screen device
 	screen().register_screen_bitmap(m_bitmap);
 
-	// resolve delegates
-	m_display_cb.resolve_safe();
+	// resolve callbacks
+	m_write_drq.resolve_safe();
+	m_write_irq.resolve_safe();
+	m_write_hrtc.resolve_safe();
+	m_write_vrtc.resolve_safe();
+	m_write_lc.resolve_safe();
+	m_display_cb.resolve();
 
 	// allocate timers
 	m_hrtc_on_timer = timer_alloc(FUNC(i8275_device::hrtc_on), this);
@@ -426,18 +431,19 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 				}
 			}
 
+			if (!m_display_cb.isnull())
 			m_display_cb(m_bitmap,
-					sx * m_hpixels_per_column, // x position on screen of starting point
-					m_scanline, // y position on screen
-					line_counter, // current line of char
-					(data & 0x7f),  // char code to be displayed
-					lineattr,  // line attribute code
-					(attr & FAC_U) ? 1 : 0,  // light enable signal
-					(attr & FAC_R) ? 1 : 0,  // reverse video signal
-					(attr & FAC_B) ? 1 : 0, // video suppression
-					(attr & FAC_GG) >> 2,  // general purpose attribute code
-					(attr & FAC_H) ? 1 : 0  // highlight
-				);
+				sx * m_hpixels_per_column, // x position on screen of starting point
+				m_scanline, // y position on screen
+				line_counter, // current line of char
+				(data & 0x7f),  // char code to be displayed
+				lineattr,  // line attribute code
+				(attr & FAC_U) ? 1 : 0,  // light enable signal
+				(attr & FAC_R) ? 1 : 0,  // reverse video signal
+				(attr & FAC_B) ? 1 : 0, // video suppression
+				(attr & FAC_GG) >> 2,  // general purpose attribute code
+				(attr & FAC_H) ? 1 : 0  // highlight
+			);
 		}
 
 		if ((SCANLINES_PER_ROW - lc) == 1)
@@ -670,7 +676,7 @@ void i8275_device::dack_w(uint8_t data)
 //  lpen_w -
 //-------------------------------------------------
 
-void i8275_device::lpen_w(int state)
+WRITE_LINE_MEMBER( i8275_device::lpen_w )
 {
 	if (!m_lpen && state)
 	{

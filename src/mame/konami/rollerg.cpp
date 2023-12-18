@@ -30,7 +30,7 @@
 
 
 // configurable logging
-#define LOG_UNKWRITE     (1U << 1)
+#define LOG_UNKWRITE     (1U <<  1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_UNKWRITE)
 
@@ -79,7 +79,7 @@ private:
 	void sound_arm_nmi_w(uint8_t data);
 	void z80_nmi_w(int state);
 	uint8_t pip_r();
-	void irq_ack_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K05324X_CB_MEMBER(sprite_callback);
 	K051316_CB_MEMBER(zoom_callback);
@@ -324,7 +324,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void rollerg_state::irq_ack_w(int state)
+WRITE_LINE_MEMBER(rollerg_state::irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

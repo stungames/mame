@@ -85,7 +85,7 @@ ticket_dispenser_device::~ticket_dispenser_device()
 //  line_r - read the status line
 //-------------------------------------------------
 
-int ticket_dispenser_device::line_r()
+READ_LINE_MEMBER( ticket_dispenser_device::line_r )
 {
 	return m_status ? 1 : 0;
 }
@@ -95,7 +95,7 @@ int ticket_dispenser_device::line_r()
 //  motor_w - write the control line
 //-------------------------------------------------
 
-void ticket_dispenser_device::motor_w(int state)
+WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 {
 	// On an activate signal, start dispensing!
 	if (bool(state) == m_motoron)
@@ -141,6 +141,8 @@ void ticket_dispenser_device::device_start()
 	m_timer = timer_alloc(FUNC(ticket_dispenser_device::update_output_state), this);
 
 	m_output.resolve();
+
+	m_dispense_handler.resolve_safe();
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_power));

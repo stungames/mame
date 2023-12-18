@@ -30,7 +30,7 @@ class liebao_device : public mbc_ram_device_base<mbc_8k_device_base>
 public:
 	liebao_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual std::error_condition load(std::string &message) override ATTR_COLD;
+	virtual image_init_result load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -60,13 +60,13 @@ liebao_device::liebao_device(
 }
 
 
-std::error_condition liebao_device::load(std::string &message)
+image_init_result liebao_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(9);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !check_ram(message))
-		return image_error::BADSOFTWARE;
+		return image_init_result::FAIL;
 	cart_space()->install_view(0xa000, 0xbfff, m_view_ram);
 	install_rom(*cart_space(), *cart_space(), *cart_space());
 	install_ram(m_view_ram[0]);
@@ -74,19 +74,19 @@ std::error_condition liebao_device::load(std::string &message)
 	// install handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			emu::rw_delegate(*this, FUNC(liebao_device::enable_ram)));
+			write8sm_delegate(*this, FUNC(liebao_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x2fff,
-			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_rom)));
+			write8sm_delegate(*this, FUNC(liebao_device::bank_switch_rom)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_ram)));
+			write8smo_delegate(*this, FUNC(liebao_device::bank_switch_ram)));
 	cart_space()->install_write_handler(
 			0x7000, 0x7fff,
-			emu::rw_delegate(*this, FUNC(liebao_device::bank_switch_rom_high)));
+			write8sm_delegate(*this, FUNC(liebao_device::bank_switch_rom_high)));
 
 	// all good
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 

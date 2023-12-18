@@ -7,8 +7,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_APPLE_MACRTC_H
-#define MAME_APPLE_MACRTC_H
+#ifndef MAME_MACHINE_MACRTC_H
+#define MAME_MACHINE_MACRTC_H
 
 #pragma once
 
@@ -32,16 +32,17 @@ public:
 	rtc3430042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool hasBigPRAM);
 	rtc3430042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void ce_w(int state);
-	void clk_w(int state);
-	int data_r();
-	void data_w(int state);
+	DECLARE_WRITE_LINE_MEMBER( ce_w );
+	DECLARE_WRITE_LINE_MEMBER( clk_w );
+	DECLARE_READ_LINE_MEMBER( data_r );
+	DECLARE_WRITE_LINE_MEMBER( data_w );
 
 	// 1 second square wave output
 	auto cko_cb() { return m_cko_cb.bind(); }
 
 protected:
 	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -116,4 +117,4 @@ protected:
 DECLARE_DEVICE_TYPE(RTC3430040, rtc3430040_device)
 DECLARE_DEVICE_TYPE(RTC3430042, rtc3430042_device)
 
-#endif // MAME_APPLE_MACRTC_H
+#endif // MAME_MACHINE_MACRTC_H

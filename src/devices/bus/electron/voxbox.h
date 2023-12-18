@@ -41,7 +41,7 @@ protected:
 private:
 	required_device<sp0256_device> m_nsp;
 
-	void lrq_cb(int state);
+	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
 
 	int m_nmi;
 };

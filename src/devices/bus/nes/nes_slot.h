@@ -265,7 +265,7 @@ public:
 protected:
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 
-	void set_irq_line(int state);
+	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 
 	// internal state
 	uint8_t *m_prg;
@@ -398,8 +398,8 @@ public:
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_cart_slot_device();
 
-	// device_image_interface implementation
-	virtual std::pair<std::error_condition, std::string> call_load() override;
+	// image-level overrides
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	virtual bool is_reset_on_load() const noexcept override { return true; }
@@ -407,7 +407,7 @@ public:
 	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
 	virtual u32 unhashed_header_length() const noexcept override { return 16; }
 
-	// device_slot_interface implementation
+	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
@@ -438,7 +438,7 @@ public:
 	int m_pcb_id;
 
 protected:
-	// device_t implementation
+	// device-level overrides
 	virtual void device_start() override;
 
 	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;

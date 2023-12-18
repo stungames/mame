@@ -294,6 +294,11 @@ ioport_constructor v550_keyboard_device::device_input_ports() const
 	return INPUT_PORTS_NAME(v550_keyboard);
 }
 
+void visual_mcs48_keyboard_device::device_resolve_objects()
+{
+	m_txd_callback.resolve_safe();
+}
+
 void visual_mcs48_keyboard_device::device_start()
 {
 	m_key_select = 0x0f;
@@ -303,7 +308,7 @@ void visual_mcs48_keyboard_device::device_start()
 	save_item(NAME(m_key_select));
 }
 
-void visual_mcs48_keyboard_device::write_rxd(int state)
+WRITE_LINE_MEMBER(visual_mcs48_keyboard_device::write_rxd)
 {
 	m_kbdc->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -321,7 +326,7 @@ void visual_mcs48_keyboard_device::p2_w(u8 data)
 	m_txd_callback(BIT(data, 7));
 }
 
-void visual_mcs48_keyboard_device::prog_w(int state)
+WRITE_LINE_MEMBER(visual_mcs48_keyboard_device::prog_w)
 {
 	if (state && !m_prog_line)
 		m_key_select = m_kbdc->p2_r() & 0x0f;

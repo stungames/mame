@@ -10,7 +10,6 @@
 #include "mpu4.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/z80scc.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -38,6 +37,14 @@ private:
 	required_shared_ptr<uint16_t> m_plasmaram;
 	required_device<palette_device> m_palette;
 
+	uint16_t mpu4plasma_unk_r()
+	{
+		return machine().rand();
+	}
+
+	void mpu4plasma_unk_w(uint16_t data)
+	{
+	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mpu4plasma_map(address_map &map);
 };
@@ -51,7 +58,8 @@ void mpu4plasma_state::mpu4plasma_map(address_map &map)
 	// why does it test this much ram, just sloppy code expecting mirroring?
 	map(0x400000, 0x4fffff).ram().share("plasmaram");
 	// comms?
-	map(0xffff00, 0xffff07).rw("scc", FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0x00ff);
+	map(0xffff00, 0xffff01).r(FUNC(mpu4plasma_state::mpu4plasma_unk_r));
+	map(0xffff04, 0xffff05).w(FUNC(mpu4plasma_state::mpu4plasma_unk_w));
 }
 
 uint32_t mpu4plasma_state::screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -86,8 +94,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 	mod2_f(config);
 	m68000_device &plasmacpu(M68000(config, "plasmacpu", 10000000));
 	plasmacpu.set_addrmap(AS_PROGRAM, &mpu4plasma_state::mpu4plasma_map);
-
-	SCC8530N(config, "scc", 4915200).out_int_callback().set_inputline("plasmacpu", 4);
+	plasmacpu.set_vblank_int("screen", FUNC(mpu4plasma_state::irq4_line_hold));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -103,6 +110,7 @@ void mpu4plasma_state::mpu4plasma_f(machine_config &config)
 	m_characteriser->set_cpu_tag("maincpu");
 	m_characteriser->set_allow_6809_cheat(true);
 	m_characteriser->set_lamp_table(nullptr);
+
 }
 
 // plasma v0.1

@@ -268,13 +268,13 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
  *
  *************************************/
 
-int exidy440_state::firq_beam_r()
+READ_LINE_MEMBER(exidy440_state::firq_beam_r)
 {
 	return m_firq_beam;
 }
 
 
-int exidy440_state::firq_vblank_r()
+READ_LINE_MEMBER(exidy440_state::firq_vblank_r)
 {
 	return m_firq_vblank;
 }

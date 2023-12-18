@@ -464,7 +464,7 @@ u16 namco_c355spr_device::spriteram_r(offs_t offset)
 	return m_spriteram[0][offset];
 }
 
-void namco_c355spr_device::vblank(int state)
+WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 {
 	if (state)
 	{

@@ -11,32 +11,16 @@ for protection.
 
 #include "emu.h"
 #include "ink.h"
-#include "machine/intelfsh.h"
 
-namespace {
+DEFINE_DEVICE_TYPE(MSX_CART_INK, msx_cart_ink_device, "msx_cart_ink", "MSX Cartridge - Ink")
 
-class msx_cart_ink_device : public device_t, public msx_cart_interface
+
+msx_cart_ink_device::msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
+	, msx_cart_interface(mconfig, *this)
+	, m_flash(*this, "flash")
 {
-public:
-	msx_cart_ink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, MSX_CART_INK, tag, owner, clock)
-		, msx_cart_interface(mconfig, *this)
-		, m_flash(*this, "flash")
-	{ }
-
-	virtual std::error_condition initialize_cartridge(std::string &message) override;
-
-protected:
-	// device_t implementation
-	virtual void device_start() override { }
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-private:
-	required_device<amd_29f040_device> m_flash;
-
-	template <int Page> void write_page(offs_t offset, u8 data);
-};
+}
 
 ROM_START(msx_cart_ink)
 	ROM_REGION(0x80000, "flash", ROMREGION_ERASEFF)
@@ -52,12 +36,12 @@ void msx_cart_ink_device::device_add_mconfig(machine_config &config)
 	AMD_29F040(config, m_flash);
 }
 
-std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &message)
+image_init_result msx_cart_ink_device::initialize_cartridge(std::string &message)
 {
 	if (!cart_rom_region())
 	{
 		message = "msx_cart_ink_device: Required region 'rom' was not found.";
-		return image_error::INTERNAL;
+		return image_init_result::FAIL;
 	}
 
 	const size_t size = std::min<size_t>(0x80000, cart_rom_region()->bytes());
@@ -69,12 +53,12 @@ std::error_condition msx_cart_ink_device::initialize_cartridge(std::string &mess
 	page(1)->install_rom(0x4000, 0x7fff, flash + 0x4000);
 	page(2)->install_rom(0x8000, 0xbfff, flash + 0x8000);
 	page(3)->install_rom(0xc000, 0xffff, flash + 0xc000);
-	page(0)->install_write_handler(0x0000, 0x3fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
-	page(1)->install_write_handler(0x4000, 0x7fff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
-	page(2)->install_write_handler(0x8000, 0xbfff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
-	page(3)->install_write_handler(0xc000, 0xffff, emu::rw_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
+	page(0)->install_write_handler(0x0000, 0x3fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<0>)));
+	page(1)->install_write_handler(0x4000, 0x7fff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<1>)));
+	page(2)->install_write_handler(0x8000, 0xbfff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<2>)));
+	page(3)->install_write_handler(0xc000, 0xffff, write8sm_delegate(*this, FUNC(msx_cart_ink_device::write_page<3>)));
 
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 template <int Page>
@@ -83,7 +67,3 @@ void msx_cart_ink_device::write_page(offs_t offset, u8 data)
 	// /RD connects to flashrom A16-A18
 	m_flash->write(offset | 0x70000 | (Page * 0x4000), data);
 }
-
-} // anonymous namespace
-
-DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_INK, msx_cart_interface, msx_cart_ink_device, "msx_cart_ink", "MSX Cartridge - Ink")

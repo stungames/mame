@@ -39,7 +39,6 @@
 #include "fdos_dsk.h"
 
 #include "imageutl.h"
-#include "multibyte.h"
 
 #include "ioprocs.h"
 
@@ -71,17 +70,17 @@ fdos_format::fdos_format() : wd177x_format(fdos_formats::formats)
 {
 }
 
-const char *fdos_format::name() const noexcept
+const char *fdos_format::name() const
 {
 	return "fdos";
 }
 
-const char *fdos_format::description() const noexcept
+const char *fdos_format::description() const
 {
 	return "FDOS compatible disk image";
 }
 
-const char *fdos_format::extensions() const noexcept
+const char *fdos_format::extensions() const
 {
 	return "dsk";
 }
@@ -142,17 +141,17 @@ int fdos_format::find_size(util::random_read &io, uint32_t form_factor, const st
 			continue;
 		if (info.start_sector != 0)
 			continue;
-		if (get_u16be(info.num_sectors) != 0x0014)
+		if ((info.num_sectors[0]<<8 | info.num_sectors[1]) != 0x0014)
 			continue;
 		// $DOS File type is supposed to be $11 but some disks (FDOSMPS) have $00
 		if (info.file_type != 0 && info.file_type != 0x11)
 			continue;
-		if (get_u16be(info.start_addr) != 0x2400)
+		if ((info.start_addr[0]<<8 | info.start_addr[1]) != 0x2400)
 			continue;
-		if (get_u16be(info.end_addr) != 0x2fff)
+		if ((info.end_addr[0]<<8 | info.end_addr[1]) != 0x2fff)
 			continue;
 		// FDOS entry is supposed to be $2600 but some disks have $2400
-		uint16_t exec = get_u16be(info.exec_addr);
+		uint16_t exec = info.exec_addr[0]<<8 | info.exec_addr[1];
 		if (exec != 0x2600 && exec != 0x2400)
 			continue;
 

@@ -137,14 +137,17 @@ static const char *crvision_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::pair<std::error_condition, std::string> crvision_cart_slot_device::call_load()
+image_init_result crvision_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 
 		if (size > 0x4800)
-			return std::make_pair(image_error::INVALIDLENGTH, "Image exceeds the expected size for a CreatiVision cartridge (18K)");
+		{
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
+			return image_init_result::FAIL;
+		}
 
 		m_cart->rom_alloc(size);
 
@@ -189,10 +192,12 @@ std::pair<std::error_condition, std::string> crvision_cart_slot_device::call_loa
 				m_type = crvision_get_pcb_id(pcb_name);
 		}
 
-		logerror("Type: %s\n", crvision_get_slot(m_type));
+		printf("Type: %s\n", crvision_get_slot(m_type));
+
+		return image_init_result::PASS;
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 

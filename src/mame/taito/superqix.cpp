@@ -226,12 +226,12 @@ The MCU acts this way:
 
 **************************************************************************/
 
-int superqix_state::fromz80_semaphore_input_r()
+READ_LINE_MEMBER(superqix_state::fromz80_semaphore_input_r)
 {
 	return (m_z80_has_written ? 1 : 0);
 }
 
-int superqix_state::frommcu_semaphore_input_r()
+READ_LINE_MEMBER(superqix_state::frommcu_semaphore_input_r)
 {
 	return (m_mcu_has_written ? 1 : 0);
 }
@@ -1428,7 +1428,7 @@ static GFXDECODE_START( gfx_sqix )
 GFXDECODE_END
 
 
-void hotsmash_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(hotsmash_state::vblank_irq)
 {
 	if (state && m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

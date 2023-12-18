@@ -209,8 +209,6 @@ _|_  74LS86PC  74LS299N |RD4B3  | 74LS153PC|V||  _|_  74LS86PC  74LS299N |RD4A3 
 #include "tilemap.h"
 
 
-namespace {
-
 class raiden_ms_state : public driver_device
 {
 public:
@@ -275,14 +273,14 @@ private:
 	void adpcm_w(u8 data);
 	void ym_w(offs_t offset, u8 data);
 	void audio_map(address_map& map);
-	void adpcm_int(int state);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 	bool m_audio_select;
 	u8 m_adpcm_data;
 
 	void unk_snd_dffx_w(offs_t offset, u8 data);
 	void soundlatch_w(u8 data);
 
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 
@@ -401,7 +399,7 @@ void raiden_ms_state::audio_map(address_map &map)
 	map(0xe00a, 0xe00b).r(m_ym2, FUNC(ym2203_device::read));
 }
 
-void raiden_ms_state::adpcm_int(int state)
+WRITE_LINE_MEMBER(raiden_ms_state::adpcm_int)
 {
 	m_msm->data_w(m_adpcm_data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
@@ -642,7 +640,7 @@ static GFXDECODE_START( gfx_raiden_ms )
 	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
 GFXDECODE_END
 
-void raiden_ms_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(raiden_ms_state::vblank_irq)
 {
 	if (state)
 	{
@@ -783,8 +781,5 @@ ROM_START( raidenm )
 	ROM_LOAD( "msraid_6-1-8086-1_645c_gal16v8.u33", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "msraid_6-1-8086-1_645d_gal16v8.u27", 0x000, 0x117, NO_DUMP )
 ROM_END
-
-} // anonymous namespace
-
 
 GAME( 1990, raidenm,  raiden,  raidenm,  raidenm,  raiden_ms_state, init_raidenm, ROT270, "bootleg (Gaelco / Ervisa)", "Raiden (Modular System)", MACHINE_NOT_WORKING )

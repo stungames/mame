@@ -54,7 +54,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual std::pair<std::error_condition, std::string> call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 private:
@@ -196,7 +196,7 @@ private:
 	void fdc_ctrl_w(u8 data);
 	void fdc_irq_w(int state);
 	void dma_adr_w(u8 data);
-	void dma_drq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(dma_drq_w);
 
 	TIMER_CALLBACK_MEMBER(lightpen_hit);
 	void lightpen_trigger(int state);
@@ -237,11 +237,11 @@ void mtu130_rom_device::device_start()
 		memset(m_romdata + m_load_offset, 0xff, 4096);
 }
 
-std::pair<std::error_condition, std::string> mtu130_rom_device::call_load()
+image_init_result mtu130_rom_device::call_load()
 {
 	u32 len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 	if(!len || len > 4096 || (4096 % len))
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+		return image_init_result::FAIL;
 
 	if (!loaded_through_softlist())
 		fread(m_romdata + m_load_offset, len);
@@ -256,7 +256,7 @@ std::pair<std::error_condition, std::string> mtu130_rom_device::call_load()
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 void mtu130_rom_device::call_unload()
@@ -473,7 +473,7 @@ void mtu130_state::dma_adr_w(u8 data)
 	m_dma_adr = data << 6;
 }
 
-void mtu130_state::dma_drq_w(int state)
+WRITE_LINE_MEMBER(mtu130_state::dma_drq_w)
 {
 	while(m_fdc->get_drq()) {
 		if(m_dma_direction) {

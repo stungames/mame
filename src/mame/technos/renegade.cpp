@@ -200,7 +200,7 @@ private:
 	void adpcm_start_w(uint8_t data);
 	void adpcm_addr_w(uint8_t data);
 	void adpcm_stop_w(uint8_t data);
-	void adpcm_int(int state);
+	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_info);
 	TILE_GET_INFO_MEMBER(get_fg_tilemap_info);
@@ -384,7 +384,7 @@ void renegade_state::adpcm_stop_w(uint8_t data)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void renegade_state::adpcm_int(int state)
+WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 {
 	if (!m_adpcm_playing || !state)
 		return;

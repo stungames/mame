@@ -480,6 +480,8 @@ void ygv608_device::device_start()
 	m_iospace = &space(AS_IO);
 
 	// TODO: tagging configuration
+	m_vblank_handler.resolve();
+	m_raster_handler.resolve();
 	m_vblank_timer = timer_alloc(FUNC(ygv608_device::update_vblank_flag), this);
 	m_raster_timer = timer_alloc(FUNC(ygv608_device::update_raster_flag), this);
 
@@ -2295,7 +2297,8 @@ inline uint32_t ygv608_device::roz_convert_raw24(uint32_t *raw_reg, uint8_t offs
 
 	// convert raw to the given register
 	res = *raw_reg & roz_data_mask24;
-	res = util::sext(res << 7, 28);
+	res <<= 7;
+	if( res & 0x08000000 ) res |= 0xf8000000;   // 2s complement
 
 	return res;
 }
@@ -2312,7 +2315,8 @@ inline uint32_t ygv608_device::roz_convert_raw16(uint16_t *raw_reg, uint8_t offs
 
 	// convert raw to the given register
 	res = *raw_reg & roz_data_mask16;
-	res = util::sext(res << 7, 20);
+	res <<= 7;
+	if( res & 0x00080000 ) res |= 0xfff80000;   // 2s complement
 
 	return res;
 }

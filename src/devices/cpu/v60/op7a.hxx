@@ -966,27 +966,27 @@ uint32_t v60_device::opCVTDZP()
 
 uint32_t v60_device::op58UNHANDLED()
 {
-	fatalerror("Unhandled 58 opcode at PC: /%06x\n", PC);
+	fatalerror("Unhandled 58 opcode at PC: /%06x\n", PC); return 0;
 }
 
 uint32_t v60_device::op5AUNHANDLED()
 {
-	fatalerror("Unhandled 5A opcode at PC: /%06x\n", PC);
+	fatalerror("Unhandled 5A opcode at PC: /%06x\n", PC); return 0;
 }
 
 uint32_t v60_device::op5BUNHANDLED()
 {
-	fatalerror("Unhandled 5B opcode at PC: /%06x\n", PC);
+	fatalerror("Unhandled 5B opcode at PC: /%06x\n", PC); return 0;
 }
 
 uint32_t v60_device::op5DUNHANDLED()
 {
-	fatalerror("Unhandled 5D opcode at PC: /%06x\n", PC);
+	fatalerror("Unhandled 5D opcode at PC: /%06x\n", PC); return 0;
 }
 
 uint32_t v60_device::op59UNHANDLED()
 {
-	fatalerror("Unhandled 59 opcode at PC: /%06x\n", PC);
+	fatalerror("Unhandled 59 opcode at PC: /%06x\n", PC); return 0;
 }
 
 const v60_device::am_func v60_device::s_Op59Table[32] =

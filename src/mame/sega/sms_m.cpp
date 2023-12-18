@@ -28,7 +28,7 @@ void sms_state::lphaser_hcount_latch()
 }
 
 
-void sms_state::sms_ctrl1_th_input(int state)
+WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 {
 	// Check if TH of controller port 1 is set to input (1)
 	if (m_io_ctrl_reg & 0x02)
@@ -48,7 +48,7 @@ void sms_state::sms_ctrl1_th_input(int state)
 }
 
 
-void sms_state::sms_ctrl2_th_input(int state)
+WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 {
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
@@ -68,7 +68,7 @@ void sms_state::sms_ctrl2_th_input(int state)
 }
 
 
-void gamegear_state::gg_ext_th_input(int state)
+WRITE_LINE_MEMBER(gamegear_state::gg_ext_th_input)
 {
 	m_gg_ioport->th_w(state);
 
@@ -78,7 +78,7 @@ void gamegear_state::gg_ext_th_input(int state)
 }
 
 
-void gamegear_state::gg_nmi(int state)
+WRITE_LINE_MEMBER(gamegear_state::gg_nmi)
 {
 	if (!(m_cartslot->exists() && m_cartslot->get_sms_mode()))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
@@ -148,7 +148,7 @@ uint8_t sms_state::sms_count_r(offs_t offset)
 /*
  If the gamegear is in sms mode, the start button performs the pause function.
  */
-void gamegear_state::gg_pause_callback(int state)
+WRITE_LINE_MEMBER(gamegear_state::gg_pause_callback)
 {
 	if (!state)
 	{
@@ -178,7 +178,7 @@ void gamegear_state::gg_pause_callback(int state)
 }
 
 
-void sms_state::rapid_n_csync_callback(int state)
+WRITE_LINE_MEMBER(sms_state::rapid_n_csync_callback)
 {
 	if (m_port_rapid.found())
 	{
@@ -1114,7 +1114,7 @@ void smssdisp_state::sms_store_control_w(uint8_t data)
 	m_store_control = data;
 }
 
-void smssdisp_state::sms_store_int_callback(int state)
+WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
 {
 	if ( m_store_control & 0x01 )
 	{
@@ -1158,7 +1158,7 @@ void sms1_state::video_reset()
 }
 
 
-void sms1_state::sscope_vblank(int state)
+WRITE_LINE_MEMBER(sms1_state::sscope_vblank)
 {
 	// on falling edge
 	if (!state)

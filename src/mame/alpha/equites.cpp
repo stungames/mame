@@ -408,7 +408,7 @@ public:
 		equites_state(mconfig, type, tag)
 	{ }
 
-	int unknown_bit_r();
+	DECLARE_READ_LINE_MEMBER(unknown_bit_r);
 	void gekisou(machine_config &config);
 
 protected:
@@ -608,7 +608,7 @@ uint16_t equites_state::spriteram_kludge_r()
 }
 
 
-int gekisou_state::unknown_bit_r()
+READ_LINE_MEMBER(gekisou_state::unknown_bit_r)
 {
 	return m_unknown_bit;
 }

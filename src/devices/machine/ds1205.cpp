@@ -174,7 +174,7 @@ void ds1205_device::readbit( u8 *buffer )
 	}
 }
 
-void ds1205_device::write_rst(int state)
+WRITE_LINE_MEMBER( ds1205_device::write_rst )
 {
 	if( m_rst != state )
 	{
@@ -206,7 +206,7 @@ void ds1205_device::write_rst(int state)
 	}
 }
 
-void ds1205_device::write_clk(int state)
+WRITE_LINE_MEMBER( ds1205_device::write_clk )
 {
 	if( m_clk != state )
 	{
@@ -383,7 +383,7 @@ void ds1205_device::write_clk(int state)
 	}
 }
 
-void ds1205_device::write_dq(int state)
+WRITE_LINE_MEMBER( ds1205_device::write_dq )
 {
 	if( m_dqw != state )
 	{
@@ -393,7 +393,7 @@ void ds1205_device::write_dq(int state)
 	}
 }
 
-int ds1205_device::read_dq()
+READ_LINE_MEMBER( ds1205_device::read_dq )
 {
 	if( m_dqr == DQ_HIGH_IMPEDANCE )
 	{

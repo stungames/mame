@@ -110,7 +110,7 @@ void mt6809_state::mt6809_map(address_map &map)
 }
 
 
-void microtan_state::trigger_reset(int state)
+WRITE_LINE_MEMBER(microtan_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -120,7 +120,7 @@ void microtan_state::trigger_reset(int state)
 	}
 }
 
-void mt6809_state::trigger_reset(int state)
+WRITE_LINE_MEMBER(mt6809_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 

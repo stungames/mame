@@ -1121,14 +1121,14 @@ void gb_cart_slot_device::device_reset_after_children()
 }
 
 
-std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_file(util::random_read &file)
+image_init_result gb_cart_slot_device::load_image_file(util::random_read &file)
 {
 	using namespace bus::gameboy;
 
 	bool proberam = true;
 	auto len = length();
-	u64 offset;
-	size_t actual;
+	u64 offset = 0;
+	size_t actual = 0;
 
 	// probe for GBX format
 	memory_region *gbxregion = nullptr;
@@ -1138,10 +1138,15 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 		// try reading the GBX footer into temporary space before more checks
 		std::unique_ptr<u8 []> const footer(new (std::nothrow) u8 [gbxtrailer.size]);
 		if (!footer)
-			return std::make_pair(std::errc::not_enough_memory, "Error allocating memory to read GBX file footer");
-		std::error_condition const err = file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual);
-		if (err || (gbxtrailer.size != actual))
-			return std::make_pair(err ? err : std::errc::io_error, "Error reading GBX file footer");
+		{
+			seterror(image_error::UNSPECIFIED, "Error allocating memory to read GBX file footer");
+			return image_init_result::FAIL;
+		}
+		if (file.read_at(len - gbxtrailer.size, footer.get(), gbxtrailer.size, actual) || (gbxtrailer.size != actual))
+		{
+			seterror(image_error::UNSPECIFIED, "Error reading GBX file footer");
+			return image_init_result::FAIL;
+		}
 		if (1 != gbxtrailer.ver_maj)
 		{
 			// some unsupported GBX version - assume footer immediately follows ROM
@@ -1241,9 +1246,11 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 	{
 		LOG("Allocating %u byte cartridge ROM region\n", len);
 		memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), len, 1, ENDIANNESS_LITTLE);
-		std::error_condition const err = file.read_at(offset, romregion->base(), len, actual);
-		if (err || (len != actual))
-			return std::make_pair(err ? err : std::errc::io_error, "Error reading ROM data from cartridge file");
+		if (file.read_at(offset, romregion->base(), len, actual) || (len != actual))
+		{
+			seterror(image_error::UNSPECIFIED, "Error reading ROM data from cartridge file");
+			return image_init_result::FAIL;
+		}
 
 		// allocate cartridge RAM based on header if necessary
 		if (proberam)
@@ -1257,7 +1264,7 @@ std::pair<std::error_condition, std::string> gb_cart_slot_device::load_image_fil
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 

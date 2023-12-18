@@ -165,7 +165,7 @@ void thepit_state::colorram_w(offs_t offset, uint8_t data)
 }
 
 
-void thepit_state::flip_screen_x_w(int state)
+WRITE_LINE_MEMBER(thepit_state::flip_screen_x_w)
 {
 	m_flip_x = state;
 
@@ -178,7 +178,7 @@ void thepit_state::flip_screen_x_w(int state)
 }
 
 
-void thepit_state::flip_screen_y_w(int state)
+WRITE_LINE_MEMBER(thepit_state::flip_screen_y_w)
 {
 	m_flip_y = state;
 
@@ -191,7 +191,7 @@ void thepit_state::flip_screen_y_w(int state)
 }
 
 
-void thepit_state::intrepid_graphics_bank_w(int state)
+WRITE_LINE_MEMBER(thepit_state::intrepid_graphics_bank_w)
 {
 	m_graphics_bank = state;
 

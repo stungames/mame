@@ -294,8 +294,6 @@
 #include "notechan.lh"
 
 
-namespace {
-
 #define MASTER_CLOCK     XTAL(8'448'000)
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
 #define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
@@ -535,8 +533,6 @@ ROM_START( notechan )
 	ROM_REGION( 0x80000, "oki", 0 ) /* Audio ADPCM */
 	ROM_LOAD( "p-650_s1_ver1.00.ic21",  0x0000, 0x80000, CRC(1b8c835b) SHA1(73749c0077605f9ad56e9dd73b60ee04fe54eb73) )
 ROM_END
-
-} // anonymous namespace
 
 
 /*********************************************

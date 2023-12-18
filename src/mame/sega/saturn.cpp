@@ -427,6 +427,7 @@ test1f diagnostic hacks:
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
+#include "cpu/sh/sh2.h"
 #include "machine/nvram.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
@@ -811,12 +812,12 @@ uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
 void sat_console_state::saturn(machine_config &config)
 {
 	/* basic machine hardware */
-	SH7604(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH2(config, m_maincpu, MASTER_CLOCK_352/2); // 28.6364 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_maincpu->set_is_slave(0);
 	TIMER(config, "scantimer").configure_scanline(FUNC(sat_console_state::saturn_scanline), "screen", 0, 1);
 
-	SH7604(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
+	SH2(config, m_slave, MASTER_CLOCK_352/2); // 28.6364 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &sat_console_state::saturn_mem);
 	m_slave->set_is_slave(1);
 	TIMER(config, "slave_scantimer").configure_scanline(FUNC(sat_console_state::saturn_slave_scanline), "screen", 0, 1);

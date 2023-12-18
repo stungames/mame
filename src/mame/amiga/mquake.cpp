@@ -44,8 +44,6 @@
 #include "speaker.h"
 
 
-namespace {
-
 class mquake_state : public amiga_state
 {
 public:
@@ -427,7 +425,6 @@ void mquake_state::init_mquake()
 }
 
 
-} // anonymous namespace
 
 
 /*************************************

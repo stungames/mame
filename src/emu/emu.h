@@ -79,6 +79,7 @@
 #include "parameters.h"
 
 // the running machine
+#include "main.h"
 #include "machine.h"
 #include "driver.h"
 

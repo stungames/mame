@@ -90,7 +90,7 @@ void electron_voxbox_device::expbus_w(offs_t offset, uint8_t data)
 	}
 }
 
-void electron_voxbox_device::lrq_cb(int state)
+WRITE_LINE_MEMBER(electron_voxbox_device::lrq_cb)
 {
 	if (state != m_nmi)
 	{

@@ -19,7 +19,7 @@ public:
 	void read();
 	bool write(uint8_t data);
 
-	int sense();
+	DECLARE_READ_LINE_MEMBER( sense );
 
 protected:
 	virtual void device_start() override;

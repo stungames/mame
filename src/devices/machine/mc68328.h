@@ -122,18 +122,18 @@ public:
 	auto out_lsclk() { return m_out_lsclk_cb.bind(); }
 	auto out_ld() { return m_out_ld_cb.bind(); }
 
+	DECLARE_WRITE_LINE_MEMBER(irq5_w);
+
 	template <typename... T>
 	void set_lcd_info_changed(T &&... args)
 	{
 		m_lcd_info_changed_cb.set(std::forward<T>(args)...);
 	}
 
-	void irq5_w(int state);
-
 protected:
-	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor);
 
-	// device_t implementation
+	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -629,7 +629,7 @@ protected:
 	u8   m_ivr;         // Interrupt Vector Register
 	u16  m_icr;         // Interrupt Control Register
 	u32  m_imr;         // Interrupt Mask Register
-	u32  m_gisr;        // (global) Interrupt Status Register
+	u32  m_isr;         // Interrupt Status Register
 	u32  m_ipr;         // Interrupt Pending Register
 
 	// $(FF)FFF400
@@ -821,7 +821,8 @@ public:
 	template <int Line> auto in_port_m() { return m_in_port_m_cb[Line].bind(); }
 
 protected:
-	// device_t implementation
+	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -1054,7 +1055,8 @@ public:
 	mc68ez328_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
-	// device_t implementation
+	// device-level overrides
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 

@@ -41,8 +41,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/cartrom.h",
 	MAME_DIR .. "src/devices/imagedev/cassette.cpp",
 	MAME_DIR .. "src/devices/imagedev/cassette.h",
-	MAME_DIR .. "src/devices/imagedev/cdromimg.cpp",
-	MAME_DIR .. "src/devices/imagedev/cdromimg.h",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.cpp",
+	MAME_DIR .. "src/devices/imagedev/chd_cd.h",
 	MAME_DIR .. "src/devices/imagedev/diablo.cpp",
 	MAME_DIR .. "src/devices/imagedev/diablo.h",
 	MAME_DIR .. "src/devices/imagedev/flopdrv.cpp",
@@ -69,8 +69,6 @@ files {
 	MAME_DIR .. "src/devices/imagedev/picture.h",
 	MAME_DIR .. "src/devices/imagedev/printer.cpp",
 	MAME_DIR .. "src/devices/imagedev/printer.h",
-	MAME_DIR .. "src/devices/imagedev/simh_tape_image.cpp",
-	MAME_DIR .. "src/devices/imagedev/simh_tape_image.h",
 	MAME_DIR .. "src/devices/imagedev/snapquik.cpp",
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
@@ -343,6 +341,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/6532riot.h,MACHINES["RIOT6532"] = true
+---------------------------------------------------
+
+if (MACHINES["RIOT6532"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/6532riot.cpp",
+		MAME_DIR .. "src/devices/machine/6532riot.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/6821pia.h,MACHINES["6821PIA"] = true
 ---------------------------------------------------
 
@@ -374,18 +384,6 @@ if (MACHINES["ACIA6850"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/6850acia.cpp",
 		MAME_DIR .. "src/devices/machine/6850acia.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/6883sam.h,MACHINES["6883SAM"] = true
----------------------------------------------------
-
-if (MACHINES["6883SAM"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/6883sam.cpp",
-		MAME_DIR .. "src/devices/machine/6883sam.h",
 	}
 end
 
@@ -446,6 +444,18 @@ if (MACHINES["7200FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/7200fifo.cpp",
 		MAME_DIR .. "src/devices/machine/7200fifo.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/7400.h,MACHINES["TTL7400"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL7400"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/7400.cpp",
+		MAME_DIR .. "src/devices/machine/7400.h",
 	}
 end
 
@@ -920,18 +930,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/atahle.h,MACHINES["ATAHLE"] = true
----------------------------------------------------
-
-if (MACHINES["ATAHLE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/atahle.cpp",
-		MAME_DIR .. "src/devices/machine/atahle.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/ataflash.h,MACHINES["ATAFLASH"] = true
 ---------------------------------------------------
 
@@ -940,18 +938,6 @@ if (MACHINES["ATAFLASH"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ataflash.cpp",
 		MAME_DIR .. "src/devices/machine/ataflash.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/atastorage.h,MACHINES["ATASTORAGE"] = true
----------------------------------------------------
-
-if (MACHINES["ATASTORAGE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/atastorage.cpp",
-		MAME_DIR .. "src/devices/machine/atastorage.h",
 	}
 end
 
@@ -1161,18 +1147,6 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/dimm_spd.h,MACHINES["DIMM_SPD"] = true
----------------------------------------------------
-
-if (MACHINES["DIMM_SPD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/dimm_spd.cpp",
-		MAME_DIR .. "src/devices/machine/dimm_spd.h",
-	}
-end
-
 --@src/devices/machine/dl11.h,MACHINES["DL11"] = true
 ---------------------------------------------------
 
@@ -1298,18 +1272,6 @@ if (MACHINES["DS2404"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ds2404.cpp",
 		MAME_DIR .. "src/devices/machine/ds2404.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/ds2430a.h,MACHINES["DS2430A"] = true
----------------------------------------------------
-
-if (MACHINES["DS2430A"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/ds2430a.cpp",
-		MAME_DIR .. "src/devices/machine/ds2430a.h",
 	}
 end
 
@@ -1768,30 +1730,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ibm21s850.h,MACHINES["IBM21S850"] = true
----------------------------------------------------
-
-if (MACHINES["IBM21S850"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
-		MAME_DIR .. "src/devices/machine/ibm21s850.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/icd2061a.h,MACHINES["ICD2061A"] = true
----------------------------------------------------
-
-if (MACHINES["ICD2061A"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/icd2061a.cpp",
-		MAME_DIR .. "src/devices/machine/icd2061a.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/icm7170.h,MACHINES["ICM7170"] = true
 ---------------------------------------------------
 
@@ -1799,6 +1737,18 @@ if (MACHINES["ICM7170"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/icm7170.cpp",
 		MAME_DIR .. "src/devices/machine/icm7170.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ibm21s850.h,MACHINES["IBM21S850"] = true
+---------------------------------------------------
+
+if (MACHINES["IBM21S850"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ibm21s850.cpp",
+		MAME_DIR .. "src/devices/machine/ibm21s850.h",
 	}
 end
 
@@ -1947,18 +1897,6 @@ if (MACHINES["KB3600"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/kb3600.cpp",
 		MAME_DIR .. "src/devices/machine/kb3600.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/keytronic_l2207.h,MACHINES["KEYTRONIC_L2207"] = true
----------------------------------------------------
-
-if (MACHINES["KEYTRONIC_L2207"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.cpp",
-		MAME_DIR .. "src/devices/machine/keytronic_l2207.h",
 	}
 end
 
@@ -2249,6 +2187,18 @@ if (MACHINES["MB8795"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mb8795.cpp",
 		MAME_DIR .. "src/devices/machine/mb8795.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mb89352.h,MACHINES["MB89352"] = true
+---------------------------------------------------
+
+if (MACHINES["MB89352"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mb89352.cpp",
+		MAME_DIR .. "src/devices/machine/mb89352.h",
 	}
 end
 
@@ -2558,18 +2508,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/mos6530.h,MACHINES["MOS6530"] = true
----------------------------------------------------
-
-if (MACHINES["MOS6530"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mos6530.cpp",
-		MAME_DIR .. "src/devices/machine/mos6530.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/mos6702.h,MACHINES["MOS6702"] = true
 ---------------------------------------------------
 
@@ -2618,6 +2556,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/mos6530.h,MACHINES["MIOT6530"] = true
+--@src/devices/machine/mos6530n.h,MACHINES["MIOT6530"] = true
+---------------------------------------------------
+
+if (MACHINES["MIOT6530"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mos6530.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530.h",
+		MAME_DIR .. "src/devices/machine/mos6530n.cpp",
+		MAME_DIR .. "src/devices/machine/mos6530n.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/mos6551.h,MACHINES["MOS6551"] = true
 ---------------------------------------------------
 
@@ -2625,18 +2578,6 @@ if (MACHINES["MOS6551"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mos6551.cpp",
 		MAME_DIR .. "src/devices/machine/mos6551.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/msm5001n.h,MACHINES["MSM5001N"] = true
----------------------------------------------------
-
-if (MACHINES["MSM5001N"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/msm5001n.cpp",
-		MAME_DIR .. "src/devices/machine/msm5001n.h",
 	}
 end
 
@@ -2661,18 +2602,6 @@ if (MACHINES["MSM58321"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/msm58321.cpp",
 		MAME_DIR .. "src/devices/machine/msm58321.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/msm6200.h,MACHINES["MSM6200"] = true
----------------------------------------------------
-
-if (MACHINES["MSM6200"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/msm6200.cpp",
-		MAME_DIR .. "src/devices/machine/msm6200.h",
 	}
 end
 
@@ -2714,13 +2643,14 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/nandflash.h,MACHINES["NANDFLASH"] = true
+--@src/devices/machine/ncr539x.h,MACHINES["NCR539x"] = true
 ---------------------------------------------------
 
-if (MACHINES["NANDFLASH"]~=null) then
+if (MACHINES["NCR539x"]~=null) then
+	MACHINES["SCSI"] = true
 	files {
-		MAME_DIR .. "src/devices/machine/nandflash.cpp",
-		MAME_DIR .. "src/devices/machine/nandflash.h",
+		MAME_DIR .. "src/devices/machine/ncr539x.cpp",
+		MAME_DIR .. "src/devices/machine/ncr539x.h",
 	}
 end
 
@@ -2840,18 +2770,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/i82439hx.h",
 		MAME_DIR .. "src/devices/machine/i82439tx.cpp",
 		MAME_DIR .. "src/devices/machine/i82439tx.h",
-		MAME_DIR .. "src/devices/machine/i82443bx_host.cpp",
-		MAME_DIR .. "src/devices/machine/i82443bx_host.h",
 		MAME_DIR .. "src/devices/machine/i82371sb.cpp",
 		MAME_DIR .. "src/devices/machine/i82371sb.h",
-		MAME_DIR .. "src/devices/machine/i82371eb_isa.cpp",
-		MAME_DIR .. "src/devices/machine/i82371eb_isa.h",
-		MAME_DIR .. "src/devices/machine/i82371eb_ide.cpp",
-		MAME_DIR .. "src/devices/machine/i82371eb_ide.h",
-		MAME_DIR .. "src/devices/machine/i82371eb_acpi.cpp",
-		MAME_DIR .. "src/devices/machine/i82371eb_acpi.h",
-		MAME_DIR .. "src/devices/machine/i82371eb_usb.cpp",
-		MAME_DIR .. "src/devices/machine/i82371eb_usb.h",
 		MAME_DIR .. "src/devices/machine/lpc.h",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-acpi.h",
@@ -2859,10 +2779,6 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
-		MAME_DIR .. "src/devices/machine/mpc106.cpp",
-		MAME_DIR .. "src/devices/machine/mpc106.h",
-		MAME_DIR .. "src/devices/machine/mv6436x.cpp",
-		MAME_DIR .. "src/devices/machine/mv6436x.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
 		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
@@ -2887,16 +2803,6 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
-		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
-		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.h",
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.cpp",
-		MAME_DIR .. "src/devices/machine/mediagx_cs5530_ide.h",
-		MAME_DIR .. "src/devices/machine/mediagx_host.cpp",
-		MAME_DIR .. "src/devices/machine/mediagx_host.h",
-		MAME_DIR .. "src/devices/machine/zfmicro_usb.cpp",
-		MAME_DIR .. "src/devices/machine/zfmicro_usb.h",
 	}
 end
 
@@ -2962,57 +2868,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/psion_asic1.h,MACHINES["PSION_ASIC"] = true
---@src/devices/machine/psion_asic2.h,MACHINES["PSION_ASIC"] = true
---@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
---@src/devices/machine/psion_asic4.h,MACHINES["PSION_ASIC"] = true
---@src/devices/machine/psion_asic5.h,MACHINES["PSION_ASIC"] = true
---@src/devices/machine/psion_asic9.h,MACHINES["PSION_ASIC"] = true
----------------------------------------------------
-
-if (MACHINES["PSION_ASIC"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/psion_asic1.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic1.h",
-		MAME_DIR .. "src/devices/machine/psion_asic2.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic2.h",
-		MAME_DIR .. "src/devices/machine/psion_asic3.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic3.h",
-		MAME_DIR .. "src/devices/machine/psion_asic4.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic4.h",
-		MAME_DIR .. "src/devices/machine/psion_asic5.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic5.h",
-		MAME_DIR .. "src/devices/machine/psion_asic9.cpp",
-		MAME_DIR .. "src/devices/machine/psion_asic9.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/psion_condor.h,MACHINES["PSION_CONDOR"] = true
----------------------------------------------------
-
-if (MACHINES["PSION_CONDOR"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/psion_condor.cpp",
-		MAME_DIR .. "src/devices/machine/psion_condor.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/psion_ssd.h,MACHINES["PSION_SSD"] = true
----------------------------------------------------
-
-if (MACHINES["PSION_SSD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/psion_ssd.cpp",
-		MAME_DIR .. "src/devices/machine/psion_ssd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/pxa255.h,MACHINES["PXA255"] = true
 ---------------------------------------------------
 
@@ -3020,6 +2875,7 @@ if (MACHINES["PXA255"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pxa255.cpp",
 		MAME_DIR .. "src/devices/machine/pxa255.h",
+		MAME_DIR .. "src/devices/machine/pxa255defs.h",
 	}
 end
 
@@ -3368,6 +3224,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/serflash.h,MACHINES["SERFLASH"] = true
+---------------------------------------------------
+
+if (MACHINES["SERFLASH"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/serflash.cpp",
+		MAME_DIR .. "src/devices/machine/serflash.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/smc91c9x.h,MACHINES["SMC91C9X"] = true
 ---------------------------------------------------
 
@@ -3605,6 +3473,18 @@ if (MACHINES["TMC208K"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tmc208k.cpp",
 		MAME_DIR .. "src/devices/machine/tmc208k.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tmp68301.h,MACHINES["TMP68301"] = true
+---------------------------------------------------
+
+if (MACHINES["TMP68301"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tmp68301.cpp",
+		MAME_DIR .. "src/devices/machine/tmp68301.h",
 	}
 end
 
@@ -4154,13 +4034,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr53c90.h,MACHINES["NCR53C90"] = true
+--@src/devices/machine/ncr5390.h,MACHINES["NCR5390"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR53C90"]~=null) then
+if (MACHINES["NCR5390"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr53c90.cpp",
-		MAME_DIR .. "src/devices/machine/ncr53c90.h",
+		MAME_DIR .. "src/devices/machine/ncr5390.cpp",
+		MAME_DIR .. "src/devices/machine/ncr5390.h",
 	}
 end
 
@@ -4215,13 +4095,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/dp8573a.h,MACHINES["DP8573A"] = true
+--@src/devices/machine/dp8573.h,MACHINES["DP8573"] = true
 ---------------------------------------------------
 
-if (MACHINES["DP8573A"]~=null) then
+if (MACHINES["DP8573"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/dp8573a.cpp",
-		MAME_DIR .. "src/devices/machine/dp8573a.h",
+		MAME_DIR .. "src/devices/machine/dp8573.cpp",
+		MAME_DIR .. "src/devices/machine/dp8573.h",
 	}
 end
 
@@ -4307,18 +4187,6 @@ if (MACHINES["STEPPERS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/steppers.cpp",
 		MAME_DIR .. "src/devices/machine/steppers.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/em_reel.h,MACHINES["EM_REEL"] = true
----------------------------------------------------
-
-if (MACHINES["EM_REEL"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/em_reel.cpp",
-		MAME_DIR .. "src/devices/machine/em_reel.h",
 	}
 end
 
@@ -4426,31 +4294,6 @@ if (MACHINES["FDC37C93X"]~=null) then
 		MAME_DIR .. "src/devices/machine/fdc37c93x.h",
 	}
 end
-
----------------------------------------------------
---
---@src/devices/machine/pc87306.h,MACHINES["PC87306"] = true
----------------------------------------------------
-
-if (MACHINES["PC87306"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/pc87306.cpp",
-		MAME_DIR .. "src/devices/machine/pc87306.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/w83977tf.h,MACHINES["W83977TF"] = true
----------------------------------------------------
-
-if (MACHINES["W83977TF"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/w83977tf.cpp",
-		MAME_DIR .. "src/devices/machine/w83977tf.h",
-	}
-end
-
 
 ---------------------------------------------------
 --
@@ -4625,18 +4468,6 @@ if (MACHINES["GEN_FIFO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/gen_fifo.cpp",
 		MAME_DIR .. "src/devices/machine/gen_fifo.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/opti82c861.h,MACHINES["OPTI82C861"] = true
----------------------------------------------------
-
-if (MACHINES["OPTI82C861"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/opti82c861.cpp",
-		MAME_DIR .. "src/devices/machine/opti82c861.h",
 	}
 end
 
@@ -4879,6 +4710,18 @@ if (MACHINES["AIC6250"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/aic6250.cpp",
 		MAME_DIR .. "src/devices/machine/aic6250.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/dc7085.h,MACHINES["DC7085"] = true
+---------------------------------------------------
+
+if (MACHINES["DC7085"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dc7085.cpp",
+		MAME_DIR .. "src/devices/machine/dc7085.h",
 	}
 end
 
@@ -5268,40 +5111,5 @@ if (MACHINES["MICOMXE1A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/micomxe1a.cpp",
 		MAME_DIR .. "src/devices/machine/micomxe1a.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/mc88200.h,MACHINES["MC88200"] = true
----------------------------------------------------
-if (MACHINES["MC88200"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/mc88200.cpp",
-		MAME_DIR .. "src/devices/machine/mc88200.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/pccard_sram.h,MACHINES["PCCARD_SRAM"] = true
----------------------------------------------------
-
-if (MACHINES["PCCARD_SRAM"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
-		MAME_DIR .. "src/devices/machine/pccard_sram.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/tc9223.h,MACHINES["TC9223"] = true
----------------------------------------------------
-
-if (MACHINES["TC9223"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/tc9223.cpp",
-		MAME_DIR .. "src/devices/machine/tc9223.h",
 	}
 end

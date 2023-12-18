@@ -27,7 +27,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 
-	void write_rxd(int state);
+	DECLARE_WRITE_LINE_MEMBER(write_rxd);
 
 protected:
 	virtual void device_start() override;

@@ -95,7 +95,7 @@ void toaplan1_demonwld_state::dsp_bio_w(u16 data)
 	}
 }
 
-int toaplan1_demonwld_state::bio_r()
+READ_LINE_MEMBER(toaplan1_demonwld_state::bio_r)
 {
 	return m_dsp_bio;
 }
@@ -177,22 +177,22 @@ void toaplan1_state::reset_sound_w(u8 data)
 }
 
 
-void toaplan1_rallybik_state::coin_counter_1_w(int state)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_counter_1_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-void toaplan1_rallybik_state::coin_counter_2_w(int state)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_counter_2_w)
 {
 	machine().bookkeeping().coin_counter_w(1, state);
 }
 
-void toaplan1_rallybik_state::coin_lockout_1_w(int state)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_lockout_1_w)
 {
 	machine().bookkeeping().coin_lockout_w(0, !state);
 }
 
-void toaplan1_rallybik_state::coin_lockout_2_w(int state)
+WRITE_LINE_MEMBER(toaplan1_rallybik_state::coin_lockout_2_w)
 {
 	machine().bookkeeping().coin_lockout_w(1, !state);
 }
@@ -207,7 +207,7 @@ void toaplan1_state::coin_w(u8 data)
 	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
 }
 
-void toaplan1_state::reset_callback(int state)
+WRITE_LINE_MEMBER(toaplan1_state::reset_callback)
 {
 	reset_sound();
 }

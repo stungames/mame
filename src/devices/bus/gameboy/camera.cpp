@@ -85,7 +85,7 @@ public:
 
 	camera_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual std::error_condition load(std::string &message) override ATTR_COLD;
+	virtual image_init_result load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -316,31 +316,31 @@ camera_device::camera_device(
 }
 
 
-std::error_condition camera_device::load(std::string &message)
+image_init_result camera_device::load(std::string &message)
 {
 	// set up ROM and RAM
 	set_bank_bits_rom(6);
 	set_bank_bits_ram(4);
 	if (!check_rom(message) || !configure_bank_ram(message))
-		return image_error::BADSOFTWARE;
+		return image_init_result::FAIL;
 	install_rom();
 
 	// install memory map control handlers
 	cart_space()->install_write_handler(
 			0x0000, 0x1fff,
-			emu::rw_delegate(*this, FUNC(camera_device::enable_ram)));
+			write8smo_delegate(*this, FUNC(camera_device::enable_ram)));
 	cart_space()->install_write_handler(
 			0x2000, 0x3fff,
-			emu::rw_delegate(*this, FUNC(camera_device::bank_switch_rom)));
+			write8smo_delegate(*this, FUNC(camera_device::bank_switch_rom)));
 	cart_space()->install_write_handler(
 			0x4000, 0x5fff,
-			emu::rw_delegate(*this, FUNC(camera_device::bank_switch_ram)));
+			write8smo_delegate(*this, FUNC(camera_device::bank_switch_ram)));
 
 	// put RAM through trampolines so it can be locked when necessary
 	cart_space()->install_readwrite_handler(
 			0xa000, 0xbfff,
-			emu::rw_delegate(*this, FUNC(camera_device::read_ram)),
-			emu::rw_delegate(*this, FUNC(camera_device::write_ram)));
+			read8sm_delegate(*this, FUNC(camera_device::read_ram)),
+			write8sm_delegate(*this, FUNC(camera_device::write_ram)));
 
 	// camera control overlays cartridge RAM
 	cart_space()->install_view(
@@ -348,16 +348,16 @@ std::error_condition camera_device::load(std::string &message)
 			m_view_cam);
 	m_view_cam[0].install_read_handler(
 			0xa000, 0xa07f, 0x0000, 0x1f80, 0x0000,
-			emu::rw_delegate(*this, FUNC(camera_device::read_camera)));
+			read8sm_delegate(*this, FUNC(camera_device::read_camera)));
 	m_view_cam[0].install_write_handler(
 			0xa000, 0xa005, 0x0000, 0x1f80, 0x0000,
-			emu::rw_delegate(*this, FUNC(camera_device::write_camera)));
+			write8sm_delegate(*this, FUNC(camera_device::write_camera)));
 	m_view_cam[0].install_writeonly(
 			0xa006, 0xa035, 0x1f80,
 			&m_threshold[0][0][0]);
 
 	// all good
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 

@@ -83,13 +83,15 @@ void cbm2_expansion_slot_device::device_start()
 //  call_load -
 //-------------------------------------------------
 
-std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_load()
+image_init_result cbm2_expansion_slot_device::call_load()
 {
+	size_t size;
+
 	if (m_card)
 	{
 		if (!loaded_through_softlist())
 		{
-			size_t const size = length();
+			size = length();
 
 			if (is_filetype("20"))
 			{
@@ -115,7 +117,7 @@ std::pair<std::error_condition, std::string> cbm2_expansion_slot_device::call_lo
 		}
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 

@@ -205,14 +205,8 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_Z80     (1U << 1)
+#define PGMLOGERROR 0
 
-#define LOG_ALL     (LOG_Z80)
-
-#define VERBOSE (0)
-#include "logmacro.h"
-
-#define LOGZ80(...) LOGMASKED(LOG_Z80, __VA_ARGS__)
 
 u16 pgm_state::videoram_r(offs_t offset)
 {
@@ -254,12 +248,14 @@ void pgm_state::z80_ram_w(offs_t offset, u8 data)
 	m_z80_mainram[offset] = data;
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		LOGZ80("Z80: write %04x, %02x (%06x)\n", offset, data, m_maincpu->pc());
+		if (PGMLOGERROR)
+			logerror("Z80: write %04x, %02x (%06x)\n", offset, data, m_maincpu->pc());
 }
 
 void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOGZ80("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
+	if (PGMLOGERROR)
+		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 
 	if (data == 0x5050)
 	{
@@ -277,19 +273,22 @@ void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 
 void pgm_state::z80_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	LOGZ80("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
+	if (PGMLOGERROR)
+		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 }
 
 void pgm_state::m68k_l1_w(u8 data)
 {
-	LOGZ80("SL 1 m68.w %02x (%06x) IRQ\n", data, m_maincpu->pc());
+	if (PGMLOGERROR)
+		logerror("SL 1 m68.w %02x (%06x) IRQ\n", data, m_maincpu->pc());
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void pgm_state::z80_l3_w(u8 data)
 {
-	LOGZ80("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
+	if (PGMLOGERROR)
+		logerror("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
 	m_soundlatch3->write(data);
 }
 
@@ -533,7 +532,7 @@ void pgm_state::pgm(machine_config &config)
 }
 
 
-/*** ROM Loading *************************************************************/
+/*** Rom Loading *************************************************************/
 
 /* take note of "sprmask" needed for expanding the Sprite Colour Data */
 
@@ -541,16 +540,15 @@ void pgm_state::pgm(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios))
 
 #define PGM_68K_BIOS \
-	ROM_SYSTEM_BIOS( 0, "v2",     "PGM BIOS V2" ) \
+	ROM_SYSTEM_BIOS( 0, "v2",     "PGM Bios V2" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "pgm_p02s.u20",    0x00000, 0x020000, CRC(78c15fa2) SHA1(885a6558e022602cc6f482ac9667ba9f61e75092) ) /* Version 2 (Label: IGS | PGM P02S | 1P0792D1 | J992438 )*/ \
-	ROM_SYSTEM_BIOS( 1, "v1",     "PGM BIOS V1" ) \
+	ROM_SYSTEM_BIOS( 1, "v1",     "PGM Bios V1" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 1, "pgm_p01s.u20",    0x00000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) ) /* Version 1 */
 #define PGM_AUDIO_BIOS \
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) )
 #define PGM_VIDEO_BIOS \
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) )
-
-/* The BIOS - NOT A GAME */
+/* The Bios - NOT A GAME */
 ROM_START( pgm )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS

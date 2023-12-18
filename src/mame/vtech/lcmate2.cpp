@@ -44,8 +44,6 @@
 #include "utf8.h"
 
 
-namespace {
-
 class lcmate2_state : public driver_device
 {
 public:
@@ -255,7 +253,7 @@ void lcmate2_state::lcmate2(machine_config &config)
 	PALETTE(config, "palette", FUNC(lcmate2_state::lcmate2_palette), 2);
 	GFXDECODE(config, "gfxdecode", "palette", gfx_lcmate2);
 
-	HD44780(config, m_lcdc, 250'000); // TODO: clock not measured, datasheet typical clock used
+	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 20);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -274,9 +272,6 @@ ROM_START( lcmate2 )
 	ROM_LOAD( "u2.bin",  0x00000, 0x08000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
 	ROM_LOAD( "u3.bin",  0x20000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
 ROM_END
-
-} // anonymous namespace
-
 
 /* Driver */
 

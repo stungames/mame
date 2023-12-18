@@ -57,20 +57,20 @@ void md90_120_device::device_add_mconfig(machine_config &config)
 }
 
 
-void md90_120_device::modem_cb(int state)
+WRITE_LINE_MEMBER( md90_120_device::modem_cb )
 {
 	LOG( "modem_cb: called %i\n", state );
 }
 
 
 
-void md90_120_device::modem_tx_w(int state)
+WRITE_LINE_MEMBER( md90_120_device::modem_tx_w )
 {
 	m_modem_tx = state;
 }
 
 
-void md90_120_device::write_acia_clock(int state)
+WRITE_LINE_MEMBER( md90_120_device::write_acia_clock )
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

@@ -10,8 +10,6 @@ exports.author = { name = "Carl" }
 
 local cheatfind = exports
 
-local reset_subscription
-
 function cheatfind.startplugin()
 	local cheat = {}
 
@@ -335,7 +333,7 @@ function cheatfind.startplugin()
 		end
 	end
 
-	reset_subscription = emu.add_machine_reset_notifier(start)
+	emu.register_start(start)
 
 	local menu_is_showing = false
 	local tabbed_out = false

@@ -211,9 +211,6 @@ Beeper Circuit, all ICs shown:
 
 #include "utf8.h"
 
-
-namespace {
-
 #define MAIN_CLOCK XTAL_4.194MHz
 
 //**************************************************************************
@@ -254,7 +251,7 @@ private:
 	uint8_t vsync_r();
 	void beep_w(uint8_t data);
 	void bank_w(uint8_t data);
-	int kbd_matrix_r();
+	DECLARE_READ_LINE_MEMBER(kbd_matrix_r);
 	void kbd_matrix_w(uint8_t data);
 	uint8_t kbd_port2_r();
 	void kbd_port2_w(uint8_t data);
@@ -264,9 +261,9 @@ private:
 	void fdc_cmd_w(uint8_t data);
 	static void itt3030_floppy_formats(format_registration &fr);
 
-	void fdcirq_w(int state);
-	void fdcdrq_w(int state);
-	void fdchld_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	void itt3030_palette(palette_device &palette) const;
 
 	void itt3030_io(address_map &map);
@@ -334,7 +331,7 @@ void itt3030_state::itt3030_io(address_map &map)
 //  INPUTS
 //**************************************************************************
 
-int itt3030_state::kbd_matrix_r()
+READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 {
 	return m_kbdread;
 }
@@ -562,18 +559,18 @@ void itt3030_state::beep_w(uint8_t data)
 //  FLOPPY
 //**************************************************************************
 
-void itt3030_state::fdcirq_w(int state)
+WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
 {
 	m_fdc_irq = state;
 }
 
 
-void itt3030_state::fdcdrq_w(int state)
+WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
 {
 	m_fdc_drq = state;
 }
 
-void itt3030_state::fdchld_w(int state)
+WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
 {
 	m_fdc_hld = state;
 }
@@ -774,9 +771,6 @@ ROM_START( itt3030 )
 	ROM_REGION( 0x0400, "kbdmcu", ROMREGION_ERASE00 )
 	ROM_LOAD( "8741ad.bin", 0x0000, 0x0400, CRC(cabf4394) SHA1(e5d1416b568efa32b578ca295a29b7b5d20c0def))
 ROM_END
-
-} // anonymous namespace
-
 
 //**************************************************************************
 //  SYSTEM DRIVERS

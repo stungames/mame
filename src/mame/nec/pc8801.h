@@ -102,7 +102,7 @@ protected:
 	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<pc8801_exp_slot_device> m_exp;
 
-	void int4_irq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
 	uint8_t m_gfx_ctrl = 0;
 
@@ -178,7 +178,7 @@ private:
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
 //  void rtc_w(uint8_t data);
 
-	void txdata_callback(int state);
+	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 
 	// video section
 	void draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, palette_device *palette, std::function<u8(u32 bitmap_offset, int y, int x, int xi)> dot_func);
@@ -188,11 +188,11 @@ private:
 	bitmap_rgb32 m_text_bitmap;
 
 	// irq section
-	void rxrdy_irq_w(int state);
-	void vrtc_irq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(rxrdy_irq_w);
+	DECLARE_WRITE_LINE_MEMBER(vrtc_irq_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_irq_w);
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
-	void irq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
 
 	struct {
 		u8 enable = 0, pending = 0;
@@ -232,7 +232,6 @@ protected:
 
 	uint8_t opn_porta_r();
 	uint8_t opn_portb_r();
-	void opn_portb_w(uint8_t data);
 
 private:
 	optional_device<ym2203_device> m_opn;

@@ -59,8 +59,6 @@
 #include "speaker.h"
 
 
-namespace {
-
 class tek440x_state : public driver_device
 {
 public:
@@ -101,9 +99,9 @@ private:
 	void sound_w(u8 data);
 	void diag_w(u8 data);
 
-	void kb_rdata_w(int state);
-	void kb_tdata_w(int state);
-	void kb_rclamp_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(kb_rdata_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_tdata_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_rclamp_w);
 
 	void logical_map(address_map &map);
 	void physical_map(address_map &map);
@@ -268,14 +266,14 @@ void tek440x_state::diag_w(u8 data)
 	m_kb_loop = BIT(data, 7);
 }
 
-void tek440x_state::kb_rdata_w(int state)
+WRITE_LINE_MEMBER(tek440x_state::kb_rdata_w)
 {
 	m_kb_rdata = state;
 	if (!m_kb_rclamp)
 		m_duart->rx_a_w(state);
 }
 
-void tek440x_state::kb_rclamp_w(int state)
+WRITE_LINE_MEMBER(tek440x_state::kb_rclamp_w)
 {
 	if (m_kb_rclamp != !state)
 	{
@@ -288,7 +286,7 @@ void tek440x_state::kb_rclamp_w(int state)
 	}
 }
 
-void tek440x_state::kb_tdata_w(int state)
+WRITE_LINE_MEMBER(tek440x_state::kb_tdata_w)
 {
 	if (m_kb_tdata != state)
 	{
@@ -425,9 +423,6 @@ ROM_START( tek4404 )
 	ROM_REGION( 0x2000, "scsimfm", 0 )
 	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 ROM_END
-
-} // anonymous namespace
-
 
 /*************************************
  *

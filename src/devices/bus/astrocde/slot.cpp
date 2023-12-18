@@ -134,11 +134,11 @@ static const char *astrocade_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-std::pair<std::error_condition, std::string> astrocade_cart_slot_device::call_load()
+image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t const size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size);
 
 		if (!loaded_through_softlist())
@@ -163,9 +163,11 @@ std::pair<std::error_condition, std::string> astrocade_cart_slot_device::call_lo
 		}
 
 		//printf("Type: %s\n", astrocade_get_slot(m_type));
+
+		return image_init_result::PASS;
 	}
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 

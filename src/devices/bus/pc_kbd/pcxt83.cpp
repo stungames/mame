@@ -276,7 +276,7 @@ void ibm_pc_xt_83_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-void ibm_pc_xt_83_keyboard_device::clock_write(int state)
+WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::clock_write )
 {
 }
 
@@ -285,7 +285,7 @@ void ibm_pc_xt_83_keyboard_device::clock_write(int state)
 //  data_write -
 //-------------------------------------------------
 
-void ibm_pc_xt_83_keyboard_device::data_write(int state)
+WRITE_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::data_write )
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -409,7 +409,7 @@ void ibm_pc_xt_83_keyboard_device::p2_w(uint8_t data)
 //  t0_r -
 //-------------------------------------------------
 
-int ibm_pc_xt_83_keyboard_device::t0_r()
+READ_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::t0_r )
 {
 	return clock_signal();
 }
@@ -419,7 +419,7 @@ int ibm_pc_xt_83_keyboard_device::t0_r()
 //  t1_r -
 //-------------------------------------------------
 
-int ibm_pc_xt_83_keyboard_device::t1_r()
+READ_LINE_MEMBER( ibm_pc_xt_83_keyboard_device::t1_r )
 {
 	return BIT(m_p2, 3) && m_q;
 }

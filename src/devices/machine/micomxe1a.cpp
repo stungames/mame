@@ -158,8 +158,8 @@ micom_xe_1a_device::micom_xe_1a_device(
 		device_t *owner,
 		u32 clock):
 	device_t(mconfig, MICOM_XE_1A, tag, owner, clock),
-	m_buttons_callback(*this, 0xffff),
-	m_analog_callback(*this, 0x00),
+	m_buttons_callback(*this),
+	m_analog_callback(*this),
 	m_output_timer(nullptr),
 	m_req(1),
 	m_mode(1),
@@ -252,7 +252,7 @@ u8 micom_xe_1a_device::out_r()
 }
 
 
-void micom_xe_1a_device::req_w(int state)
+WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 {
 	u8 const req = state ? 1 : 0;
 	if (req != m_req)
@@ -289,7 +289,7 @@ void micom_xe_1a_device::req_w(int state)
 }
 
 
-void micom_xe_1a_device::mode_w(int state)
+WRITE_LINE_MEMBER(micom_xe_1a_device::mode_w)
 {
 	u8 const mode = state ? 1 : 0;
 	if (mode != m_mode)
@@ -309,7 +309,7 @@ void micom_xe_1a_device::mode_w(int state)
 }
 
 
-void micom_xe_1a_device::interface_w(int state)
+WRITE_LINE_MEMBER(micom_xe_1a_device::interface_w)
 {
 	m_interface = state ? 1 : 0;
 }
@@ -317,6 +317,9 @@ void micom_xe_1a_device::interface_w(int state)
 
 void micom_xe_1a_device::device_start()
 {
+	m_buttons_callback.resolve_safe(0xffff);
+	m_analog_callback.resolve_safe(0x00);
+
 	m_output_timer = timer_alloc(FUNC(micom_xe_1a_device::step_output), this);
 
 	std::fill(std::begin(m_data), std::end(m_data), 0x00);

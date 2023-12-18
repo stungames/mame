@@ -53,8 +53,7 @@ const size_t debugger_commands::MAX_GLOBALS = 1000;
 
 bool debugger_commands::cheat_address_is_valid(address_space &space, offs_t address)
 {
-	address_space *tspace;
-	return space.device().memory().translate(space.spacenum(), device_memory_interface::TR_READ, address, tspace) && (tspace->get_write_ptr(address) != nullptr);
+	return space.device().memory().translate(space.spacenum(), TRANSLATE_READ, address) && (space.get_write_ptr(address) != nullptr);
 }
 
 
@@ -105,15 +104,14 @@ u64 debugger_commands::cheat_system::read_extended(offs_t address) const
 {
 	address &= space->logaddrmask();
 	u64 value = space->unmap();
-	address_space *tspace;
-	if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+	if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
 	{
 		switch (width)
 		{
-		case 1: value = tspace->read_byte(address);              break;
-		case 2: value = tspace->read_word_unaligned(address);    break;
-		case 4: value = tspace->read_dword_unaligned(address);   break;
-		case 8: value = tspace->read_qword_unaligned(address);   break;
+		case 1: value = space->read_byte(address);              break;
+		case 2: value = space->read_word_unaligned(address);    break;
+		case 4: value = space->read_dword_unaligned(address);   break;
+		case 8: value = space->read_qword_unaligned(address);   break;
 		}
 	}
 	return sign_extend(byte_swap(value));
@@ -170,7 +168,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 		if ((valcount == 1) && (blockcount == 1) && strstr(name, "/globals/"))
 		{
 			char symname[100];
-			snprintf(symname, 100, ".%s", strrchr(name, '/') + 1);
+			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			m_global_array[itemnum].base = base;
 			m_global_array[itemnum].size = valsize;
 			symtable.add(
@@ -2004,9 +2002,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
-			address_space *tspace;
-			u64 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_qword(curaddr) : space->unmap();
+			u64 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_qword(curaddr) : space->unmap();
 			fwrite(&data, 8, 1, f);
 		}
 		break;
@@ -2014,9 +2011,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
-			address_space *tspace;
-			u32 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_dword(curaddr) : space->unmap();
+			u32 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_dword(curaddr) : space->unmap();
 			fwrite(&data, 4, 1, f);
 		}
 		break;
@@ -2024,9 +2020,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
-			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_word(curaddr) : space->unmap();
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2034,9 +2029,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
-			address_space *tspace;
-			u8 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_byte(curaddr) : space->unmap();
+			u8 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_byte(curaddr) : space->unmap();
 			fwrite(&data, 1, 1, f);
 		}
 		break;
@@ -2046,9 +2040,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		for (u64 i = offset; i != endoffset; i+=16)
 		{
 			offs_t curaddr = i;
-			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr) ?
+				space->read_word(curaddr) : space->unmap();
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2152,9 +2145,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			offs_t curaddr = i;
 			u64 data;
 			f.read((char *)&data, 8);
-			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
-				tspace->write_qword(curaddr, data);
+			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
+				space->write_qword(curaddr, data);
 		}
 		break;
 	case -2:
@@ -2163,9 +2155,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			offs_t curaddr = i;
 			u32 data;
 			f.read((char *)&data, 4);
-			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
-				tspace->write_dword(curaddr, data);
+			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
+				space->write_dword(curaddr, data);
 		}
 		break;
 	case -1:
@@ -2174,9 +2165,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			offs_t curaddr = i;
 			u16 data;
 			f.read((char *)&data, 2);
-			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
-				tspace->write_word(curaddr, data);
+			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
+				space->write_word(curaddr, data);
 		}
 		break;
 	case  0:
@@ -2185,9 +2175,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			offs_t curaddr = i;
 			u8 data;
 			f.read((char *)&data, 1);
-			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
-				tspace->write_byte(curaddr, data);
+			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
+				space->write_byte(curaddr, data);
 		}
 		break;
 	case  3:
@@ -2198,9 +2187,8 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			offs_t curaddr = i;
 			u16 data;
 			f.read((char *)&data, 2);
-			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
-				tspace->write_word(curaddr, data);
+			if (f && space->device().memory().translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, curaddr))
+				space->write_word(curaddr, data);
 		}
 		break;
 	}
@@ -2350,22 +2338,21 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			if (i + j <= endoffset)
 			{
 				offs_t curaddr = i + j;
-				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
 					switch (width)
 					{
 					case 8:
-						util::stream_format(output, " %016X", tspace->read_qword_unaligned(i+j));
+						util::stream_format(output, " %016X", space->read_qword_unaligned(i+j));
 						break;
 					case 4:
-						util::stream_format(output, " %08X", tspace->read_dword_unaligned(i+j));
+						util::stream_format(output, " %08X", space->read_dword_unaligned(i+j));
 						break;
 					case 2:
-						util::stream_format(output, " %04X", tspace->read_word_unaligned(i+j));
+						util::stream_format(output, " %04X", space->read_word_unaligned(i+j));
 						break;
 					case 1:
-						util::stream_format(output, " %02X", tspace->read_byte(i+j));
+						util::stream_format(output, " %02X", space->read_byte(i+j));
 						break;
 					}
 				}
@@ -2385,23 +2372,22 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
 			{
 				offs_t curaddr = i + j;
-				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
 					u64 data = 0;
 					switch (width)
 					{
 					case 8:
-						data = tspace->read_qword_unaligned(i+j);
+						data = space->read_qword_unaligned(i+j);
 						break;
 					case 4:
-						data = tspace->read_dword_unaligned(i+j);
+						data = space->read_dword_unaligned(i+j);
 						break;
 					case 2:
-						data = tspace->read_word_unaligned(i+j);
+						data = space->read_word_unaligned(i+j);
 						break;
 					case 1:
-						data = tspace->read_byte(i+j);
+						data = space->read_byte(i+j);
 						break;
 					}
 					for (unsigned int b = 0; b != width; b++) {
@@ -2497,29 +2483,28 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 		// get the character data
 		u64 data = 0;
 		offs_t curaddr = offset;
-		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+		if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 		{
 			switch (width)
 			{
 			case 1:
-				data = tspace->read_byte(curaddr);
+				data = space->read_byte(curaddr);
 				break;
 
 			case 2:
-				data = tspace->read_word(curaddr);
+				data = space->read_word(curaddr);
 				if (be)
 					data = swapendian_int16(data);
 				break;
 
 			case 4:
-				data = tspace->read_dword(curaddr);
+				data = space->read_dword(curaddr);
 				if (be)
 					data = swapendian_int32(data);
 				break;
 
 			case 8:
-				data = tspace->read_qword(curaddr);
+				data = space->read_qword(curaddr);
 				if (be)
 					data = swapendian_int64(data);
 				break;
@@ -3173,37 +3158,36 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		for (int j = 0; j < data_count && match; j++)
 		{
 			offs_t address = space->byte_to_address(i + suboffset);
-			address_space *tspace;
 			switch (data_size[j])
 			{
 			case 1:
 				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
-					match = tspace->read_byte(address) == u8(data_to_find[j]);
+				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
+					match = space->read_byte(address) == u8(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 2:
 				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
-					match = tspace->read_word_unaligned(address) == u16(data_to_find[j]);
+				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
+					match = space->read_word_unaligned(address) == u16(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 4:
 				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
-					match = tspace->read_dword_unaligned(address) == u32(data_to_find[j]);
+				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
+					match = space->read_dword_unaligned(address) == u32(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 8:
 				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
-					match = tspace->read_qword_unaligned(address) == u64(data_to_find[j]);
+				if (memory.translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
+					match = space->read_qword_unaligned(address) == u64(data_to_find[j]);
 				else
 					match = false;
 				break;
@@ -3300,8 +3284,7 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 		for (int j = 0; j < data_count; j++)
 		{
 			offs_t address = space->byte_to_address(offset) & space->logaddrmask();
-			address_space *tspace;
-			if (!memory.translate(space->spacenum(), device_memory_interface::TR_WRITE, address, tspace))
+			if (!memory.translate(space->spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			{
 				m_console.printf("Fill aborted due to page fault at %0*X\n", space->logaddrchars(), space->byte_to_address(offset) & space->logaddrmask());
 				length = 0;
@@ -3310,19 +3293,19 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 			switch (fill_data_size[j])
 			{
 			case 1:
-				tspace->write_byte(address, fill_data[j]);
+				space->write_byte(address, fill_data[j]);
 				break;
 
 			case 2:
-				tspace->write_word_unaligned(address, fill_data[j]);
+				space->write_word_unaligned(address, fill_data[j]);
 				break;
 
 			case 4:
-				tspace->write_dword_unaligned(address, fill_data[j]);
+				space->write_dword_unaligned(address, fill_data[j]);
 				break;
 
 			case 8:
-				tspace->read_qword_unaligned(address, fill_data[j]);
+				space->read_qword_unaligned(address, fill_data[j]);
 				break;
 			}
 			offset += fill_data_size[j];
@@ -3551,13 +3534,13 @@ void debugger_commands::execute_history(const std::vector<std::string_view> &par
 	}
 
 	// loop over lines
+	debug_disasm_buffer buffer(*device);
 	std::string instruction;
 	for (int index = int(unsigned(count)); index > 0; index--)
 	{
 		auto const pc = debug->history_pc(1 - index);
 		if (pc.second)
 		{
-			debug_disasm_buffer buffer(*device);
 			offs_t next_offset;
 			offs_t size;
 			u32 info;
@@ -3671,8 +3654,7 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 
 	// Translate the address
 	offs_t a = address & space->logaddrmask();
-	address_space *tspace;
-	if (!space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, a, tspace))
+	if (!space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, a))
 	{
 		m_console.printf("Address translation failed\n");
 		return;
@@ -3684,19 +3666,19 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 	switch (space->data_width())
 	{
 	case 8:
-		data = tspace->read_byte(a);
+		data = space->read_byte(a);
 		break;
 
 	case 16:
-		data = tspace->read_word_unaligned(a);
+		data = space->read_word_unaligned(a);
 		break;
 
 	case 32:
-		data = tspace->read_dword_unaligned(a);
+		data = space->read_dword_unaligned(a);
 		break;
 
 	case 64:
-		data = tspace->read_qword_unaligned(a);
+		data = space->read_qword_unaligned(a);
 		break;
 	}
 
@@ -3778,22 +3760,20 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 	address_space *space;
 	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
 		return;
-	address &= space->logaddrmask();
 
 	// do the translation first
-	for (int intention = device_memory_interface::TR_READ; intention <= device_memory_interface::TR_FETCH; intention++)
+	for (int intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
-		offs_t taddress = address;
-		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), intention, taddress, tspace))
+		offs_t taddress = address & space->addrmask();
+		if (space->device().memory().translate(space->spacenum(), intention, taddress))
 		{
-			std::string mapname = tspace->get_handler_string((intention == device_memory_interface::TR_WRITE) ? read_or_write::WRITE : read_or_write::READ, taddress);
+			std::string mapname = space->get_handler_string((intention == TRANSLATE_WRITE_DEBUG) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
-					"%7s: %0*X logical %s == %0*X physical %s -> %s\n",
+					"%7s: %0*X logical == %0*X physical -> %s\n",
 					intnames[intention & 3],
-					space->logaddrchars(), address, space->name(),
-					tspace->addrchars(), taddress, tspace->name(),
+					space->logaddrchars(), address,
+					space->addrchars(), taddress,
 					mapname);
 		}
 		else
@@ -3991,19 +3971,10 @@ void debugger_commands::execute_mount(const std::vector<std::string_view> &param
 	{
 		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
-			auto [err, msg] = img.load(params[1]);
-			if (!err)
-			{
-				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
-			}
+			if (img.load(params[1]) != image_init_result::PASS)
+				m_console.printf("Unable to mount file %s on %s\n", params[1], params[0]);
 			else
-			{
-				m_console.printf(
-						"Unable to mount file %s on %s: %s\n",
-						params[1],
-						params[0],
-						!msg.empty() ? msg : err.message());
-			}
+				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
 			return;
 		}
 	}

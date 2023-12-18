@@ -101,7 +101,7 @@ public:
 
 	tama5_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	virtual std::error_condition load(std::string &message) override ATTR_COLD;
+	virtual image_init_result load(std::string &message) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -137,21 +137,21 @@ tama5_device::tama5_device(
 }
 
 
-std::error_condition tama5_device::load(std::string &message)
+image_init_result tama5_device::load(std::string &message)
 {
 	// set up ROM
 	set_bank_bits_rom(5);
 	if (!check_rom(message))
-		return image_error::BADSOFTWARE;
+		return image_init_result::FAIL;
 	install_rom();
 
 	// install I/O
-	cart_space()->install_read_handler(0xa000, 0xa000, 0x0000, 0x1fff, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::data_r)));
-	cart_space()->install_write_handler(0xa000, 0xa000, 0x0000, 0x1ffe, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::data_w)));
-	cart_space()->install_write_handler(0xa001, 0xa001, 0x0000, 0x1ffe, 0x0000, emu::rw_delegate(*this, FUNC(tama5_device::command_w)));
+	cart_space()->install_read_handler(0xa000, 0xa000, 0x0000, 0x1fff, 0x0000, read8mo_delegate(*this, FUNC(tama5_device::data_r)));
+	cart_space()->install_write_handler(0xa000, 0xa000, 0x0000, 0x1ffe, 0x0000, write8smo_delegate(*this, FUNC(tama5_device::data_w)));
+	cart_space()->install_write_handler(0xa001, 0xa001, 0x0000, 0x1ffe, 0x0000, write8smo_delegate(*this, FUNC(tama5_device::command_w)));
 
 	// all good
-	return std::error_condition();
+	return image_init_result::PASS;
 }
 
 

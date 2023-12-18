@@ -359,23 +359,6 @@ void sinistar_state::vram_select_w(u8 data)
 }
 
 
-TIMER_CALLBACK_MEMBER(sinistar_state::cockpit_deferred_snd_cmd_w)
-{
-	m_pia[2]->portb_w(param);
-	m_pia[2]->cb1_w((param == 0xff) ? 0 : 1);
-
-	m_pia[3]->portb_w(param);
-	m_pia[3]->cb1_w((param == 0xff) ? 0 : 1);
-}
-
-
-void sinistar_state::cockpit_snd_cmd_w(u8 data)
-{
-	/* the high two bits are set externally, and should be 1 */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(sinistar_state::cockpit_deferred_snd_cmd_w), this), data | 0xc0);
-}
-
-
 
 /*************************************
  *
@@ -441,7 +424,7 @@ TIMER_CALLBACK_MEMBER(blaster_state::deferred_snd_cmd_w)
 
 void blaster_state::blaster_snd_cmd_w(u8 data)
 {
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::deferred_snd_cmd_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(blaster_state::deferred_snd_cmd_w),this), data);
 }
 
 
@@ -475,7 +458,7 @@ void tshoot_state::machine_start()
 }
 
 
-void tshoot_state::maxvol_w(int state)
+WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
@@ -515,7 +498,7 @@ TIMER_CALLBACK_MEMBER(joust2_state::deferred_snd_cmd_w)
 }
 
 
-void joust2_state::pia_s11_bg_strobe_w(int state)
+WRITE_LINE_MEMBER(joust2_state::pia_s11_bg_strobe_w)
 {
 	m_current_sound_data = (m_current_sound_data & ~0x100) | ((state << 8) & 0x100);
 	m_bg->ctrl_w(state);

@@ -75,9 +75,6 @@
       which contain neither internal ROM nor RAM, has been emulated only
       to the extent required by psr500, though it likely has a few other
       features and quirks.
-    * In DF mode, MOV (da),(YP) and MOV (XP),(da) apparently need to take
-      the high byte of the direct address from the opposite pointer,
-      despite MN1870 documentation suggesting these use the same pointer.
 
 ***************************************************************************/
 
@@ -342,9 +339,8 @@ void mn1880_device::device_reset()
 	m_mmu_enable = 0;
 }
 
-bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+bool mn1880_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	target_space = &space(spacenum);
 	switch (spacenum)
 	{
 	case AS_PROGRAM:
@@ -708,7 +704,7 @@ void mn1880_device::execute_run()
 
 		case microstate::MOV36_1:
 			if (BIT(cpu.fs, 5))
-				m_da |= cpu.yp & 0xff00;
+				m_da |= cpu.xp & 0xff00;
 			m_ustate = microstate::MOV36_2;
 			break;
 
@@ -727,7 +723,7 @@ void mn1880_device::execute_run()
 			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = input;
 			if (BIT(cpu.fs, 5))
-				m_da |= cpu.xp & 0xff00;
+				m_da |= cpu.yp & 0xff00;
 			m_ustate = microstate::MOV56_2;
 			break;
 
@@ -2171,7 +2167,7 @@ void mn1880_device::execute_run()
 		case microstate::ADDRE8_1:
 			++cpu.ip;
 			if (BIT(cpu.fs, 5))
-				m_da |= cpu.yp & 0xff00;
+				m_da |= cpu.yp & 0x00ff;
 			m_tmp2 = input;
 			m_ustate = microstate::ADDRE8_2;
 			break;
@@ -2180,15 +2176,15 @@ void mn1880_device::execute_run()
 			m_tmp1 = m_data.read_byte(mmu_data_translate(m_da));
 			m_da = m_tmp2;
 			if (BIT(cpu.fs, 5))
-				m_da |= cpu.xp & 0xff00;
+				m_da |= cpu.xp & 0x00ff;
 			m_ustate = microstate::ADDRE8_3;
 			break;
 
 		case microstate::ADDRE8_3:
 			if (BIT(cpu.ir, 1))
-				setl(cpu.yp, cpu.addcz(m_tmp1, m_data.read_byte(mmu_data_translate(m_da)), false, false));
+				setl(cpu.yp, cpu.addcz(cpu.yp & 0x00ff, m_data.read_byte(mmu_data_translate(m_da)), false, false));
 			else
-				setl(cpu.xp, cpu.addcz(m_tmp1, m_data.read_byte(mmu_data_translate(m_da)), false, false));
+				setl(cpu.xp, cpu.addcz(cpu.xp & 0x00ff, m_data.read_byte(mmu_data_translate(m_da)), false, false));
 			m_ustate = microstate::NOP_1; // TODO: output queue (XPl only?)
 			break;
 
@@ -2197,7 +2193,7 @@ void mn1880_device::execute_run()
 			m_tmp2 = m_da & 0x00ff;
 			m_da = input;
 			if (BIT(cpu.fs, 5))
-				m_da |= (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0xff00;
+				m_da |= (BIT(cpu.ir, 1) ? cpu.yp : cpu.xp) & 0x00ff;
 			m_ustate = microstate::ADDRE9_2;
 			break;
 
@@ -2431,7 +2427,7 @@ void mn1880_device::execute_run()
 			{
 				// IRQ0 (first of four external edge inputs?) has the highest priority (after RESET)
 				unsigned level = 32 - count_leading_zeros_32((m_irq - 1) & ~m_irq);
-				(void)standard_irq_callback(level, cpu.ip);
+				(void)standard_irq_callback(level);
 				cpu.ie &= ~(1 << level); // No separate in-service lockout; handler must re-enable specific interrupt
 				m_if &= ~(1 << level);
 				cpu.iemask = true;

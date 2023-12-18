@@ -177,13 +177,13 @@ void zaccaria_state::update_colscroll()
 		m_bg_tilemap->set_scrolly(i, read_attr(i, 0));
 }
 
-void zaccaria_state::flip_screen_x_w(int state)
+WRITE_LINE_MEMBER(zaccaria_state::flip_screen_x_w)
 {
 	flip_screen_x_set(state);
 	update_colscroll();
 }
 
-void zaccaria_state::flip_screen_y_w(int state)
+WRITE_LINE_MEMBER(zaccaria_state::flip_screen_y_w)
 {
 	flip_screen_y_set(state);
 }

@@ -170,8 +170,9 @@ Notes on floppy drive:
 #include "ibm6580.lh"
 
 
-#define LOG_KEYBOARD  (1U << 1)
-#define LOG_DEBUG     (1U << 2)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_KEYBOARD  (1U <<  1)
+#define LOG_DEBUG     (1U <<  2)
 
 //#define VERBOSE (LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -234,21 +235,21 @@ private:
 
 	void video_w(offs_t offset, uint8_t data);
 	uint8_t video_r(offs_t offset);
-	void vblank_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	uint8_t kb_data_r();
 	void led_w(uint8_t data);
 	void ppi_c_w(uint8_t data);
 
-	void kb_data_w(int state);
-	void kb_clock_w(int state);
-	void kb_clock_w_internal(int state);
-	void kb_strobe_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_clock_w_internal);
+	DECLARE_WRITE_LINE_MEMBER(kb_strobe_w);
 
 	void floppy_w(offs_t offset, uint8_t data);
 	uint8_t floppy_r(offs_t offset);
 	static void floppy_formats(format_registration &fr);
-	void hrq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(hrq_w);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
@@ -445,7 +446,7 @@ uint8_t ibm6580_state::video_r(offs_t offset)
 	return data;
 }
 
-void ibm6580_state::vblank_w(int state)
+WRITE_LINE_MEMBER(ibm6580_state::vblank_w)
 {
 //  if (state)
 //      m_pic8259->ir6_w(state);
@@ -589,21 +590,21 @@ uint8_t ibm6580_state::kb_data_r()
 	return data;
 }
 
-void ibm6580_state::kb_data_w(int state)
+WRITE_LINE_MEMBER(ibm6580_state::kb_data_w)
 {
 	if (!BIT(m_p4a, 0)) return;
 
 	m_kb_data_bit = !state;
 }
 
-void ibm6580_state::kb_clock_w(int state)
+WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w)
 {
 	if (!BIT(m_p4a, 0)) return;
 
 	kb_clock_w_internal(state);
 }
 
-void ibm6580_state::kb_clock_w_internal(int state)
+WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w_internal)
 {
 	if (m_kb_clock == state) return;
 	m_kb_clock = state;
@@ -615,7 +616,7 @@ void ibm6580_state::kb_clock_w_internal(int state)
 	}
 }
 
-void ibm6580_state::kb_strobe_w(int state)
+WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
 {
 	if (!BIT(m_p4a, 0)) return;
 
@@ -629,7 +630,7 @@ void ibm6580_state::kb_strobe_w(int state)
 	m_ppi8255->pc4_w(m_kb_strobe);
 }
 
-void ibm6580_state::hrq_w(int state)
+WRITE_LINE_MEMBER(ibm6580_state::hrq_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma8257->hlda_w(state);

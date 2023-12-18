@@ -58,8 +58,7 @@ inifile_manager::inifile_manager(ui_options &options)
 			}
 		}
 	}
-	std::locale const lcl;
-	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
 	std::stable_sort(
 			m_ini_index.begin(),
 			m_ini_index.end(),
@@ -133,8 +132,7 @@ void inifile_manager::init_category(std::string &&filename, util::core_file &fil
 	}
 	if (!index.empty())
 	{
-		std::locale const lcl;
-		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(lcl);
+		std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
 		std::stable_sort(
 				index.begin(),
 				index.end(),
@@ -345,7 +343,7 @@ void favorite_manager::add_favorite(running_machine &machine)
 							driver,
 							imagedev->software_list_name(),
 							imagedev->instance_name(),
-							imagedev->image_type_name() ? imagedev->image_type_name() : "");
+							strensure(imagedev->image_type_name()));
 
 					// assume it's available if it's mounted
 					info.available = true;

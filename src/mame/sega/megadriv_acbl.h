@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_SEGA_MEGADRIV_ACBL_H
-#define MAME_SEGA_MEGADRIV_ACBL_H
+#ifndef MAME_INCLUDES_MEGADRIV_ACBL_H
+#define MAME_INCLUDES_MEGADRIV_ACBL_H
 
 #include "megadriv.h"
 
@@ -22,7 +22,6 @@ public:
 	void init_barek2();
 	void init_barek2ch();
 	void init_barek3();
-	void init_barek3a();
 	void init_sonic2mb();
 	void init_twinktmb();
 	void init_jparkmb();
@@ -36,7 +35,6 @@ private:
 	void aladmdb_w(uint16_t data);
 	uint16_t aladmdb_r();
 	uint16_t barek2mb_r();
-	uint16_t barek3mba_r();
 	uint16_t jparkmb_r();
 	uint16_t twinktmb_r();
 
@@ -89,4 +87,4 @@ private:
 	void ssf2mdb_68k_map(address_map &map);
 };
 
-#endif // MAME_SEGA_MEGADRIV_ACBL_H
+#endif // MAME_INCLUDES_MEGADRIV_ACBL_H

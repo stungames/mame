@@ -9,13 +9,13 @@
 #include "machine/pci.h"
 #include "machine/idectrl.h"
 
-#define LOG_OHCI (0)
-
+//#define LOG_OHCI
 
 /*
  * OHCI usb controller
  */
 
+#ifdef LOG_OHCI
 static const char *const usbregnames[] = {
 	"HcRevision",
 	"HcControl",
@@ -40,6 +40,7 @@ static const char *const usbregnames[] = {
 	"HcRhStatus",
 	"HcRhPortStatus[1]"
 };
+#endif
 
 ohci_usb_controller::ohci_usb_controller()
 {
@@ -74,13 +75,12 @@ uint32_t ohci_usb_controller::read(offs_t offset)
 {
 	uint32_t ret;
 
-	if (LOG_OHCI)
-	{
-		if (offset >= 0x54 / 4)
-			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] read\n", (offset - 0x54 / 4) + 1);
-		else
-			m_maincpu->machine().logerror("usb controller 0 register %s read\n", usbregnames[offset]);
-	}
+#ifdef LOG_OHCI
+	if (offset >= 0x54 / 4)
+		logerror("usb controller 0 register HcRhPortStatus[%d] read\n", (offset - 0x54 / 4) + 1);
+	else
+		logerror("usb controller 0 register %s read\n", usbregnames[offset]);
+#endif
 	ret = ohcist.hc_regs[offset];
 	return ret;
 }
@@ -89,13 +89,12 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 {
 	uint32_t old = ohcist.hc_regs[offset];
 
-	if (LOG_OHCI)
-	{
-		if (offset >= 0x54 / 4)
-			m_maincpu->machine().logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n", (offset - 0x54 / 4) + 1, data);
-		else
-			m_maincpu->machine().logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
-	}
+#ifdef LOG_OHCI
+	if (offset >= 0x54 / 4)
+		logerror("usb controller 0 register HcRhPortStatus[%d] write %08X\n", (offset - 0x54 / 4) + 1, data);
+	else
+		logerror("usb controller 0 register %s write %08X\n", usbregnames[offset], data);
+#endif
 	if (offset == HcRhStatus) {
 		if (data & CRWE)
 			ohcist.hc_regs[HcRhStatus] &= ~DRWE;
@@ -222,7 +221,7 @@ void ohci_usb_controller::write(offs_t offset, uint32_t data)
 	ohcist.hc_regs[offset] = data;
 }
 
-void ohci_usb_controller::timer(s32 param)
+void ohci_usb_controller::timer(int param)
 {
 	uint32_t plh;
 	int changed = 0;

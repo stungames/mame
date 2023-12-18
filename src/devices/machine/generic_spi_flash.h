@@ -24,7 +24,7 @@ public:
 		m_spi_state = READY_FOR_COMMAND;
 	}
 
-	void dir_w(int state)
+	DECLARE_WRITE_LINE_MEMBER(dir_w)
 	{
 		m_spidir = state;
 	}

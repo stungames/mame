@@ -353,7 +353,6 @@ void render_texture::release()
 	m_bitmap = nullptr;
 	m_sbounds.set(0, -1, 0, -1);
 	m_format = TEXFORMAT_ARGB32;
-	m_scaler = nullptr;
 	m_curseq = 0;
 }
 
@@ -432,7 +431,6 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		texinfo.base = m_bitmap->raw_pixptr(m_sbounds.top(), m_sbounds.left());
 		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
-		texinfo.width_margin = m_sbounds.left();
 		texinfo.height = sheight;
 		// palette will be set later
 		texinfo.seqid = ++m_curseq;
@@ -1015,9 +1013,9 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 	m_width = width;
 	m_height = height;
 	m_bounds.x0 = m_bounds.y0 = 0;
-	m_bounds.x1 = float(width);
-	m_bounds.y1 = float(height);
-	m_pixel_aspect = pixel_aspect != 0.0F ? pixel_aspect : 1.0F;
+	m_bounds.x1 = (float)width;
+	m_bounds.y1 = (float)height;
+	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
 }
 
 
@@ -1073,29 +1071,28 @@ void render_target::set_visibility_toggle(unsigned index, bool enable)
 
 unsigned render_target::configured_view(const char *viewname, int targetindex, int numtargets)
 {
+	layout_view *view = nullptr;
+
 	// if it isn't "auto" or an empty string, try to match it as a view name prefix
 	if (viewname && *viewname && strcmp(viewname, "auto"))
 	{
 		// scan for a matching view name
 		size_t const viewlen = strlen(viewname);
-		for (unsigned i = 0; m_views.size() > i; ++i)
-		{
+		for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			if (!core_strnicmp(m_views[i].first.name().c_str(), viewname, viewlen))
-				return i;
-		}
+				view = &m_views[i].first;
 	}
 
 	// if we don't have a match, default to the nth view
 	std::vector<std::reference_wrapper<screen_device> > screens;
 	for (screen_device &screen : screen_device_enumerator(m_manager.machine().root_device()))
 		screens.push_back(screen);
-	if (!screens.empty())
+	if (!view && !screens.empty())
 	{
 		// if we have enough targets to be one per screen, assign in order
 		if (numtargets >= screens.size())
 		{
 			// find the first view with this screen and this screen only
-			layout_view *view = nullptr;
 			screen_device const &screen = screens[index() % screens.size()];
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
@@ -1113,21 +1110,22 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 					}
 				}
 			}
-			if (view)
-				return view_index(*view);
 		}
 
 		// otherwise, find the first view that has all the screens
-		for (unsigned i = 0; m_views.size() > i; ++i)
+		if (!view)
 		{
-			layout_view &curview = m_views[i].first;
-			if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
-				return i;
+			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
+			{
+				layout_view &curview = m_views[i].first;
+				if (std::find_if(screens.begin(), screens.end(), [&curview] (screen_device &screen) { return !curview.has_screen(screen); }) == screens.end())
+					view = &curview;
+			}
 		}
 	}
 
-	// default to the first view
-	return 0;
+	// make sure it's a valid view
+	return view ? view_index(*view) : 0;
 }
 
 
@@ -2216,7 +2214,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	{
 		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
-	catch (emu_fatalerror const &err)
+	catch (emu_fatalerror &err)
 	{
 		osd_printf_warning("%s\n", err.what());
 		return false;
@@ -2662,22 +2660,20 @@ void render_target::config_load(util::xml::data_node const *targetnode)
 	if (!targetnode)
 		return;
 
-	// TODO: consider option priority - command line should take precedence over CFG
-	// not practical at the moment because view selection options are in the OSD layer
-
 	// find the view
 	const char *viewname = targetnode->get_attribute_string("view", nullptr);
-	if (viewname)
-	{
-		for (unsigned viewnum = 0; m_views.size() > viewnum; viewnum++)
+	if (viewname != nullptr)
+		for (int viewnum = 0; viewnum < 1000; viewnum++)
 		{
-			if (!strcmp(viewname, view_name(viewnum)))
+			const char *testname = view_name(viewnum);
+			if (testname == nullptr)
+				break;
+			if (!strcmp(viewname, testname))
 			{
 				set_view(viewnum);
 				break;
 			}
 		}
-	}
 
 	// modify the artwork config
 	int const zoom = targetnode->get_attribute_int("zoom", -1);
@@ -3260,7 +3256,12 @@ float render_manager::ui_aspect(render_container *rc)
 	}
 
 	// clamp for extreme proportions
-	return std::clamp(aspect, 0.66f, 1.5f);
+	if (aspect < 0.66f)
+		aspect = 0.66f;
+	if (aspect > 1.5f)
+		aspect = 1.5f;
+
+	return aspect;
 }
 
 

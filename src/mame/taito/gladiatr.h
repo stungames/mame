@@ -17,11 +17,11 @@ public:
 	void colorram_w(offs_t offset, u8 data);
 	void textram_w(offs_t offset, u8 data);
 	void paletteram_w(offs_t offset, u8 data);
-	void spritebuffer_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(spritebuffer_w);
 	void adpcm_command_w(u8 data);
 	u8 adpcm_command_r();
-	void flipscreen_w(int state);
-	void ym_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(ym_irq);
 
 	void cpu2_map(address_map &map);
 protected:
@@ -121,23 +121,23 @@ public:
 	void init_gladiatr();
 
 private:
-	void spritebank_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(spritebank_w);
 	void gladiatr_video_registers_w(offs_t offset, u8 data);
 
 	void gladiatr_irq_patch_w(u8 data);
 	void gladiator_int_control_w(u8 data);
 	void gladiator_adpcm_w(u8 data);
 
-	void tclk_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 	u8 cctl_p1_r();
 	u8 cctl_p2_r();
 	void ccpu_p2_w(u8 data);
-	int tclk_r();
-	int ucpu_t1_r();
+	DECLARE_READ_LINE_MEMBER(tclk_r);
+	DECLARE_READ_LINE_MEMBER(ucpu_t1_r);
 	u8 ucpu_p1_r();
 	void ucpu_p1_w(u8 data);
 	u8 ucpu_p2_r();
-	int csnd_t1_r();
+	DECLARE_READ_LINE_MEMBER(csnd_t1_r);
 	u8 csnd_p1_r();
 	void csnd_p1_w(u8 data);
 	u8 csnd_p2_r();

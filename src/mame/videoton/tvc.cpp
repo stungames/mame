@@ -35,9 +35,6 @@
 
 #include "formats/tvc_cas.h"
 
-
-namespace {
-
 #define CENTRONICS_TAG  "centronics"
 
 
@@ -99,8 +96,8 @@ protected:
 	void sound_w(offs_t offset, uint8_t data);
 	void cassette_w(uint8_t data);
 	uint8_t _5b_r();
-	void int_ff_set(int state);
-	void centronics_ack(int state);
+	DECLARE_WRITE_LINE_MEMBER(int_ff_set);
+	DECLARE_WRITE_LINE_MEMBER(centronics_ack);
 
 	// expansions
 	void expansion_w(offs_t offset, uint8_t data);
@@ -722,7 +719,7 @@ void tvc_state::tvc_palette(palette_device &palette) const
 	palette.set_pen_colors(0, tvc_pens);
 }
 
-void tvc_state::int_ff_set(int state)
+WRITE_LINE_MEMBER(tvc_state::int_ff_set)
 {
 	if (state)
 	{
@@ -731,7 +728,7 @@ void tvc_state::int_ff_set(int state)
 	}
 }
 
-void tvc_state::centronics_ack(int state)
+WRITE_LINE_MEMBER(tvc_state::centronics_ack)
 {
 	if (state)
 		m_centronics_ff = 1;
@@ -746,11 +743,11 @@ QUICKLOAD_LOAD_MEMBER(tvc_state::quickload_cb)
 	{
 		image.fseek(0x90, SEEK_SET);
 		image.fread(m_ram->pointer() + 0x19ef, image.length() - 0x90);
-		return std::make_pair(std::error_condition(), std::string());
+		return image_init_result::PASS;
 	}
 	else
 	{
-		return std::make_pair(image_error::INVALIDIMAGE, std::string());
+		return image_init_result::FAIL;
 	}
 }
 
@@ -895,9 +892,6 @@ ROM_START( tvc64pru )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
 ROM_END
-
-} // anonymous namespace
-
 
 /* Driver */
 

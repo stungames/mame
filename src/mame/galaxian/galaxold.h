@@ -11,8 +11,8 @@
     - scobra.cpp
 
 ***************************************************************************/
-#ifndef MAME_GALAXIAN_GALAXOLD_H
-#define MAME_GALAXIAN_GALAXOLD_H
+#ifndef MAME_INCLUDES_GALAXOLD_H
+#define MAME_INCLUDES_GALAXOLD_H
 
 #pragma once
 
@@ -144,11 +144,11 @@ public:
 	void galaxold_gfxbank_w(offs_t offset, uint8_t data);
 	void dambustr_bg_split_line_w(uint8_t data);
 	void dambustr_bg_color_w(uint8_t data);
-	void galaxold_7474_9m_2_q_callback(int state);
-	void galaxold_7474_9m_1_callback(int state);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
+	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
 	uint8_t rescueb_a002_r() { return 0xfc; }
-	template <int Mask> int _4in1_fake_port_r();
-	template <int Mask> int vpool_lives_r();
+	template <int Mask> DECLARE_READ_LINE_MEMBER(_4in1_fake_port_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(vpool_lives_r);
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 
 	void init_bullsdrtg();
@@ -300,4 +300,4 @@ protected:
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
 
-#endif // MAME_GALAXIAN_GALAXOLD_H
+#endif

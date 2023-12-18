@@ -47,7 +47,7 @@ void k033906_device::device_start()
 }
 
 
-void k033906_device::set_reg(int state)
+WRITE_LINE_MEMBER(k033906_device::set_reg)
 {
 	m_reg_set = state & 1;
 }

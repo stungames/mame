@@ -131,7 +131,8 @@ inline void mccs1850_device::check_interrupt()
 		m_ram[REGISTER_STATUS] &= ~STATUS_IT;
 	}
 
-	int_cb(interrupt);
+	if(!int_cb.isnull())
+		int_cb(interrupt);
 }
 
 
@@ -143,7 +144,8 @@ inline void mccs1850_device::set_pse_line(bool state)
 {
 	m_pse = state;
 
-	pse_cb(m_pse);
+	if(!pse_cb.isnull())
+		pse_cb(m_pse);
 }
 
 
@@ -316,6 +318,11 @@ void mccs1850_device::rtc_clock_updated(int year, int month, int day, int day_of
 
 void mccs1850_device::device_start()
 {
+	// resolve callbacks
+	int_cb.resolve();
+	pse_cb.resolve();
+	nuc_cb.resolve();
+
 	// allocate timers
 	m_clock_timer = timer_alloc(FUNC(mccs1850_device::advance_seconds), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
@@ -395,7 +402,7 @@ bool mccs1850_device::nvram_write(util::write_stream &file)
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-void mccs1850_device::ce_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::ce_w )
 {
 	m_ce = state;
 
@@ -411,7 +418,7 @@ void mccs1850_device::ce_w(int state)
 //  sck_w - serial clock write
 //-------------------------------------------------
 
-void mccs1850_device::sck_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 {
 	if (!m_ce) return;
 
@@ -491,7 +498,7 @@ void mccs1850_device::sck_w(int state)
 //  sdo_r - serial data out read
 //-------------------------------------------------
 
-int mccs1850_device::sdo_r()
+READ_LINE_MEMBER( mccs1850_device::sdo_r )
 {
 	if (!m_ce || BIT(m_address, 7))
 	{
@@ -509,7 +516,7 @@ int mccs1850_device::sdo_r()
 //  sdi_w - serial data in write
 //-------------------------------------------------
 
-void mccs1850_device::sdi_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::sdi_w )
 {
 	m_sdi = state;
 }
@@ -519,7 +526,7 @@ void mccs1850_device::sdi_w(int state)
 //  pwrsw_w - power switch write
 //-------------------------------------------------
 
-void mccs1850_device::pwrsw_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
 {
 	if (!state)
 	{
@@ -539,7 +546,7 @@ void mccs1850_device::pwrsw_w(int state)
 //  por_w - power on reset write
 //-------------------------------------------------
 
-void mccs1850_device::por_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::por_w )
 {
 	if (!state)
 	{
@@ -552,7 +559,7 @@ void mccs1850_device::por_w(int state)
 //  test_w - test mode write
 //-------------------------------------------------
 
-void mccs1850_device::test_w(int state)
+WRITE_LINE_MEMBER( mccs1850_device::test_w )
 {
 	if (state)
 	{

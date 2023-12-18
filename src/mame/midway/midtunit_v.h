@@ -7,8 +7,8 @@
 
 **************************************************************************/
 
-#ifndef MAME_MIDWAY_MIDTUNIT_V_H
-#define MAME_MIDWAY_MIDTUNIT_V_H
+#ifndef MAME_VIDEO_MIDTUNIT_H
+#define MAME_VIDEO_MIDTUNIT_H
 
 #pragma once
 
@@ -146,6 +146,7 @@ protected:
 	};
 	dma_state   m_dma_state;
 
+
 #if DEBUG_MIDTUNIT_BLITTER
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -176,6 +177,15 @@ protected:
 	void debug_help_command(const std::vector<std::string_view> &params);
 	void debug_png_dma_command(const std::vector<std::string_view> &params);
 	void log_bitmap(int command, int bpp, bool skip);
+
+public:
+	struct BLOCKREMAP
+	{
+		uint32_t gfxoffset;
+		int16_t  x, y;
+	};
+
+	render_texture* map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP* remap);
 };
 
 class midwunit_video_device : public midtunit_video_device
@@ -234,4 +244,4 @@ DECLARE_DEVICE_TYPE(MIDTUNIT_VIDEO, midtunit_video_device)
 DECLARE_DEVICE_TYPE(MIDWUNIT_VIDEO, midwunit_video_device)
 DECLARE_DEVICE_TYPE(MIDXUNIT_VIDEO, midxunit_video_device)
 
-#endif // MAME_MIDWAY_MIDTUNIT_V_H
+#endif // MAME_VIDEO_MIDTUNIT_H

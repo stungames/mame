@@ -1872,14 +1872,11 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, u
 		}
 		else if (destination==DMA_PCM)
 		{
-			dest = nullptr;
-			//fatalerror("PCM RAM DMA unimplemented!\n");
+			dest = nullptr;//fatalerror("PCM RAM DMA unimplemented!\n");
 		}
 		else
 		{
-			// TODO: audio CD player accesses this
-			dest = nullptr;
-			//fatalerror("Unknown DMA Destination!!\n");
+			fatalerror("Unknown DMA Destination!!\n");
 		}
 
 		if (PCM_DMA)

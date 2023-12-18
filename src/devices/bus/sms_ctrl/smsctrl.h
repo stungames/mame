@@ -91,6 +91,7 @@ public:
 	void out_w(u8 data, u8 mem_mask);
 
 protected:
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 private:
@@ -117,7 +118,7 @@ protected:
 	template <typename T> void configure_screen(T &&act) { if (m_port) act(std::as_const(m_port->m_screen)); }
 
 	screen_device *screen() const { return m_port ? m_port->m_screen.target() : nullptr; }
-	void th_w(int state) { if (m_port) m_port->m_th_handler(state); }
+	DECLARE_WRITE_LINE_MEMBER(th_w) { if (m_port) m_port->m_th_handler(state); }
 
 private:
 	sms_control_port_device *const m_port;

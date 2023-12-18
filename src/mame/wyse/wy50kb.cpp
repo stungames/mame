@@ -423,7 +423,7 @@ void wyse_parallel_keyboard_device::scan_w(u8 address)
 	m_address = address;
 }
 
-int wyse_parallel_keyboard_device::sense_r()
+READ_LINE_MEMBER(wyse_parallel_keyboard_device::sense_r)
 {
 	return BIT(m_key_matrix[(m_address >> 3) & 15].read_safe(0xff), m_address & 7);
 }

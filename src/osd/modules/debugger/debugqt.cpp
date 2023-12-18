@@ -43,11 +43,9 @@ bool winwindow_qt_filter(void *message);
 #endif
 
 
-namespace osd {
-
 namespace {
 
-class debug_qt : public osd_module, public debug_module, protected debugger::qt::DebuggerQt
+class debug_qt : public osd_module, public debug_module, protected osd::debugger::qt::DebuggerQt
 #if defined(_WIN32) && !defined(SDLMAME_WIN32)
 , public QAbstractNativeEventFilter
 #endif
@@ -63,7 +61,7 @@ public:
 
 	virtual ~debug_qt() { }
 
-	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
+	virtual int init(const osd_options &options) override { return 0; }
 	virtual void exit() override;
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -85,7 +83,7 @@ private:
 	void load_window_configurations(util::xml::data_node const &parentnode);
 
 	running_machine *m_machine;
-	debugger::qt::MainWindow *m_mainwindow;
+	osd::debugger::qt::MainWindow *m_mainwindow;
 	util::xml::file::ptr m_config;
 };
 
@@ -144,7 +142,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 	// Dialog initialization
 	if (!m_mainwindow)
 	{
-		m_mainwindow = new debugger::qt::MainWindow(*this);
+		m_mainwindow = new osd::debugger::qt::MainWindow(*this);
 		if (m_config)
 		{
 			load_window_configurations(*m_config->get_first_child());
@@ -213,31 +211,31 @@ void debug_qt::configuration_save(config_type which_type, util::xml::data_node *
 
 void debug_qt::load_window_configurations(util::xml::data_node const &parentnode)
 {
-	for (util::xml::data_node const *wnode = parentnode.get_child(debugger::NODE_WINDOW); wnode; wnode = wnode->get_next_sibling(debugger::NODE_WINDOW))
+	for (util::xml::data_node const *wnode = parentnode.get_child(osd::debugger::NODE_WINDOW); wnode; wnode = wnode->get_next_sibling(osd::debugger::NODE_WINDOW))
 	{
-		debugger::qt::WindowQt *win = nullptr;
-		switch (wnode->get_attribute_int(debugger::ATTR_WINDOW_TYPE, -1))
+		osd::debugger::qt::WindowQt *win = nullptr;
+		switch (wnode->get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, -1))
 		{
-		case debugger::WINDOW_TYPE_CONSOLE:
+		case osd::debugger::WINDOW_TYPE_CONSOLE:
 			win = m_mainwindow;
 			break;
-		case debugger::WINDOW_TYPE_MEMORY_VIEWER:
-			win = new debugger::qt::MemoryWindow(*this);
+		case osd::debugger::WINDOW_TYPE_MEMORY_VIEWER:
+			win = new osd::debugger::qt::MemoryWindow(*this);
 			break;
-		case debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
-			win = new debugger::qt::DasmWindow(*this);
+		case osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = new osd::debugger::qt::DasmWindow(*this);
 			break;
-		case debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
-			win = new debugger::qt::LogWindow(*this);
+		case osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = new osd::debugger::qt::LogWindow(*this);
 			break;
-		case debugger::WINDOW_TYPE_POINTS_VIEWER:
-			win = new debugger::qt::BreakpointsWindow(*this);
+		case osd::debugger::WINDOW_TYPE_POINTS_VIEWER:
+			win = new osd::debugger::qt::BreakpointsWindow(*this);
 			break;
-		case debugger::WINDOW_TYPE_DEVICES_VIEWER:
-			win = new debugger::qt::DevicesWindow(*this);
+		case osd::debugger::WINDOW_TYPE_DEVICES_VIEWER:
+			win = new osd::debugger::qt::DevicesWindow(*this);
 			break;
-		case debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
-			win = new debugger::qt::DeviceInformationWindow(*this);
+		case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
+			win = new osd::debugger::qt::DeviceInformationWindow(*this);
 			break;
 		}
 		if (win)
@@ -247,12 +245,10 @@ void debug_qt::load_window_configurations(util::xml::data_node const &parentnode
 
 } // anonymous namespace
 
-} // namespace osd
-
 #else // USE_QTDEBUG
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(debug_qt, OSD_DEBUG_PROVIDER, "qt") } }
+MODULE_NOT_SUPPORTED(debug_qt, OSD_DEBUG_PROVIDER, "qt")
 
 #endif
 
-MODULE_DEFINITION(DEBUG_QT, osd::debug_qt)
+MODULE_DEFINITION(DEBUG_QT, debug_qt)

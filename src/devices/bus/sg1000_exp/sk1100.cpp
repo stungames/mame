@@ -19,8 +19,6 @@ TODO:
 #include "emu.h"
 #include "sk1100.h"
 #include "softlist_dev.h"
-
-#include "formats/sc3000_bit.h"
 #include "utf8.h"
 
 

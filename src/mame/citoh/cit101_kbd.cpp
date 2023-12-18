@@ -86,6 +86,7 @@ cit101e_keyboard_device::cit101e_keyboard_device(const machine_config &mconfig, 
 
 void cit101_keyboard_device::device_resolve_objects()
 {
+	m_txd_callback.resolve_safe();
 	m_leds.resolve();
 }
 
@@ -94,7 +95,7 @@ void cit101_keyboard_device::device_start()
 	save_item(NAME(m_kbid_enabled));
 }
 
-void cit101_keyboard_device::write_rxd(int state)
+WRITE_LINE_MEMBER(cit101_keyboard_device::write_rxd)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }

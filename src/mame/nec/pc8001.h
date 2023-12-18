@@ -70,14 +70,14 @@ protected:
 	void set_screen_frequency(bool is_24KHz) { m_screen_is_24KHz = is_24KHz; }
 	bool get_screen_frequency() { return m_screen_is_24KHz; }
 
-	void crtc_reverse_w(int state);
+	DECLARE_WRITE_LINE_MEMBER( crtc_reverse_w );
 	UPD3301_DRAW_CHARACTER_MEMBER( draw_text );
 	virtual UPD3301_FETCH_ATTRIBUTE( attr_fetch );
-	void hrq_w(int state);
+	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	virtual uint8_t dma_mem_r(offs_t offset);
 
-	void write_centronics_busy(int state);
-	void write_centronics_ack(int state);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 
 	int m_centronics_busy = 0;
 	int m_centronics_ack = 0;

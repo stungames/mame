@@ -7,17 +7,17 @@ thomson_525_format::thomson_525_format() : wd177x_format(formats)
 {
 }
 
-const char *thomson_525_format::name() const noexcept
+const char *thomson_525_format::name() const
 {
 	return "thomson_525";
 }
 
-const char *thomson_525_format::description() const noexcept
+const char *thomson_525_format::description() const
 {
 	return "Thomson 5.25 disk image";
 }
 
-const char *thomson_525_format::extensions() const noexcept
+const char *thomson_525_format::extensions() const
 {
 	return "fd";
 }
@@ -55,17 +55,17 @@ thomson_35_format::thomson_35_format() : wd177x_format(formats)
 {
 }
 
-const char *thomson_35_format::name() const noexcept
+const char *thomson_35_format::name() const
 {
 	return "thomson_35";
 }
 
-const char *thomson_35_format::description() const noexcept
+const char *thomson_35_format::description() const
 {
 	return "Thomson 3.5 disk image";
 }
 
-const char *thomson_35_format::extensions() const noexcept
+const char *thomson_35_format::extensions() const
 {
 	return "fd";
 }

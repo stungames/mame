@@ -64,7 +64,7 @@ int osd_netdev::send(uint8_t *buf, int len)
 	return 0;
 }
 
-void osd_netdev::recv(int32_t param)
+void osd_netdev::recv(int param)
 {
 	uint8_t *buf;
 	int len;

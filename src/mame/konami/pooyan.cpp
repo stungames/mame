@@ -66,8 +66,8 @@ private:
 	// misc
 	uint8_t m_irq_enable = 0;
 
-	void irq_enable_w(int state);
-	template <uint8_t Which> void coin_counter_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 
@@ -78,7 +78,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void vblank_irq(int state);
+	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void main_map(address_map &map);
 };
 
@@ -266,14 +266,14 @@ uint32_t pooyan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
  *
  *************************************/
 
-void pooyan_state::vblank_irq(int state)
+WRITE_LINE_MEMBER(pooyan_state::vblank_irq)
 {
 	if (state && m_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-void pooyan_state::irq_enable_w(int state)
+WRITE_LINE_MEMBER(pooyan_state::irq_enable_w)
 {
 	m_irq_enable = state;
 	if (!m_irq_enable)
@@ -282,7 +282,7 @@ void pooyan_state::irq_enable_w(int state)
 
 
 template <uint8_t Which>
-void pooyan_state::coin_counter_w(int state)
+WRITE_LINE_MEMBER(pooyan_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(Which, state);
 }

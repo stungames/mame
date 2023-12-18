@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Berger
-/*******************************************************************************
+/******************************************************************************
 
 Novag Micro II (model 821)
 
@@ -12,10 +12,9 @@ This program was used in several Novag chesscomputers:
 - Novag Octo
 
 suspected, to be confirmed:
-- Novag Allegro (not Allegro 4)
+- Novag Allegro
 - Novag Piccolo
-
-The chess engine is by Julio Kaplan, not David Kittinger.
+- Novag Alto
 
 Hardware notes:
 
@@ -39,7 +38,7 @@ TODO:
   6MHz: valid (single) button press registered between 307ms and 436ms,
   12MHz: between 154ms and 218ms.
 
-*******************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 
@@ -51,7 +50,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "novag_micro2.lh"
+#include "novag_micro2.lh" // clickable
 
 
 namespace {
@@ -71,13 +70,15 @@ public:
 	// machine configs
 	void micro2(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(change_cpu_freq) { set_cpu_freq(); }
+	DECLARE_INPUT_CHANGED_MEMBER(cpu_freq) { set_cpu_freq(); }
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override { set_cpu_freq(); }
 
 private:
+	void set_cpu_freq();
+
 	// devices/pointers
 	required_device<mcs48_cpu_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
@@ -85,17 +86,15 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_ioport m_inputs;
 
-	bool m_kp_select = false;
-	u8 m_inp_mux = 0;
-	u8 m_led_select = 0;
-
 	// I/O handlers
 	void update_display();
 	void mux_w(u8 data);
 	void control_w(u8 data);
 	u8 input_r();
 
-	void set_cpu_freq();
+	bool m_kp_select = false;
+	u8 m_inp_mux = 0;
+	u8 m_led_select = 0;
 };
 
 void micro2_state::machine_start()
@@ -109,17 +108,16 @@ void micro2_state::machine_start()
 void micro2_state::set_cpu_freq()
 {
 	// known CPU speeds: 6MHz(XTAL), 6MHz(LC), 12MHz(LC)
-	u32 freq = (ioport("CPU")->read() & 1) ? 12'000'000 : 6'000'000;
-	m_maincpu->set_unscaled_clock(freq);
-
-	m_board->set_delay(attotime::from_ticks(2'000'000, freq)); // see TODO
+	u32 clock = (ioport("FAKE")->read() & 1) ? 12000000 : 6000000;
+	m_board->set_delay(attotime::from_ticks(2000000, clock)); // see TODO
+	m_maincpu->set_unscaled_clock(clock);
 }
 
 
 
-/*******************************************************************************
+/******************************************************************************
     I/O
-*******************************************************************************/
+******************************************************************************/
 
 // MCU ports/generic
 
@@ -167,36 +165,36 @@ u8 micro2_state::input_r()
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Input Ports
-*******************************************************************************/
+******************************************************************************/
 
 static INPUT_PORTS_START( micro2 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B/W") // aka "Black/White" or "Change Color"
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_V) PORT_NAME("Verify / Pawn")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_U) PORT_NAME("Set Up / Rook")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("B/W") // aka "Black/White" or "Change Color"
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Verify / Pawn")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Set Up / Rook")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Knight")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_L) PORT_NAME("Level / Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Level / Bishop")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Queen")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back / King")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("Go")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Take Back / King")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Go")
 
-	PORT_START("CPU")
-	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, change_cpu_freq, 0) // factory set
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, micro2_state, cpu_freq, 0) // factory set
 	PORT_CONFSETTING(    0x00, "6MHz (original)" )
 	PORT_CONFSETTING(    0x01, "12MHz (Octo)" )
 INPUT_PORTS_END
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Machine Configs
-*******************************************************************************/
+******************************************************************************/
 
 void micro2_state::micro2(machine_config &config)
 {
-	// basic machine hardware
+	/* basic machine hardware */
 	I8049(config, m_maincpu, 6_MHz_XTAL); // see set_cpu_freq
 	m_maincpu->p1_in_cb().set(FUNC(micro2_state::input_r));
 	m_maincpu->p2_out_cb().set(FUNC(micro2_state::control_w));
@@ -205,20 +203,20 @@ void micro2_state::micro2(machine_config &config)
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 
-	// video hardware
+	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_novag_micro2);
 
-	// sound hardware
+	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
 
-/*******************************************************************************
+/******************************************************************************
     ROM Definitions
-*******************************************************************************/
+******************************************************************************/
 
 ROM_START( nmicro2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
@@ -229,9 +227,9 @@ ROM_END
 
 
 
-/*******************************************************************************
+/******************************************************************************
     Drivers
-*******************************************************************************/
+******************************************************************************/
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1982, nmicro2, 0,       0,      micro2,  micro2, micro2_state, empty_init, "Novag", "Micro II (Novag)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -65,12 +65,12 @@ void mc68328_lcd_device::palette_init()
 	}
 }
 
-void mc68328_lcd_device::flm_w(int state)
+DECLARE_WRITE_LINE_MEMBER(mc68328_lcd_device::flm_w)
 {
 	m_lcd_first_line = state;
 }
 
-void mc68328_lcd_device::llp_w(int state)
+DECLARE_WRITE_LINE_MEMBER(mc68328_lcd_device::llp_w)
 {
 	const int old = m_lcd_line_pulse;
 	m_lcd_line_pulse = state;
@@ -88,7 +88,7 @@ void mc68328_lcd_device::llp_w(int state)
 	}
 }
 
-void mc68328_lcd_device::lsclk_w(int state)
+DECLARE_WRITE_LINE_MEMBER(mc68328_lcd_device::lsclk_w)
 {
 	const int old = m_lcd_shift_clk;
 	m_lcd_shift_clk = state;

@@ -764,8 +764,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)mouseDown:(NSEvent *)event {
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	NSUInteger const modifiers = [event modifierFlags];
-	view->process_click(((modifiers & NSEventModifierFlagCommand) && [[self window] isMainWindow]) ? DCK_RIGHT_CLICK
-					  : (modifiers & NSEventModifierFlagOption) ? DCK_MIDDLE_CLICK
+	view->process_click(((modifiers & NSCommandKeyMask) && [[self window] isMainWindow]) ? DCK_RIGHT_CLICK
+					  : (modifiers & NSAlternateKeyMask) ? DCK_MIDDLE_CLICK
 					  : DCK_LEFT_CLICK,
 						[self convertLocation:location]);
 }
@@ -776,8 +776,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	NSPoint const location = [self convertPoint:[event locationInWindow] fromView:nil];
 	NSUInteger const modifiers = [event modifierFlags];
 	if (view->cursor_supported()
-	 && !(modifiers & NSEventModifierFlagOption)
-	 && (!(modifiers & NSEventModifierFlagCommand) || ![[self window] isMainWindow]))
+	 && !(modifiers & NSAlternateKeyMask)
+	 && (!(modifiers & NSCommandKeyMask) || ![[self window] isMainWindow]))
 	{
 		view->set_cursor_position([self convertLocation:location]);
 		view->set_cursor_visible(true);
@@ -804,34 +804,34 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 	if ([str length] == 1)
 	{
-		if (modifiers & NSEventModifierFlagNumericPad)
+		if (modifiers & NSNumericPadKeyMask)
 		{
 			switch ([str characterAtIndex:0])
 			{
 			case NSUpArrowFunctionKey:
-				if (modifiers & NSEventModifierFlagCommand)
+				if (modifiers & NSCommandKeyMask)
 					view->process_char(DCH_CTRLHOME);
 				else
 					view->process_char(DCH_UP);
 				return;
 			case NSDownArrowFunctionKey:
-				if (modifiers & NSEventModifierFlagCommand)
+				if (modifiers & NSCommandKeyMask)
 					view->process_char(DCH_CTRLEND);
 				else
 					view->process_char(DCH_DOWN);
 				return;
 			case NSLeftArrowFunctionKey:
-				if (modifiers & NSEventModifierFlagCommand)
+				if (modifiers & NSCommandKeyMask)
 					[self typeCharacterAndScrollToCursor:DCH_HOME];
-				else if (modifiers & NSEventModifierFlagOption)
+				else if (modifiers & NSAlternateKeyMask)
 					[self typeCharacterAndScrollToCursor:DCH_CTRLLEFT];
 				else
 					[self typeCharacterAndScrollToCursor:DCH_LEFT];
 				return;
 			case NSRightArrowFunctionKey:
-				if (modifiers & NSEventModifierFlagCommand)
+				if (modifiers & NSCommandKeyMask)
 					[self typeCharacterAndScrollToCursor:DCH_END];
-				else if (modifiers & NSEventModifierFlagOption)
+				else if (modifiers & NSAlternateKeyMask)
 					[self typeCharacterAndScrollToCursor:DCH_CTRLRIGHT];
 				else
 					[self typeCharacterAndScrollToCursor:DCH_RIGHT];
@@ -841,18 +841,18 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 				return;
 			}
 		}
-		else if (modifiers & NSEventModifierFlagFunction)
+		else if (modifiers & NSFunctionKeyMask)
 		{
 			switch ([str characterAtIndex:0])
 			{
 				case NSPageUpFunctionKey:
-					if (modifiers & NSEventModifierFlagOption)
+					if (modifiers & NSAlternateKeyMask)
 					{
 						view->process_char(DCH_PUP);
 						return;
 					}
 				case NSPageDownFunctionKey:
-					if (modifiers & NSEventModifierFlagOption)
+					if (modifiers & NSAlternateKeyMask)
 					{
 						view->process_char(DCH_PDOWN);
 						return;

@@ -316,7 +316,7 @@ void isbc202_device::io_w(address_space &space, offs_t offset, uint8_t data)
 	}
 }
 
-void isbc202_device::co_w(int state)
+WRITE_LINE_MEMBER(isbc202_device::co_w)
 {
 	m_inputs[ IN_SEL_CO ] = state;
 	m_mcu->fi_w(state);

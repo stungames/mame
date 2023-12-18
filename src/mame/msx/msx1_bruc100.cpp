@@ -13,8 +13,6 @@
 #include "bus/msx/slot/ram.h"
 #include "bus/msx/slot/ram_mm.h"
 
-#include "msx_nocode.lh"
-
 using namespace msx_keyboard;
 
 
@@ -37,7 +35,7 @@ private:
 
 
 bruc100_state::bruc100_state(const machine_config &mconfig, device_type type, const char *tag)
-	: msx_state(mconfig, type, tag, 10.738635_MHz_XTAL, 3)
+	: msx_state(mconfig, type, tag)
 	, m_bruc100_firm(*this, "firm")
 {
 }
@@ -75,7 +73,7 @@ void bruc100_state::bruc100(machine_config &config)
 	// Expansion slot in slot 1
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 0, 4).set_total_size(0x10000);   // 64KB RAM
 
-	msx1(VDP_TMS9129, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9129, SND_AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
 
@@ -110,7 +108,7 @@ void bruc100_state::bruc100a(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot in slot 3
 
-	msx1(VDP_TMS9129, SND_AY8910, config, layout_msx_nocode);
+	msx1(VDP_TMS9129, SND_AY8910, config);
 	m_maincpu->set_addrmap(AS_IO, &bruc100_state::io_map);
 }
 

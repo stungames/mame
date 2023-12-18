@@ -11,11 +11,15 @@
 #include "emu.h"
 #include "amiga.h"
 
-#define LOG_SPRITE_DMA (1U << 1)
 
-#define VERBOSE (0)
-#include "logmacro.h"
 
+/*************************************
+ *
+ *  Debugging
+ *
+ *************************************/
+
+#define LOG_SPRITE_DMA      0
 
 /*************************************
  *
@@ -152,7 +156,7 @@ void amiga_state::set_genlock_color(uint16_t color)
 
 void amiga_state::sprite_dma_reset(int which)
 {
-	LOGMASKED(LOG_SPRITE_DMA, "sprite %d dma reset\n", which );
+	if (LOG_SPRITE_DMA) logerror("sprite %d dma reset\n", which );
 	m_sprite_dma_reload_mask |= 1 << which;
 	m_sprite_dma_live_mask |= 1 << which;
 }
@@ -160,7 +164,7 @@ void amiga_state::sprite_dma_reset(int which)
 
 void amiga_state::sprite_enable_comparitor(int which, int enable)
 {
-	LOGMASKED(LOG_SPRITE_DMA, "sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
+	if (LOG_SPRITE_DMA) logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
 	if (enable)
 	{
 		m_sprite_comparitor_enable_mask |= 1 << which;
@@ -186,7 +190,7 @@ void amiga_state::fetch_sprite_data(int scanline, int sprite)
 	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
 	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
 	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
-	LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
+	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
 }
 
 void amiga_state::update_sprite_dma(int scanline)
@@ -216,7 +220,7 @@ void amiga_state::update_sprite_dma(int scanline)
 			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
 			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
 		/* compute vstart/vstop */
@@ -227,7 +231,7 @@ void amiga_state::update_sprite_dma(int scanline)
 		if (scanline == vstart)
 		{
 			m_sprite_comparitor_enable_mask |= 1 << num;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor enable\n", scanline, num);
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor enable\n", scanline, num);
 		}
 
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
@@ -238,7 +242,7 @@ void amiga_state::update_sprite_dma(int scanline)
 			m_sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;     /* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
-			LOGMASKED(LOG_SPRITE_DMA, "%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
+			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
 
 		/* fetch data if this sprite is enabled */

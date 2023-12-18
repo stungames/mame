@@ -64,14 +64,14 @@ protected:
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_palette_offset = 0U;
 
-	void coin_counter_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	void pal_offs_w(uint8_t data);
 	void scroll_w(uint8_t data);
-	void flipscreen_x_w(int state);
-	void flipscreen_y_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
 
 	void io_map(address_map &map);
 };
@@ -202,12 +202,12 @@ void base_state::scroll_w(uint8_t data)
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-void base_state::flipscreen_x_w(int state)
+WRITE_LINE_MEMBER(base_state::flipscreen_x_w)
 {
 	flip_screen_x_set(state);
 }
 
-void base_state::flipscreen_y_w(int state)
+WRITE_LINE_MEMBER(base_state::flipscreen_y_w)
 {
 	flip_screen_y_set(state);
 }
@@ -302,7 +302,7 @@ uint32_t crzrally_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 // machine
 
-void base_state::coin_counter_w(int state)
+WRITE_LINE_MEMBER(base_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
 }

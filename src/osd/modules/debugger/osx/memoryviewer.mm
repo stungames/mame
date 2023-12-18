@@ -46,7 +46,7 @@
 	// create the subview popup
 	subviewButton = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 100, 19)];
 	[subviewButton setAutoresizingMask:(NSViewWidthSizable | NSViewMinXMargin | NSViewMinYMargin)];
-	[subviewButton setBezelStyle:NSBezelStyleShadowlessSquare];
+	[subviewButton setBezelStyle:NSShadowlessSquareBezelStyle];
 	[subviewButton setFocusRingType:NSFocusRingTypeNone];
 	[subviewButton setFont:defaultFont];
 	[subviewButton setTarget:self];
@@ -118,11 +118,9 @@
 
 	// calculate the optimal size for everything
 	NSSize const desired = [NSScrollView frameSizeForContentSize:[memoryView maximumFrameSize]
-										 horizontalScrollerClass:[NSScroller class]
-										   verticalScrollerClass:[NSScroller class]
-													  borderType:[memoryScroll borderType]
-													 controlSize:NSControlSizeRegular
-												   scrollerStyle:NSScrollerStyleOverlay];
+										   hasHorizontalScroller:YES
+											 hasVerticalScroller:YES
+													  borderType:[memoryScroll borderType]];
 	[self cascadeWindowWithDesiredSize:desired forView:memoryScroll];
 
 	// don't forget the result

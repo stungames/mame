@@ -40,34 +40,46 @@ void msx_cart_beepack_device::device_add_mconfig(machine_config &config)
 	SOFTWARE_LIST(config, "bee_card_list").set_original("msx1_bee_card");
 }
 
-std::pair<std::error_condition, std::string> msx_cart_beepack_device::call_load()
+image_init_result msx_cart_beepack_device::call_load()
 {
 	if (m_beecard)
 	{
 		if (loaded_through_softlist())
 		{
-			u32 const length = get_software_region_length("rom");
+			u32 length = get_software_region_length("rom");
 			// Only 16KB or 32KB images are supported
 			if (length != 0x4000 && length != 0x8000)
-				return std::make_pair(image_error::BADSOFTWARE, "Invalid file size for a bee card (must be 16K or 32K)");
+			{
+				seterror(image_error::UNSPECIFIED, "Invalid file size for a bee card");
+				return image_init_result::FAIL;
+			}
 		}
 		else
 		{
-			u32 const length = this->length();
+			u32 length = this->length();
 			// Only 16KB or 32KB images are supported
 			if (length != 0x4000 && length != 0x8000)
-				return std::make_pair(image_error::BADSOFTWARE, "Invalid file size for a bee card (must be 16K or 32K)");
+			{
+				seterror(image_error::UNSPECIFIED, "Invalid file size for a bee card");
+				return image_init_result::FAIL;
+			}
 
 			memory_region *const romregion = machine().memory().region_alloc(subtag("rom"), length, 1, ENDIANNESS_LITTLE);
 			if (fread(romregion->base(), length) != length)
-				return std::make_pair(image_error::UNSPECIFIED, "Unable to fully read file");
+			{
+				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
+				return image_init_result::FAIL;
+			}
 		}
 
 		std::string message;
-		std::error_condition result = m_beecard->initialize_cartridge(message);
-		return std::make_pair(result, message);
+		image_init_result result = m_beecard->initialize_cartridge(message);
+		if (image_init_result::PASS != result)
+			seterror(image_error::INVALIDIMAGE, message.c_str());
+
+		return result;
 	}
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 std::string msx_cart_beepack_device::get_default_card_software(get_default_card_software_hook &hook) const

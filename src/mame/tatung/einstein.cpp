@@ -12,7 +12,9 @@
  ******************************************************************************/
 
 #include "emu.h"
-
+#include "cpu/z80/z80.h"
+#include "machine/z80daisy.h"
+#include "machine/z80daisy_generic.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
@@ -22,7 +24,6 @@
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
-#include "cpu/z80/z80.h"
 #include "machine/adc0844.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
@@ -30,19 +31,15 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
-#include "machine/z80daisy.h"
-#include "machine/z80daisy_generic.h"
 #include "machine/z80pio.h"
-#include "sound/ay8910.h"
 #include "video/tms9928a.h"
 #include "video/v9938.h"
+#include "sound/ay8910.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
-
-namespace {
 
 /***************************************************************************
     CONSTANTS
@@ -123,18 +120,18 @@ private:
 	void reset_w(uint8_t data);
 	uint8_t rom_r();
 	void rom_w(uint8_t data);
-	template <int Src> void int_w(int state);
+	template <int src> DECLARE_WRITE_LINE_MEMBER(int_w);
 	uint8_t kybint_msk_r();
 	void kybint_msk_w(uint8_t data);
 	void adcint_msk_w(uint8_t data);
 	void fireint_msk_w(uint8_t data);
 	void evdpint_msk_w(uint8_t data);
 	void drsel_w(uint8_t data);
-	void write_centronics_ack(int state);
-	void write_centronics_busy(int state);
-	void write_centronics_perror(int state);
-	void write_centronics_fault(int state);
-	void ardy_w(int state);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
 	uint8_t system_r();
@@ -289,27 +286,27 @@ void einstein_state::drsel_w(uint8_t data)
     CENTRONICS
 ***************************************************************************/
 
-void einstein_state::write_centronics_ack(int state)
+WRITE_LINE_MEMBER(einstein_state::write_centronics_ack)
 {
 	m_centronics_ack = state;
 }
 
-void einstein_state::write_centronics_busy(int state)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_busy )
 {
 	m_centronics_busy = state;
 }
 
-void einstein_state::write_centronics_perror(int state)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_perror )
 {
 	m_centronics_perror = state;
 }
 
-void einstein_state::write_centronics_fault(int state)
+WRITE_LINE_MEMBER( einstein_state::write_centronics_fault )
 {
 	m_centronics_fault = state;
 }
 
-void einstein_state::ardy_w(int state)
+WRITE_LINE_MEMBER( einstein_state::ardy_w )
 {
 	if (m_strobe == 0 && state == 1)
 	{
@@ -350,14 +347,13 @@ static const z80_daisy_config einst256_daisy_chain[] =
 	{ nullptr }
 };
 
-template <int Src>
-void einstein_state::int_w(int state)
+template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 {
 	int old = m_int;
 
 	if (state)
 	{
-		m_int |= (1 << Src);
+		m_int |= (1 << src);
 		if (!old)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -366,7 +362,7 @@ void einstein_state::int_w(int state)
 	}
 	else
 	{
-		m_int &= ~(1 << Src);
+		m_int &= ~(1 << src);
 		if (old && !m_int)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -845,27 +841,27 @@ QUICKLOAD_LOAD_MEMBER(einstein_state::quickload_cb)
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
 	if (image.length() >= 0xfd00)
-		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+		return image_init_result::FAIL;
 
-	// disable ROM
+	/* disable rom */
 	m_rom_enabled = 0;
 	m_bank1->set_entry(m_rom_enabled);
 
-	// load image
-	uint16_t const quickload_size = image.length();
+	/* load image */
+	uint16_t quickload_size = image.length();
 	for (uint16_t i = 0; i < quickload_size; i++)
 	{
 		uint8_t data;
 
 		if (image.fread(&data, 1) != 1)
-			return std::make_pair(image_error::UNSPECIFIED, std::string());
+			return image_init_result::FAIL;
 		prog_space.write_byte(i + 0x100, data);
 	}
 
-	// start program
+	/* start program */
 	m_maincpu->set_pc(0x100);
 
-	return std::make_pair(std::error_condition(), std::string());
+	return image_init_result::PASS;
 }
 
 
@@ -1064,8 +1060,6 @@ ROM_START( einst256 )
 	/* i008 */
 	ROM_LOAD("mos21.i008", 0x0000, 0x4000, CRC(d1bb5efc) SHA1(9168df70af6746c88748049d1b9d119a29e605de) )
 ROM_END
-
-} // anonymous namespace
 
 
 /***************************************************************************

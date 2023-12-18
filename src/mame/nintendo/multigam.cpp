@@ -114,8 +114,6 @@ Eproms are 27512,27010,274001
 #include "speaker.h"
 
 
-namespace {
-
 class multigam_state : public driver_device
 {
 public:
@@ -141,7 +139,7 @@ public:
 	void init_multigam();
 	void init_multigm3();
 
-	int multigam_inputs_r();
+	DECLARE_READ_LINE_MEMBER(multigam_inputs_r);
 
 protected:
 	virtual void machine_start() override;
@@ -317,7 +315,7 @@ uint8_t multigam_state::multigam_IN1_r()
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-int multigam_state::multigam_inputs_r()
+READ_LINE_MEMBER(multigam_state::multigam_inputs_r)
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */
@@ -1404,9 +1402,6 @@ void multigam_state::init_multigmt()
 
 	multigam_switch_prg_rom(0x01);
 }
-
-} // anonymous namespace
-
 
 GAME( 1992, multigam, 0,        multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 1)", 0 )
 GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, init_multigam, ROT0, "<unknown>", "Multi Game (set 2)", 0 )

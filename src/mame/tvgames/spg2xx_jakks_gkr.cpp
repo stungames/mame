@@ -10,8 +10,6 @@
 #include "softlist_dev.h"
 
 
-namespace {
-
 class jakks_gkr_state : public spg2xx_game_state
 {
 public:
@@ -41,11 +39,11 @@ public:
 	void jakks_gkr_wp(machine_config &config);
 	void jakks_gkr_cb(machine_config &config);
 
-	int i2c_gkr_r();
+	DECLARE_READ_LINE_MEMBER(i2c_gkr_r);
 
 protected:
-	[[maybe_unused]] uint16_t jakks_porta_r();
-	[[maybe_unused]] void jakks_porta_w(uint16_t data);
+	uint16_t jakks_porta_r();
+	void jakks_porta_w(uint16_t data);
 	void jakks_portb_w(uint16_t data);
 
 private:
@@ -67,7 +65,7 @@ private:
 	optional_ioport m_analog_y;
 };
 
-int jakks_gkr_state::i2c_gkr_r()
+READ_LINE_MEMBER(jakks_gkr_state::i2c_gkr_r)
 {
 	if (m_cart && m_cart->exists())
 	{
@@ -706,7 +704,6 @@ ROM_START( jak_capc )
 	ROM_LOAD16_WORD_SWAP( "capcomgkr.bin", 0x000000, 0x200000, CRC(6d47cce4) SHA1(263926a991d55459aa3cee90049d2202c1e3a70e) )
 ROM_END
 
-} // anonymous namespace
 
 
 // 'Game-Key Ready' JAKKS games (these can also take per-game specific expansion cartridges, although not all games had them released)

@@ -4,7 +4,8 @@
 #include "ibm6580_fdc.h"
 
 
-#define LOG_DEBUG     (1U << 1)
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_DEBUG     (1U <<  1)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
@@ -57,6 +58,9 @@ dw_fdc_device::dw_fdc_device(const machine_config &mconfig, const char *tag, dev
 
 void dw_fdc_device::device_start()
 {
+	m_out_data.resolve_safe();
+	m_out_clock.resolve_safe();
+	m_out_strobe.resolve_safe();
 	m_reset_timer = timer_alloc(FUNC(dw_fdc_device::assert_reset_line), this);
 }
 
@@ -93,14 +97,14 @@ uint8_t dw_fdc_device::p2_r()
 	return data;
 }
 
-int dw_fdc_device::t0_r()
+READ_LINE_MEMBER( dw_fdc_device::t0_r )
 {
 	LOGDBG("t0 == %d\n", m_t0);
 
 	return m_t0;
 }
 
-int dw_fdc_device::t1_r()
+READ_LINE_MEMBER( dw_fdc_device::t1_r )
 {
 	LOGDBG("t1 == %d\n", m_t1);
 
@@ -117,7 +121,7 @@ uint8_t dw_fdc_device::bus_r()
 	return m_bus;
 }
 
-void dw_fdc_device::reset_w(int state)
+WRITE_LINE_MEMBER( dw_fdc_device::reset_w )
 {
 	if(!state)
 		m_reset_timer->adjust(attotime::from_msec(50));
@@ -128,7 +132,7 @@ void dw_fdc_device::reset_w(int state)
 	}
 }
 
-void dw_fdc_device::ack_w(int state)
+WRITE_LINE_MEMBER( dw_fdc_device::ack_w )
 {
 	m_t0 = state;
 }

@@ -64,16 +64,13 @@
 #include "cpu/m6502/m65ce02.h"
 #include "sound/dac.h"
 
-#define LOG_VDP (1U << 1)
+#define LOG_VDP (1U <<  1)
 #define LOG_MUSICMCUCOMMS (1U << 2)
 
 //#define VERBOSE     (LOG_VDP)
 #define VERBOSE     (0)
 
 #include "logmacro.h"
-
-
-namespace {
 
 class monon_color_state : public driver_device
 {
@@ -156,7 +153,7 @@ private:
 		return m_cart->read();
 	}
 
-	void spidir_w(int state)
+	DECLARE_WRITE_LINE_MEMBER(spidir_w)
 	{
 		m_cart->dir_w(state);
 	}
@@ -988,8 +985,5 @@ ROM_START( mononcol )
 	ROM_FILL( 0x1ffc, 0x1, 0x00 )
 	ROM_FILL( 0x1ffd, 0x1, 0x20 )
 ROM_END
-
-} // anonymous namespace
-
 
 CONS( 2014, mononcol,    0,          0,  monon_color,  monon_color,    monon_color_state, empty_init,    "M&D",   "Monon Color", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

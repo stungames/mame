@@ -1091,16 +1091,13 @@ std::string core_options::output_help() const
 	// loop over all items
 	for (auto &curentry : m_entries)
 	{
+		// header: just print
 		if (curentry->type() == option_type::HEADER)
-		{
-			// header: just print
 			util::stream_format(buffer, "\n#\n# %s\n#\n", curentry->description());
-		}
+
+		// otherwise, output entries for all non-deprecated items
 		else if (curentry->description() != nullptr)
-		{
-			// otherwise, output entries for all non-deprecated items
-			util::stream_format(buffer, "-%-19s %s\n", curentry->name(), curentry->description());
-		}
+			util::stream_format(buffer, "-%-20s%s\n", curentry->name(), curentry->description());
 	}
 	return buffer.str();
 }

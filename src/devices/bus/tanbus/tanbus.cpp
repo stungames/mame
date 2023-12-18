@@ -67,15 +67,11 @@ tanbus_device::tanbus_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-tanbus_device::~tanbus_device()
-{
-}
-
 void tanbus_device::add_card(device_tanbus_interface *card, int num)
 {
 	card->m_tanbus = this;
 	card->m_page = num;
-	m_device_list.emplace_back(*card);
+	m_device_list.append(*card);
 }
 
 //-------------------------------------------------
@@ -84,6 +80,12 @@ void tanbus_device::add_card(device_tanbus_interface *card, int num)
 
 void tanbus_device::device_start()
 {
+	// resolve callbacks
+	m_out_irq_cb.resolve_safe();
+	m_out_nmi_cb.resolve_safe();
+	m_out_so_cb.resolve_safe();
+	m_out_pgm_cb.resolve_safe();
+
 	save_item(NAME(m_block_register));
 }
 
@@ -105,8 +107,13 @@ void tanbus_device::set_inhibit_lines(offs_t offset)
 	// reset inhibit lines
 	m_inhram = m_inhrom = 0;
 
-	for (device_tanbus_interface &card : m_device_list)
-		card.set_inhibit_lines(offset, m_inhram, m_inhrom);
+	device_tanbus_interface *card = m_device_list.first();
+
+	while (card)
+	{
+		card->set_inhibit_lines(offset, m_inhram, m_inhrom);
+		card = card->next();
+	}
 }
 
 //-------------------------------------------------
@@ -119,15 +126,19 @@ uint8_t tanbus_device::read(offs_t offset)
 
 	set_inhibit_lines(offset);
 
-	for (device_tanbus_interface &card : m_device_list)
+	device_tanbus_interface *card = m_device_list.first();
+
+	while (card)
 	{
 		// set block enable line for current card
-		if (BIT(m_block_register, 4, 3) == card.m_page)
+		if (BIT(m_block_register, 4, 3) == card->m_page)
 			m_block_enable = 1;
 		else
 			m_block_enable = 0;
 
-		data &= card.read(offset, m_inhrom, m_inhram, m_block_enable);
+		data &= card->read(offset, m_inhrom, m_inhram, m_block_enable);
+		card = card->next();
+
 	}
 
 	return data;
@@ -151,15 +162,18 @@ void tanbus_device::write(offs_t offset, uint8_t data)
 
 	set_inhibit_lines(offset);
 
-	for (device_tanbus_interface &card : m_device_list)
+	device_tanbus_interface *card = m_device_list.first();
+
+	while (card)
 	{
 		// set block enable line for current card
-		if (BIT(m_block_register, 0,3) == card.m_page)
+		if (BIT(m_block_register, 0,3) == card->m_page)
 			m_block_enable = 1;
 		else
 			m_block_enable = 0;
 
-		card.write(offset, data, m_inhrom, m_inhram, m_block_enable);
+		card->write(offset, data, m_inhrom, m_inhram, m_block_enable);
+		card = card->next();
 	}
 }
 
@@ -175,6 +189,7 @@ device_tanbus_interface::device_tanbus_interface(const machine_config &mconfig, 
 	: device_interface(device, "tanbus")
 	, m_tanbus(nullptr)
 	, m_page(0)
+	, m_next(nullptr)
 {
 }
 

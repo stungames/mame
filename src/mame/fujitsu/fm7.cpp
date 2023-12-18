@@ -380,12 +380,12 @@ void fm77_state::init_en_w(address_space &space, uint8_t data)
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-void fm7_state::fdc_intrq_w(int state)
+WRITE_LINE_MEMBER(fm7_state::fdc_intrq_w)
 {
 	m_fdc_irq_flag = state;
 }
 
-void fm7_state::fdc_drq_w(int state)
+WRITE_LINE_MEMBER(fm7_state::fdc_drq_w)
 {
 	m_fdc_drq_flag = state;
 }
@@ -710,22 +710,22 @@ void fm77_state::av_key_encoder_w(offs_t offset, uint8_t data)
 	}
 }
 
-void fm7_state::write_centronics_busy(int state)
+WRITE_LINE_MEMBER(fm7_state::write_centronics_busy)
 {
 	m_centronics_busy = state;
 }
 
-void fm7_state::write_centronics_fault(int state)
+WRITE_LINE_MEMBER(fm7_state::write_centronics_fault)
 {
 	m_centronics_fault = state;
 }
 
-void fm7_state::write_centronics_ack(int state)
+WRITE_LINE_MEMBER(fm7_state::write_centronics_ack)
 {
 	m_centronics_ack = state;
 }
 
-void fm7_state::write_centronics_perror(int state)
+WRITE_LINE_MEMBER(fm7_state::write_centronics_perror)
 {
 	m_centronics_perror = state;
 }
@@ -1237,7 +1237,7 @@ IRQ_CALLBACK_MEMBER(fm7_state::sub_irq_ack)
 	return -1;
 }
 
-void fm77_state::av_fmirq(int state)
+WRITE_LINE_MEMBER(fm77_state::av_fmirq)
 {
 	if(state == 1)
 	{

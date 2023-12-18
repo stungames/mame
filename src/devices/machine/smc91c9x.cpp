@@ -10,16 +10,14 @@
 
 #include "emu.h"
 #include "smc91c9x.h"
-
-#include "multibyte.h"
-
-#include <iomanip>
 #include <sstream>
+#include <iomanip>
 
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
 
+#define LOG_GENERAL (1U << 0)
 #define LOG_PACKETS (1U << 1)
 #define LOG_TX      (1U << 2)
 #define LOG_RX      (1U << 3)
@@ -85,6 +83,8 @@ void smc91c9x_device::device_start()
 
 	// TX timer
 	m_tx_poll = timer_alloc(FUNC(smc91c9x_device::tx_poll), this);
+
+	m_irq_handler.resolve_safe();
 
 	// These registers don't get cleared on reset
 	m_reg[B1_CONFIG] = 0x0030;   m_regmask[B1_CONFIG] = 0x17c6;
@@ -975,12 +975,7 @@ void smc91c9x_device::write(offs_t offset, u16 data, u16 mem_mask)
 			if ( ACCESSING_BITS_8_15 )
 			{
 				set_promisc(m_reg[B0_RCR] & PRMS);
-
-				u8 mac[6];
-				put_u16le(&mac[0], m_reg[B1_IA0_1]);
-				put_u16le(&mac[2], m_reg[B1_IA2_3]);
-				put_u16le(&mac[4], m_reg[B1_IA4_5]);
-				set_mac(mac);
+				set_mac((char *)&m_reg[B1_IA0_1]);
 			}
 			break;
 

@@ -929,6 +929,8 @@ void tms340x0_device::fill_l(uint16_t op)
 	(this->*s_fill_op_table[ix])(1);
 }
 
+extern int midtunit_bg_drawn_bg[16];
+
 void tms340x0_device::fill_xy(uint16_t op)
 {
 	int psize = pixelsize_lookup[IOREG(REG_PSIZE) & 0x1f];
@@ -939,6 +941,8 @@ void tms340x0_device::fill_xy(uint16_t op)
 	m_pixel_op = s_pixel_op_table[rop];
 	m_pixel_op_timing = s_pixel_op_timing_table[rop];
 	(this->*s_fill_op_table[ix])(0);
+	machine().m_dma_item_count = 0;
+	memset(midtunit_bg_drawn_bg, 0, sizeof(midtunit_bg_drawn_bg));
 }
 
 

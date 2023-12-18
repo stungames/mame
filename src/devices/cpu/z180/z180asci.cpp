@@ -85,6 +85,14 @@ z180asci_channel_base::z180asci_channel_base(const machine_config &mconfig, devi
 }
 
 
+void z180asci_channel_base::device_resolve_objects()
+{
+	// resolve callbacks
+	m_txa_handler.resolve_safe();
+	m_rts_handler.resolve_safe();
+	m_cka_handler.resolve_safe();
+}
+
 void z180asci_channel_base::device_start()
 {
 	save_item(NAME(m_asci_cntla));
@@ -212,7 +220,7 @@ uint8_t z180asci_channel_base::cntla_r()
 
 uint8_t z180asci_channel_base::cntlb_r()
 {
-	uint8_t data = (m_asci_cntlb & 0xdf) | (m_cts << 5);
+	uint8_t data = (m_asci_cntlb & 0x0d) | (m_cts << 5);
 	LOG("Z180 CNTLB%d rd $%02x\n", m_id, data);
 	return data;
 }
@@ -333,7 +341,7 @@ void z180asci_channel_base::astch_w(uint8_t data)
 	device_clock_changed();
 }
 
-void z180asci_channel_base::cts_wr(int state)
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cts_wr )
 {
 	if (m_id)
 	{
@@ -349,7 +357,7 @@ void z180asci_channel_base::cts_wr(int state)
 	m_cts = state;
 }
 
-void z180asci_channel_base::dcd_wr(int state)
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::dcd_wr )
 {
 	if (m_id)
 		return;
@@ -367,12 +375,12 @@ void z180asci_channel_base::dcd_wr(int state)
 		m_irq = 1;
 }
 
-void z180asci_channel_base::rxa_wr(int state)
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::rxa_wr )
 {
 	m_rxa = state;
 }
 
-void z180asci_channel_base::cka_wr(int state)
+DECLARE_WRITE_LINE_MEMBER( z180asci_channel_base::cka_wr )
 {
 	// For channel 1, CKA can be disabled
 	if (m_id && (m_asci_cntla & Z180_CNTLA1_CKA1D)) return;
