@@ -1777,8 +1777,7 @@ bool screen_device::update_quads()
 					(rct.y ) / (float)m_visarea.height(),
 					(rct.x1 - 56.5f) / (float)(m_visarea.width()-1),
 					(rct.y1 ) / (float)m_visarea.height(),
-					(rct.flags & 0x100) ? 0xff000000 :
-					rct.tex == 0 ? 0xff00cc00 : 0xffffffff,
+					rct.color,
 					rct.tex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA)|((rct.flags>>7)&1));
 			}
 		}

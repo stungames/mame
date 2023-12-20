@@ -370,15 +370,14 @@ public:
 
 	struct dma_item
 	{
-		int16_t  x;
-		int16_t  y;
-		int16_t  x1;
-		int16_t  y1;
+		int16_t  x,y,x1,y1;
+		int16_t  sx, sy, sx1, sy1;
 		render_texture *tex;
-		uint16_t flags;
+		rgb_t color;
+		uint32_t flags;
 	};
 
-	dma_item m_dma_items[256];
+	dma_item m_dma_items[512];
 	uint32_t m_dma_item_count;
 
 	void add_dma_item(dma_item& item);

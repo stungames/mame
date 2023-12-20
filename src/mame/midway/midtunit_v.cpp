@@ -1010,6 +1010,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		item.flags = 0;
 		item.y = m_dma_state.ypos - m_dma_state.topclip ;
 		item.y1 = item.y + m_dma_state.height;
+		item.color = 0xff00ff00;
 
 		machine().add_dma_item(item);
 		skip_render = 1;
@@ -1031,13 +1032,15 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 				int width = (bmp->width() * (0x10000/m_dma_state.xstep)) / sdiv;
 				int height = (bmp->height() * (0x10000/m_dma_state.ystep)) / sdiv;
 
+				bool is_shadow = m_dma_state.palette == 0 && m_dma_state.color == 0xf;
+
 				item.x = m_dma_state.xpos + (flipx ? remap.x : -remap.x);
 				item.x1 = item.x + (flipx ? -width : width);
 				item.tex = tex;
-				item.flags = (flipx ? 0x80 : 0x00) | (
-					(m_dma_state.palette == 0 && m_dma_state.color == 0xf) ? 0x100 : 0x00);//Font shadows
+				item.flags = (flipx ? 0x80 : 0x00);
+				item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
 
-				if (m_dma_state.height == 1 && (item.flags & 0x100)) {//Shadow?
+				if (m_dma_state.height == 1 && is_shadow) {//Shadow?
 					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
 					item.y1 = item.y + height / 4;
 				}
