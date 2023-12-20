@@ -46,10 +46,10 @@
 *.obj
 *.filters
 *.user
-*.pdb
-*.db
 /.idea
-/.vs/
+**/.vs/**
+**/Debug/**
+**/Release/**
 .vscode
 docs/build
 docs/source/_build
