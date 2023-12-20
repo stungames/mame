@@ -11,13 +11,16 @@
 
 /*
 /*/
+/.vs/
+!mame.exe
+!*.sln
 !/.github/
-!/3rdparty/
 !/android-project/
 !/benchmarks/
 !/artwork/
 !/bgfx/
 !/docs/
+!/build/
 !/hash/
 !/hlsl/
 !/keymaps/
@@ -41,6 +44,10 @@
 !/*.md
 !/*.bdf
 !/LICENSE
+*.obj
+*.filters
+*.user
+*.db
 /.idea
 .vscode
 docs/build
@@ -49,3 +56,4 @@ regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
 /samples
+
