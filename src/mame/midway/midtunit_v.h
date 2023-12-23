@@ -181,8 +181,9 @@ protected:
 public:
 	struct BLOCKREMAP
 	{
-		uint32_t gfxoffset;
-		int16_t  x, y;
+		uint32_t gfxoffset;//4
+		int16_t  x, y;//8
+		uint16_t map, flags;//12
 	};
 
 	render_texture* map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP* remap);

@@ -717,12 +717,6 @@ typedef struct
 	uint8_t map, mod;
 } REMAPPEDBLOCK;
 
-typedef struct 
-{
-	uint32_t gfxoffset;//4
-	int16_t  x, y;//8
-	uint16_t map, flags;//12
-}BLOCKREMAPPING;
 
 
 static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
@@ -731,7 +725,7 @@ static uint16_t mod_textures[256] = { 0 };
 static REMAPPEDBLOCK addr2texture[64 * 256 * 256] = { 0 };
 static uint16_t tga_texture_count = 0;
 static uint8_t gfx_remaps_loaded[8] = { 0 };
-static BLOCKREMAPPING remapdata[MAX_REMAPS];
+static midtunit_video_device::BLOCKREMAP remapdata[MAX_REMAPS];
 int midtunit_bg_drawn_bg[16] = { 0 };
 int use_2x_bg = 0;
 
@@ -775,13 +769,11 @@ static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 	return slot;
 }
 
-render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP *rmap)
+render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP *remap)
 {
 	REMAPPEDBLOCK* fmap = find_remap(gfxoffset);
 
 	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->texture;
-	BLOCKREMAPPING* remap = (BLOCKREMAPPING*)rmap;
-
 	remap->x = fmap->x;
 	remap->y = fmap->y;
 	remap->map = fmap->map;
@@ -1024,9 +1016,9 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 
 	}else
 	{
-		BLOCKREMAPPING remap = { 0 };
+		BLOCKREMAP remap = { 0 };
 		bitmap_argb32* bmp = 0;
-		render_texture* tex = map_gfx_texture(gfxoffset, &bmp, (BLOCKREMAP*)&remap);
+		render_texture* tex = map_gfx_texture(gfxoffset, &bmp, &remap);
 
 		if (tex)
 		{
