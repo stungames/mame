@@ -21,6 +21,7 @@
 !/docs/
 !/build/
 !/roms/
+!/cfg/
 !/hash/
 !/hlsl/
 !/keymaps/
