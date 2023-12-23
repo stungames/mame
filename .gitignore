@@ -15,6 +15,7 @@
 !*.sln
 !/.github/
 !/android-project/
+!/3rdparty/
 !/benchmarks/
 !/artwork/
 !/bgfx/
