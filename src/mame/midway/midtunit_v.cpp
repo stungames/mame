@@ -777,8 +777,6 @@ static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 
 render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP *rmap)
 {
-	if (tga_texture_count >= (MAX_4X_TEXTURES-1)) return 0;
-
 	REMAPPEDBLOCK* fmap = find_remap(gfxoffset);
 
 	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->texture;
@@ -798,6 +796,8 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitma
 		*outbitmap = tga_bitmaps[texid - 1];
 		return tga_textures[texid - 1];
 	}
+
+	if (tga_texture_count >= (MAX_4X_TEXTURES - 1)) return 0;
 
 	char filename[128];
 	if (fmap->mod) {
@@ -1009,8 +1009,15 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		item.tex = 0;
 		item.flags = 0;
 		item.y = m_dma_state.ypos - m_dma_state.topclip ;
+		short sy = item.y << 7;
+		item.y = sy / 128;
 		item.y1 = item.y + m_dma_state.height;
-		item.color = 0xff00ff00;
+
+		int color = m_dma_state.palette | m_dma_state.color;
+
+		rgb_t rgbcolor = m_palette->palette()->entry_list_raw()[color];
+
+		item.color = 0xff000000 | rgbcolor;
 
 		machine().add_dma_item(item);
 		skip_render = 1;
@@ -1035,17 +1042,25 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 				bool is_shadow = m_dma_state.palette == 0 && m_dma_state.color == 0xf;
 
 				item.x = m_dma_state.xpos + (flipx ? remap.x : -remap.x);
+				short sx = item.x << 6;
+				item.x = sx / 64;
+
 				item.x1 = item.x + (flipx ? -width : width);
 				item.tex = tex;
 				item.flags = (flipx ? 0x80 : 0x00);
 				item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
 
 				if (m_dma_state.height == 1 && is_shadow) {//Shadow?
+					
 					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
+					short sy = item.y << 7;
+					item.y = sy / 128;
 					item.y1 = item.y + height / 4;
 				}
 				else {
 					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y;
+					short sy = item.y << 7;
+					item.y = sy / 128;
 					item.y1 = item.y + height;
 				}
 
