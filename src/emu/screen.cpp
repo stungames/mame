@@ -1739,6 +1739,8 @@ void screen_device::create_composited_bitmap()
 //  screen
 //-------------------------------------------------
 
+extern int midtunit_bg_drawn_bg[16];
+
 bool screen_device::update_quads()
 {	
 	// only update if live
@@ -1778,8 +1780,11 @@ bool screen_device::update_quads()
 					(rct.x1 - 56.5f) / (float)(m_visarea.width()-1),
 					(rct.y1 ) / (float)m_visarea.height(),
 					rct.color,
-					rct.tex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA)|((rct.flags>>7)&1));
+					rct.tex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA)|rct.flags);
 			}
+
+			machine().m_dma_item_count = 0;
+			memset(midtunit_bg_drawn_bg, 0, sizeof(midtunit_bg_drawn_bg));
 		}
 	}
 

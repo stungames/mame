@@ -1000,9 +1000,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 		item.x1 = item.x + m_dma_state.width;
 		item.tex = 0;
 		item.flags = 0;
-		item.y = m_dma_state.ypos - m_dma_state.topclip ;
-		short sy = item.y << 7;
-		item.y = sy / 128;
+		item.y = m_dma_state.ypos - m_dma_state.topclip;
 		item.y1 = item.y + m_dma_state.height;
 
 		int color = m_dma_state.palette | m_dma_state.color;
@@ -1039,11 +1037,11 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 
 				item.x1 = item.x + (flipx ? -width : width);
 				item.tex = tex;
-				item.flags = (flipx ? 0x80 : 0x00);
+				item.flags = (flipx ? 0x01 : 0x00);
 				item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
 
-				if (m_dma_state.height == 1 && is_shadow) {//Shadow?
-					
+				if (m_dma_state.height == 1 && is_shadow) {
+					//Character shadow?					
 					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
 					short sy = item.y << 7;
 					item.y = sy / 128;
