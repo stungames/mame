@@ -186,7 +186,7 @@ public:
 		uint16_t map, flags;//12
 	};
 
-	render_texture* map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP* remap);
+	render_texture* map_gfx_texture(uint32_t gfxoffset, uint32_t palette, bitmap_argb32** outbitmap, BLOCKREMAP* remap);
 };
 
 class midwunit_video_device : public midtunit_video_device

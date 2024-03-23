@@ -693,6 +693,7 @@ uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
 
 #define MAX_4X_TEXTURES 1024
 #define MAX_REMAPS 2048
+#define GFXOFFSET_SHIFT 8
 
 typedef struct
 {
@@ -713,7 +714,7 @@ typedef struct
 typedef struct
 {
 	int16_t x, y;
-	uint16_t texture;
+	uint16_t textures[2];
 	uint8_t map, mod;
 } REMAPPEDBLOCK;
 
@@ -722,16 +723,24 @@ typedef struct
 static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
 static bitmap_argb32* tga_bitmaps[MAX_4X_TEXTURES] = { 0 };
 static uint16_t mod_textures[256] = { 0 };
-static REMAPPEDBLOCK addr2texture[64 * 256 * 256] = { 0 };
+static REMAPPEDBLOCK addr2texture[16 * 256 * 256] = { 0 };
 static uint16_t tga_texture_count = 0;
 static uint8_t gfx_remaps_loaded[8] = { 0 };
 static midtunit_video_device::BLOCKREMAP remapdata[MAX_REMAPS];
 int midtunit_bg_drawn_bg[16] = { 0 };
 int use_2x_bg = 0;
 
+static void set_map_hardcoded(uint32_t addr, int16_t x, int16_t y, uint8_t flags)
+{
+	addr2texture[addr >> GFXOFFSET_SHIFT].x = x;
+	addr2texture[addr >> GFXOFFSET_SHIFT].y = y;
+	addr2texture[addr >> GFXOFFSET_SHIFT].map = 0;
+	addr2texture[addr >> GFXOFFSET_SHIFT].mod = flags;
+}
+
 static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 {
-	REMAPPEDBLOCK* slot = &addr2texture[gfxoffset >> 6];
+	REMAPPEDBLOCK* slot = &addr2texture[gfxoffset >> GFXOFFSET_SHIFT];
 
 	int bank = (gfxoffset >> 24) & 0x7;
 	if (gfx_remaps_loaded[bank] == 2) return slot;
@@ -739,6 +748,19 @@ static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 	if (gfx_remaps_loaded[bank] == 0)
 	{
 		char filename[128];
+
+		if (bank == 5) {
+
+			set_map_hardcoded(0x5f18000, 0, 0, 54);
+			set_map_hardcoded(0x5f18100, 0, 0, 54);
+			set_map_hardcoded(0x5f18200, 0, 0, 54);
+			set_map_hardcoded(0x5f18300, 0, 0, 54);
+			set_map_hardcoded(0x5f18400, 0, 0, 54);
+			set_map_hardcoded(0x5f18500, 0, 0, 54);
+			set_map_hardcoded(0x5f18600, 0, 0, 54);
+			set_map_hardcoded(0x5f18700, 0, 0, 54);
+			set_map_hardcoded(0x5f18800, 0, 0, 54);
+		}
 
 		sprintf(filename, "C:/Projects/MK2Reboot/output/remap%d.bin", bank);
 		FILE* f = fopen(filename, "rb");
@@ -757,10 +779,13 @@ static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 			if (addr > 0x09ffffff) continue;
 			if (!use_2x_bg && remapdata[i].map) continue;
 
-			addr2texture[addr >> 6].x = remapdata[i].x;
-			addr2texture[addr >> 6].y = remapdata[i].y;
-			addr2texture[addr >> 6].map = (uint8_t)remapdata[i].map;
-			addr2texture[addr >> 6].mod = (uint8_t)remapdata[i].flags;
+			set_map_hardcoded(addr,remapdata[i].x, remapdata[i].y, (uint8_t)remapdata[i].flags);
+			/*
+			addr2texture[addr >> GFXOFFSET_SHIFT].x = remapdata[i].x;
+			addr2texture[addr >> GFXOFFSET_SHIFT].y = remapdata[i].y;
+			addr2texture[addr >> GFXOFFSET_SHIFT].map = (uint8_t)remapdata[i].map;
+			addr2texture[addr >> GFXOFFSET_SHIFT].mod = (uint8_t)remapdata[i].flags;
+			*/
 		}
 
 		gfx_remaps_loaded[bank] = 1;
@@ -769,11 +794,31 @@ static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
 	return slot;
 }
 
-render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitmap_argb32** outbitmap, BLOCKREMAP *remap)
+render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, uint32_t pindex, bitmap_argb32** outbitmap, BLOCKREMAP *remap)
 {
 	REMAPPEDBLOCK* fmap = find_remap(gfxoffset);
 
-	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->texture;
+	static int avail_pals555[] = {
+		0x20bf
+	};
+
+	int palette = 0;
+	rgb_t rgb555color = 0;
+
+	if (pindex && fmap->map == 0 && fmap->mod) {
+		rgb555color = m_palette->palette()->entry_list_adjusted_rgb15()[fmap->mod|pindex];
+
+		for (size_t i = 0; i < sizeof(avail_pals555)/sizeof(int); i++)
+		{
+			if (avail_pals555[i] == rgb555color) {
+				palette = 1;
+				break;
+			}
+		}
+
+	}	
+
+	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->textures[palette];
 	remap->x = fmap->x;
 	remap->y = fmap->y;
 	remap->map = fmap->map;
@@ -791,23 +836,33 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitma
 
 	if (tga_texture_count >= (MAX_4X_TEXTURES - 1)) return 0;
 
+	FILE* f = 0;
+
 	char filename[128];
-	if (fmap->mod) {
+	if (fmap->map && fmap->mod) {
 		sprintf(filename, "C:/Projects/MK2Reboot/images4x/Mod%d.tga", fmap->mod);
+		f = fopen(filename, "rb");
 	}
 	else {
-		sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
+		if (palette) {
+			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x_%04x.tga", gfxoffset, (int)rgb555color);
+			f = fopen(filename, "rb");
+		}
+
+		if (f == 0){
+			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
+			f = fopen(filename, "rb");
+		}
+		
 	}
 	
+	if (f == 0) {
+		fmap->textures[palette] = 0xffff;//Mark missing
+		return NULL;
+	}
 
 	TGAHeader tgaheader;
 	TGA tga;
-	FILE* f = fopen(filename, "rb");
-
-	if (f == 0) {
-		fmap->texture = 0xffff;//Mark missing
-		return NULL;
-	}
 
 	// Attempt To Read The File Header
 	if (fread(&tgaheader, sizeof(TGAHeader), 1, f) == 0)
@@ -875,7 +930,7 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, bitma
 	if (fmap->map) {
 		mod_textures[fmap->mod] = texind;
 	} else {
-		fmap->texture = texind;
+		fmap->textures[palette] = texind;
 	}	
 	tga_textures[texind-1] = tex;
 	tga_bitmaps[texind - 1] = bitmap;
@@ -1016,7 +1071,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	{
 		BLOCKREMAP remap = { 0 };
 		bitmap_argb32* bmp = 0;
-		render_texture* tex = map_gfx_texture(gfxoffset, &bmp, &remap);
+		render_texture* tex = map_gfx_texture(gfxoffset, m_dma_state.palette, &bmp, &remap);
 
 		if (tex)
 		{
