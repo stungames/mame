@@ -590,6 +590,99 @@
     <None Include="..\..\..\..\..\src\emu\emumem_hedw.ipp" />
     <None Include="..\..\..\..\..\src\emu\inpttype.ipp" />
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\..\scripts\font\NotoSans-Bold.bdc">
+      <FileType>Text</FileType>
+      <Command>@echo Converting NotoSans-Bold.bdc...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/file2str.py  ../../../../../scripts/font/NotoSans-Bold.bdc  ../../../../generated/emu/uismall.fh  font_uismall uint8_t
+</Command>
+      <Outputs>../../../../generated/emu/uismall.fh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\frontend\mame\ui\uicmd14.png">
+      <FileType>Text</FileType>
+      <Command>@echo Converting uicmd14.png...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/png2bdc.py  ../../../../../src/frontend/mame/ui/uicmd14.png  temp_cmd.bdc
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/file2str.py  temp_cmd.bdc ../../../../generated/emu/ui/uicmd14.fh  font_uicmd14 uint8_t
+</Command>
+      <Outputs>../../../../generated/emu/ui/uicmd14.fh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\noscreens.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/noscreens.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/noscreens.lay  ../../../../generated/emu/layout/noscreens.lh  layout_noscreens
+</Command>
+      <Outputs>../../../../generated/emu/layout/noscreens.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\monitors.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/monitors.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/monitors.lay  ../../../../generated/emu/layout/monitors.lh  layout_monitors
+</Command>
+      <Outputs>../../../../generated/emu/layout/monitors.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\dualhovu.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/dualhovu.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/dualhovu.lay  ../../../../generated/emu/layout/dualhovu.lh  layout_dualhovu
+</Command>
+      <Outputs>../../../../generated/emu/layout/dualhovu.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\dualhsxs.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/dualhsxs.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/dualhsxs.lay  ../../../../generated/emu/layout/dualhsxs.lh  layout_dualhsxs
+</Command>
+      <Outputs>../../../../generated/emu/layout/dualhsxs.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\dualhuov.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/dualhuov.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/dualhuov.lay  ../../../../generated/emu/layout/dualhuov.lh  layout_dualhuov
+</Command>
+      <Outputs>../../../../generated/emu/layout/dualhuov.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\triphsxs.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/triphsxs.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/triphsxs.lay  ../../../../generated/emu/layout/triphsxs.lh  layout_triphsxs
+</Command>
+      <Outputs>../../../../generated/emu/layout/triphsxs.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\..\..\src\emu\layout\quadhsxs.lay">
+      <FileType>Text</FileType>
+      <Command>@echo Compressing src/emu/layout/quadhsxs.lay...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/quadhsxs.lay  ../../../../generated/emu/layout/quadhsxs.lh  layout_quadhsxs
+</Command>
+      <Outputs>../../../../generated/emu/layout/quadhsxs.lh;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

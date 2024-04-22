@@ -143,10 +143,10 @@
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
-      <Command>mkdir "d:\mame\build\generated\resource\" 2&gt;NUL
-mkdir "d:\mame\build\generated\mame\mame\" 2&gt;NUL
+      <Command>mkdir "c:\Projects\Mame\build\generated\resource\" 2&gt;NUL
+mkdir "c:\Projects\Mame\build\generated\mame\mame\" 2&gt;NUL
 @echo Emitting mame_mame_vers.rc...
-D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "d:\mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "d:\mame\build\generated\version.cpp"</Command>
+C:\msys64\mingw64\bin\python.exe "c:\Projects\Mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "c:\Projects\Mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "c:\Projects\Mame\build\generated\version.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -185,8 +185,10 @@ D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mam
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>mkdir "c:\Projects\Mame\build\generated\resource\" 2&gt;NUL
+mkdir "c:\Projects\Mame\build\generated\mame\mame\" 2&gt;NUL
+@echo Emitting mame_mame_vers.rc...
+C:\msys64\mingw64\bin\python.exe "c:\Projects\Mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "c:\Projects\Mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "c:\Projects\Mame\build\generated\version.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -227,10 +229,10 @@ D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mam
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
-      <Command>mkdir "d:\mame\build\generated\resource\" 2&gt;NUL
-mkdir "d:\mame\build\generated\mame\mame\" 2&gt;NUL
+      <Command>mkdir "c:\Projects\Mame\build\generated\resource\" 2&gt;NUL
+mkdir "c:\Projects\Mame\build\generated\mame\mame\" 2&gt;NUL
 @echo Emitting mame_mame_vers.rc...
-D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "d:\mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "d:\mame\build\generated\version.cpp"</Command>
+C:\msys64\mingw64\bin\python.exe "c:\Projects\Mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "c:\Projects\Mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "c:\Projects\Mame\build\generated\version.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -271,8 +273,10 @@ D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mam
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>mkdir "c:\Projects\Mame\build\generated\resource\" 2&gt;NUL
+mkdir "c:\Projects\Mame\build\generated\mame\mame\" 2&gt;NUL
+@echo Emitting mame_mame_vers.rc...
+C:\msys64\mingw64\bin\python.exe "c:\Projects\Mame\scripts\build\verinfo.py" -f rc -t mame -s mame -e mame -o "c:\Projects\Mame\build\generated\resource\mame_mame_vers.rc" -r "mame.rc" "c:\Projects\Mame\build\generated\version.cpp"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -287,7 +291,7 @@ D:\msys64\mingw64\bin\python.exe "d:\mame\scripts\build\verinfo.py" -f rc -t mam
     <CustomBuild Include="..\..\..\..\..\src\mame\mame.lst">
       <FileType>Text</FileType>
       <Command>@echo Building driver list...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/makedep.py  -r d:/mame/ driverlist ../../../../../src/mame/mame.lst  &gt; ../../../../generated/mame/mame/drivlist.cpp 
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/makedep.py  -r c:/Projects/Mame/ driverlist ../../../../../src/mame/mame.lst  &gt; ../../../../generated/mame/mame/drivlist.cpp 
 </Command>
       <Outputs>../../../../generated/mame/mame/drivlist.cpp;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -299,6 +303,9 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/makedep.py  -r d:/
     <ResourceCompile Include="..\..\..\..\generated\resource\mame_mame_vers.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="itech.vcxproj">
+      <Project>{493dd46d-b59e-b17b-3e0c-f82daa6ce83a}</Project>
+    </ProjectReference>
     <ProjectReference Include="qtdbg_windows.vcxproj">
       <Project>{01D73598-6D97-B1CE-36D2-FA4BA251F6AA}</Project>
     </ProjectReference>

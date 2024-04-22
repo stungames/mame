@@ -854,13 +854,13 @@
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\h8\h8.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating H8-300 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d o   ../../../../generated/emu/cpu/h8/h8d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d o   ../../../../generated/emu/cpu/h8/h8d.hxx 
 @echo Generating H8-300H disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d h   ../../../../generated/emu/cpu/h8/h8hd.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d h   ../../../../generated/emu/cpu/h8/h8hd.hxx 
 @echo Generating H8S/2000 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d s20 ../../../../generated/emu/cpu/h8/h8s2000d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d s20 ../../../../generated/emu/cpu/h8/h8s2000d.hxx 
 @echo Generating H8S/2600 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d s26 ../../../../generated/emu/cpu/h8/h8s2600d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  d s26 ../../../../generated/emu/cpu/h8/h8s2600d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/h8/h8d.hxx;../../../../generated/emu/cpu/h8/h8hd.hxx;../../../../generated/emu/cpu/h8/h8s2000d.hxx;../../../../generated/emu/cpu/h8/h8s2600d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -870,7 +870,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ..
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\h8\gt913.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating GT913 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/gt913.lst  d g   ../../../../generated/emu/cpu/h8/gt913d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/gt913.lst  d g   ../../../../generated/emu/cpu/h8/gt913d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/h8/gt913d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -880,9 +880,9 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ..
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\mcs96\mcs96ops.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating i8x9x disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  d i8x9x ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  $(2) ../../../../generated/emu/cpu/mcs96/i8x9xd.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  d i8x9x ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  $(2) ../../../../generated/emu/cpu/mcs96/i8x9xd.hxx 
 @echo Generating i8xc196 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  d i8xc196 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  $(2) ../../../../generated/emu/cpu/mcs96/i8xc196d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  d i8xc196 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  $(2) ../../../../generated/emu/cpu/mcs96/i8xc196d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/mcs96/i8x9xd.hxx;../../../../generated/emu/cpu/mcs96/i8xc196d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -892,7 +892,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\odeco16.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating deco16 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d deco16 ../../../../../src/devices/cpu/m6502/odeco16.lst  ../../../../../src/devices/cpu/m6502/ddeco16.lst  ../../../../generated/emu/cpu/m6502/deco16d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d deco16 ../../../../../src/devices/cpu/m6502/odeco16.lst  ../../../../../src/devices/cpu/m6502/ddeco16.lst  ../../../../generated/emu/cpu/m6502/deco16d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/deco16d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -902,7 +902,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om4510.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m4510 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m4510 ../../../../../src/devices/cpu/m6502/om4510.lst  ../../../../../src/devices/cpu/m6502/dm4510.lst  ../../../../generated/emu/cpu/m6502/m4510d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m4510 ../../../../../src/devices/cpu/m6502/om4510.lst  ../../../../../src/devices/cpu/m6502/dm4510.lst  ../../../../generated/emu/cpu/m6502/m4510d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m4510d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -912,7 +912,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6502.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6502 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6502 ../../../../../src/devices/cpu/m6502/om6502.lst  ../../../../../src/devices/cpu/m6502/dm6502.lst  ../../../../generated/emu/cpu/m6502/m6502d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6502 ../../../../../src/devices/cpu/m6502/om6502.lst  ../../../../../src/devices/cpu/m6502/dm6502.lst  ../../../../generated/emu/cpu/m6502/m6502d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6502d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -922,7 +922,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om65c02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m65c02 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m65c02 ../../../../../src/devices/cpu/m6502/om65c02.lst  ../../../../../src/devices/cpu/m6502/dm65c02.lst  ../../../../generated/emu/cpu/m6502/m65c02d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m65c02 ../../../../../src/devices/cpu/m6502/om65c02.lst  ../../../../../src/devices/cpu/m6502/dm65c02.lst  ../../../../generated/emu/cpu/m6502/m65c02d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m65c02d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -932,7 +932,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om65ce02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m65ce02 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m65ce02 ../../../../../src/devices/cpu/m6502/om65ce02.lst  ../../../../../src/devices/cpu/m6502/dm65ce02.lst  ../../../../generated/emu/cpu/m6502/m65ce02d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m65ce02 ../../../../../src/devices/cpu/m6502/om65ce02.lst  ../../../../../src/devices/cpu/m6502/dm65ce02.lst  ../../../../generated/emu/cpu/m6502/m65ce02d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m65ce02d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -942,7 +942,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6509.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6509 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6509 ../../../../../src/devices/cpu/m6502/om6509.lst  ../../../../../src/devices/cpu/m6502/dm6509.lst  ../../../../generated/emu/cpu/m6502/m6509d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6509 ../../../../../src/devices/cpu/m6502/om6509.lst  ../../../../../src/devices/cpu/m6502/dm6509.lst  ../../../../generated/emu/cpu/m6502/m6509d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6509d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -952,7 +952,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6510.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6510 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6510 ../../../../../src/devices/cpu/m6502/om6510.lst  ../../../../../src/devices/cpu/m6502/dm6510.lst  ../../../../generated/emu/cpu/m6502/m6510d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m6510 ../../../../../src/devices/cpu/m6502/om6510.lst  ../../../../../src/devices/cpu/m6502/dm6510.lst  ../../../../generated/emu/cpu/m6502/m6510d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6510d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -962,7 +962,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om740.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m740 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m740 ../../../../../src/devices/cpu/m6502/om740.lst  ../../../../../src/devices/cpu/m6502/dm740.lst  ../../../../generated/emu/cpu/m6502/m740d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d m740 ../../../../../src/devices/cpu/m6502/om740.lst  ../../../../../src/devices/cpu/m6502/dm740.lst  ../../../../generated/emu/cpu/m6502/m740d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m740d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -972,7 +972,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\dr65c02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating r65c02 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d r65c02 - ../../../../../src/devices/cpu/m6502/dr65c02.lst  ../../../../generated/emu/cpu/m6502/r65c02d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d r65c02 - ../../../../../src/devices/cpu/m6502/dr65c02.lst  ../../../../generated/emu/cpu/m6502/r65c02d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/r65c02d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -982,7 +982,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\or65c19.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating r65c19 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d r65c19 ../../../../../src/devices/cpu/m6502/or65c19.lst  ../../../../../src/devices/cpu/m6502/dr65c19.lst  ../../../../generated/emu/cpu/m6502/r65c19d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d r65c19 ../../../../../src/devices/cpu/m6502/or65c19.lst  ../../../../../src/devices/cpu/m6502/dr65c19.lst  ../../../../generated/emu/cpu/m6502/r65c19d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/r65c19d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -992,7 +992,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\orp2a03.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating rp2a03 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d rp2a03 ../../../../../src/devices/cpu/m6502/orp2a03.lst  ../../../../../src/devices/cpu/m6502/drp2a03.lst  ../../../../generated/emu/cpu/m6502/rp2a03d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d rp2a03 ../../../../../src/devices/cpu/m6502/orp2a03.lst  ../../../../../src/devices/cpu/m6502/drp2a03.lst  ../../../../generated/emu/cpu/m6502/rp2a03d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/rp2a03d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -1002,7 +1002,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\oxavix.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating xavix disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d xavix ../../../../../src/devices/cpu/m6502/oxavix.lst  ../../../../../src/devices/cpu/m6502/dxavix.lst  ../../../../generated/emu/cpu/m6502/xavixd.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d xavix ../../../../../src/devices/cpu/m6502/oxavix.lst  ../../../../../src/devices/cpu/m6502/dxavix.lst  ../../../../generated/emu/cpu/m6502/xavixd.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/xavixd.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -1012,7 +1012,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\oxavix2000.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating xavix2000 disassembler source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d xavix2000 ../../../../../src/devices/cpu/m6502/oxavix2000.lst  ../../../../../src/devices/cpu/m6502/dxavix2000.lst  ../../../../generated/emu/cpu/m6502/xavix2000d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  d xavix2000 ../../../../../src/devices/cpu/m6502/oxavix2000.lst  ../../../../../src/devices/cpu/m6502/dxavix2000.lst  ../../../../generated/emu/cpu/m6502/xavix2000d.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/xavix2000d.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -1022,9 +1022,9 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\tms57002\tmsinstr.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating TMS57002 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  d ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002d.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  d ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002d.hxx 
 @echo Generating TMS57002 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  s ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  s ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/tms57002/tms57002d.hxx;../../../../generated/emu/cpu/tms57002/tms57002.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>

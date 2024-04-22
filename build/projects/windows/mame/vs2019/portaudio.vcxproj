@@ -275,8 +275,6 @@
     <ClCompile Include="..\..\..\..\..\3rdparty\portaudio\src\hostapi\wasapi\pa_win_wasapi.c">
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\3rdparty\portaudio\src\hostapi\wdmks\pa_win_wdmks.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\3rdparty\portaudio\src\hostapi\wmme\pa_win_wmme.c">
     </ClCompile>

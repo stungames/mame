@@ -9858,13 +9858,13 @@
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\h8\h8.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating H8-300 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s o   ../../../../generated/emu/cpu/h8/h8.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s o   ../../../../generated/emu/cpu/h8/h8.hxx 
 @echo Generating H8-300H source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s h   ../../../../generated/emu/cpu/h8/h8h.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s h   ../../../../generated/emu/cpu/h8/h8h.hxx 
 @echo Generating H8S/2000 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s s20 ../../../../generated/emu/cpu/h8/h8s2000.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s s20 ../../../../generated/emu/cpu/h8/h8s2000.hxx 
 @echo Generating H8S/2600 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s s26 ../../../../generated/emu/cpu/h8/h8s2600.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/h8.lst  s s26 ../../../../generated/emu/cpu/h8/h8s2600.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/h8/h8.hxx;../../../../generated/emu/cpu/h8/h8h.hxx;../../../../generated/emu/cpu/h8/h8s2000.hxx;../../../../generated/emu/cpu/h8/h8s2600.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9874,7 +9874,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ..
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\h8\gt913.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating GT913 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/gt913.lst  s g   ../../../../generated/emu/cpu/h8/gt913.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ../../../../../src/devices/cpu/h8/gt913.lst  s g   ../../../../generated/emu/cpu/h8/gt913.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/h8/gt913.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9884,11 +9884,11 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/h8/h8make.py  ..
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\mcs96\mcs96ops.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating mcs96 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s mcs96 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/mcs96.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s mcs96 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/mcs96.hxx 
 @echo Generating i8x9x source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s i8x9x ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/i8x9x.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s i8x9x ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/i8x9x.hxx 
 @echo Generating i8xc196 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s i8xc196 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/i8xc196.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.py  s i8xc196 ../../../../../src/devices/cpu/mcs96/mcs96ops.lst  ../../../../generated/emu/cpu/mcs96/i8xc196.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/mcs96/mcs96.hxx;../../../../generated/emu/cpu/mcs96/i8x9x.hxx;../../../../generated/emu/cpu/mcs96/i8xc196.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9898,7 +9898,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/mcs96/mcs96make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\odeco16.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating deco16 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s deco16 ../../../../../src/devices/cpu/m6502/odeco16.lst  ../../../../../src/devices/cpu/m6502/ddeco16.lst  ../../../../generated/emu/cpu/m6502/deco16.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s deco16 ../../../../../src/devices/cpu/m6502/odeco16.lst  ../../../../../src/devices/cpu/m6502/ddeco16.lst  ../../../../generated/emu/cpu/m6502/deco16.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/deco16.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9908,7 +9908,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om4510.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m4510 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m4510 ../../../../../src/devices/cpu/m6502/om4510.lst  ../../../../../src/devices/cpu/m6502/dm4510.lst  ../../../../generated/emu/cpu/m6502/m4510.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m4510 ../../../../../src/devices/cpu/m6502/om4510.lst  ../../../../../src/devices/cpu/m6502/dm4510.lst  ../../../../generated/emu/cpu/m6502/m4510.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m4510.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9918,7 +9918,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6502.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6502 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6502 ../../../../../src/devices/cpu/m6502/om6502.lst  ../../../../../src/devices/cpu/m6502/dm6502.lst  ../../../../generated/emu/cpu/m6502/m6502.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6502 ../../../../../src/devices/cpu/m6502/om6502.lst  ../../../../../src/devices/cpu/m6502/dm6502.lst  ../../../../generated/emu/cpu/m6502/m6502.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6502.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9928,7 +9928,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om65c02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m65c02 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m65c02 ../../../../../src/devices/cpu/m6502/om65c02.lst  ../../../../../src/devices/cpu/m6502/dm65c02.lst  ../../../../generated/emu/cpu/m6502/m65c02.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m65c02 ../../../../../src/devices/cpu/m6502/om65c02.lst  ../../../../../src/devices/cpu/m6502/dm65c02.lst  ../../../../generated/emu/cpu/m6502/m65c02.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m65c02.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9938,7 +9938,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om65ce02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m65ce02 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m65ce02 ../../../../../src/devices/cpu/m6502/om65ce02.lst  ../../../../../src/devices/cpu/m6502/dm65ce02.lst  ../../../../generated/emu/cpu/m6502/m65ce02.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m65ce02 ../../../../../src/devices/cpu/m6502/om65ce02.lst  ../../../../../src/devices/cpu/m6502/dm65ce02.lst  ../../../../generated/emu/cpu/m6502/m65ce02.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m65ce02.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9948,7 +9948,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6509.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6509 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6509 ../../../../../src/devices/cpu/m6502/om6509.lst  ../../../../../src/devices/cpu/m6502/dm6509.lst  ../../../../generated/emu/cpu/m6502/m6509.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6509 ../../../../../src/devices/cpu/m6502/om6509.lst  ../../../../../src/devices/cpu/m6502/dm6509.lst  ../../../../generated/emu/cpu/m6502/m6509.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6509.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9958,7 +9958,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om6510.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6510 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6510 ../../../../../src/devices/cpu/m6502/om6510.lst  ../../../../../src/devices/cpu/m6502/dm6510.lst  ../../../../generated/emu/cpu/m6502/m6510.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m6510 ../../../../../src/devices/cpu/m6502/om6510.lst  ../../../../../src/devices/cpu/m6502/dm6510.lst  ../../../../generated/emu/cpu/m6502/m6510.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m6510.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9968,7 +9968,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\om740.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m740 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m740 ../../../../../src/devices/cpu/m6502/om740.lst  ../../../../../src/devices/cpu/m6502/dm740.lst  ../../../../generated/emu/cpu/m6502/m740.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s m740 ../../../../../src/devices/cpu/m6502/om740.lst  ../../../../../src/devices/cpu/m6502/dm740.lst  ../../../../generated/emu/cpu/m6502/m740.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/m740.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9978,7 +9978,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\dr65c02.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating r65c02 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s r65c02 - ../../../../../src/devices/cpu/m6502/dr65c02.lst  ../../../../generated/emu/cpu/m6502/r65c02.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s r65c02 - ../../../../../src/devices/cpu/m6502/dr65c02.lst  ../../../../generated/emu/cpu/m6502/r65c02.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/r65c02.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9988,7 +9988,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\or65c19.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating r65c19 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s r65c19 ../../../../../src/devices/cpu/m6502/or65c19.lst  ../../../../../src/devices/cpu/m6502/dr65c19.lst  ../../../../generated/emu/cpu/m6502/r65c19.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s r65c19 ../../../../../src/devices/cpu/m6502/or65c19.lst  ../../../../../src/devices/cpu/m6502/dr65c19.lst  ../../../../generated/emu/cpu/m6502/r65c19.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/r65c19.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -9998,7 +9998,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\orp2a03.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating rp2a03 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s rp2a03_core ../../../../../src/devices/cpu/m6502/orp2a03.lst  ../../../../../src/devices/cpu/m6502/drp2a03.lst  ../../../../generated/emu/cpu/m6502/rp2a03.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s rp2a03_core ../../../../../src/devices/cpu/m6502/orp2a03.lst  ../../../../../src/devices/cpu/m6502/drp2a03.lst  ../../../../generated/emu/cpu/m6502/rp2a03.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/rp2a03.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10008,7 +10008,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\ow65c02s.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating w65c02s instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s w65c02s ../../../../../src/devices/cpu/m6502/ow65c02s.lst  ../../../../../src/devices/cpu/m6502/dw65c02s.lst  ../../../../generated/emu/cpu/m6502/w65c02s.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s w65c02s ../../../../../src/devices/cpu/m6502/ow65c02s.lst  ../../../../../src/devices/cpu/m6502/dw65c02s.lst  ../../../../generated/emu/cpu/m6502/w65c02s.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/w65c02s.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10018,7 +10018,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\oxavix.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating xavix instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s xavix ../../../../../src/devices/cpu/m6502/oxavix.lst  ../../../../../src/devices/cpu/m6502/dxavix.lst  ../../../../generated/emu/cpu/m6502/xavix.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s xavix ../../../../../src/devices/cpu/m6502/oxavix.lst  ../../../../../src/devices/cpu/m6502/dxavix.lst  ../../../../generated/emu/cpu/m6502/xavix.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/xavix.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10028,7 +10028,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6502\oxavix2000.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating xavix2000 instruction source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s xavix2000 ../../../../../src/devices/cpu/m6502/oxavix2000.lst  ../../../../../src/devices/cpu/m6502/dxavix2000.lst  ../../../../generated/emu/cpu/m6502/xavix2000.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.py  s xavix2000 ../../../../../src/devices/cpu/m6502/oxavix2000.lst  ../../../../../src/devices/cpu/m6502/dxavix2000.lst  ../../../../generated/emu/cpu/m6502/xavix2000.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6502/xavix2000.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10038,7 +10038,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6502/m6502make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6809\m6809.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating m6809 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/m6809.lst  &gt; ../../../../generated/emu/cpu/m6809/m6809.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/m6809.lst  &gt; ../../../../generated/emu/cpu/m6809/m6809.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6809/m6809.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10048,7 +10048,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6809\hd6309.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating hd6309 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/hd6309.lst  &gt; ../../../../generated/emu/cpu/m6809/hd6309.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/hd6309.lst  &gt; ../../../../generated/emu/cpu/m6809/hd6309.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6809/hd6309.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10058,7 +10058,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\m6809\konami.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating konami source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/konami.lst  &gt; ../../../../generated/emu/cpu/m6809/konami.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.py  ../../../../../src/devices/cpu/m6809/konami.lst  &gt; ../../../../generated/emu/cpu/m6809/konami.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/m6809/konami.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10068,7 +10068,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/m6809/m6809make.
     <CustomBuild Include="..\..\..\..\..\src\devices\cpu\tms57002\tmsinstr.lst">
       <FileType>Text</FileType>
       <Command>@echo Generating TMS57002 source file...
-D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  s ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002.hxx 
+C:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake.py  s ../../../../../src/devices/cpu/tms57002/tmsinstr.lst  ../../../../generated/emu/cpu/tms57002/tms57002.hxx 
 </Command>
       <Outputs>../../../../generated/emu/cpu/tms57002/tms57002.hxx;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10078,7 +10078,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../src/devices/cpu/tms57002/tmsmake
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\exorterm155.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/exorterm155.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/exorterm155.lay  ../../../../generated/emu/layout/exorterm155.lh  layout_exorterm155
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/exorterm155.lay  ../../../../generated/emu/layout/exorterm155.lh  layout_exorterm155
 </Command>
       <Outputs>../../../../generated/emu/layout/exorterm155.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10088,7 +10088,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\ie15.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/ie15.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/ie15.lay  ../../../../generated/emu/layout/ie15.lh  layout_ie15
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/ie15.lay  ../../../../generated/emu/layout/ie15.lh  layout_ie15
 </Command>
       <Outputs>../../../../generated/emu/layout/ie15.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10098,7 +10098,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\hp9122c.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/hp9122c.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/hp9122c.lay  ../../../../generated/emu/layout/hp9122c.lh  layout_hp9122c
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/hp9122c.lay  ../../../../generated/emu/layout/hp9122c.lh  layout_hp9122c
 </Command>
       <Outputs>../../../../generated/emu/layout/hp9122c.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10108,7 +10108,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\ex800.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/ex800.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/ex800.lay  ../../../../generated/emu/layout/ex800.lh  layout_ex800
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/ex800.lay  ../../../../generated/emu/layout/ex800.lh  layout_ex800
 </Command>
       <Outputs>../../../../generated/emu/layout/ex800.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10118,7 +10118,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\lx800.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/lx800.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/lx800.lay  ../../../../generated/emu/layout/lx800.lh  layout_lx800
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/lx800.lay  ../../../../generated/emu/layout/lx800.lh  layout_lx800
 </Command>
       <Outputs>../../../../generated/emu/layout/lx800.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10128,7 +10128,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\smartboard.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/smartboard.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/smartboard.lay  ../../../../generated/emu/layout/smartboard.lh  layout_smartboard
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/smartboard.lay  ../../../../generated/emu/layout/smartboard.lh  layout_smartboard
 </Command>
       <Outputs>../../../../generated/emu/layout/smartboard.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10138,7 +10138,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\nes_rob.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/nes_rob.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/nes_rob.lay  ../../../../generated/emu/layout/nes_rob.lh  layout_nes_rob
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/nes_rob.lay  ../../../../generated/emu/layout/nes_rob.lh  layout_nes_rob
 </Command>
       <Outputs>../../../../generated/emu/layout/nes_rob.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10148,7 +10148,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\qx10ascii.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/qx10ascii.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/qx10ascii.lay  ../../../../generated/emu/layout/qx10ascii.lh  layout_qx10ascii
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/qx10ascii.lay  ../../../../generated/emu/layout/qx10ascii.lh  layout_qx10ascii
 </Command>
       <Outputs>../../../../generated/emu/layout/qx10ascii.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>
@@ -10158,7 +10158,7 @@ D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../
     <CustomBuild Include="..\..\..\..\..\src\emu\layout\qx10hasci.lay">
       <FileType>Text</FileType>
       <Command>@echo Compressing src/emu/layout/qx10hasci.lay...
-D:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/qx10hasci.lay  ../../../../generated/emu/layout/qx10hasci.lh  layout_qx10hasci
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/complay.py  ../../../../../src/emu/layout/qx10hasci.lay  ../../../../generated/emu/layout/qx10hasci.lh  layout_qx10hasci
 </Command>
       <Outputs>../../../../generated/emu/layout/qx10hasci.lh;%(Outputs)</Outputs>
       <SubType>Designer</SubType>

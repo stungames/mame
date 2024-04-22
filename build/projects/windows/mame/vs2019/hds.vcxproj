@@ -31,7 +31,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -39,7 +39,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
@@ -47,14 +47,14 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -108,7 +108,8 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <PrecompiledHeader></PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -120,11 +121,11 @@
       <PreprocessorDefinitions>MAME_DEBUG;MAME_PROFILER;CRLF=3;LSB_FIRST;FLAC__NO_DLL;PUGIXML_HEADER_ONLY;NATIVE_DRC=drcbe_x86;LUA_COMPAT_ALL;LUA_COMPAT_5_1;LUA_COMPAT_5_2;XML_STATIC;WIN32;_WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\..\3rdparty\dxsdk\Include;..\..\..\..\..\src\osd;..\..\..\..\..\src\emu;..\..\..\..\..\src\devices;..\..\..\..\..\src\mame\shared;..\..\..\..\..\src\lib;..\..\..\..\..\src\lib\util;..\..\..\..\..\3rdparty;..\..\..\..\generated\mame\layout;..\..\..\..\..\3rdparty\asio\include;..\..\..\..\..\3rdparty\libflac\include;..\..\..\..\..\3rdparty\glm;..\..\..\..\..\3rdparty\libjpeg;..\..\..\..\..\3rdparty\rapidjson\include;..\..\..\..\..\3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  <Lib>
-    <OutputFile>$(OutDir)hds.lib</OutputFile>
-    <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
-    <TargetMachine>MachineX86</TargetMachine>
-  </Lib>
+    <Lib>
+      <OutputFile>$(OutDir)hds.lib</OutputFile>
+      <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,7 +143,8 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <PrecompiledHeader></PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -154,11 +156,11 @@
       <PreprocessorDefinitions>X64_WINDOWS_ABI;PTR64=1;MAME_DEBUG;MAME_PROFILER;CRLF=3;LSB_FIRST;FLAC__NO_DLL;PUGIXML_HEADER_ONLY;NATIVE_DRC=drcbe_x64;LUA_COMPAT_ALL;LUA_COMPAT_5_1;LUA_COMPAT_5_2;_WIN64;XML_STATIC;WIN32;_WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\..\3rdparty\dxsdk\Include;..\..\..\..\..\src\osd;..\..\..\..\..\src\emu;..\..\..\..\..\src\devices;..\..\..\..\..\src\mame\shared;..\..\..\..\..\src\lib;..\..\..\..\..\src\lib\util;..\..\..\..\..\3rdparty;..\..\..\..\generated\mame\layout;..\..\..\..\..\3rdparty\asio\include;..\..\..\..\..\3rdparty\libflac\include;..\..\..\..\..\3rdparty\glm;..\..\..\..\..\3rdparty\libjpeg;..\..\..\..\..\3rdparty\rapidjson\include;..\..\..\..\..\3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  <Lib>
-    <OutputFile>$(OutDir)hds.lib</OutputFile>
-    <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
-    <TargetMachine>MachineX64</TargetMachine>
-  </Lib>
+    <Lib>
+      <OutputFile>$(OutDir)hds.lib</OutputFile>
+      <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -176,22 +178,24 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader></PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;CRLF=3;LSB_FIRST;FLAC__NO_DLL;PUGIXML_HEADER_ONLY;NATIVE_DRC=drcbe_x86;LUA_COMPAT_ALL;LUA_COMPAT_5_1;LUA_COMPAT_5_2;XML_STATIC;WIN32;_WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\..\3rdparty\dxsdk\Include;..\..\..\..\..\src\osd;..\..\..\..\..\src\emu;..\..\..\..\..\src\devices;..\..\..\..\..\src\mame\shared;..\..\..\..\..\src\lib;..\..\..\..\..\src\lib\util;..\..\..\..\..\3rdparty;..\..\..\..\generated\mame\layout;..\..\..\..\..\3rdparty\asio\include;..\..\..\..\..\3rdparty\libflac\include;..\..\..\..\..\3rdparty\glm;..\..\..\..\..\3rdparty\libjpeg;..\..\..\..\..\3rdparty\rapidjson\include;..\..\..\..\..\3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  <Lib>
-    <OutputFile>$(OutDir)hds.lib</OutputFile>
-    <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
-    <TargetMachine>MachineX86</TargetMachine>
-  </Lib>
+    <Lib>
+      <OutputFile>$(OutDir)hds.lib</OutputFile>
+      <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -210,22 +214,24 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <PrecompiledHeader></PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <DiagnosticsFormat>Caret</DiagnosticsFormat>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>X64_WINDOWS_ABI;PTR64=1;NDEBUG;CRLF=3;LSB_FIRST;FLAC__NO_DLL;PUGIXML_HEADER_ONLY;NATIVE_DRC=drcbe_x64;LUA_COMPAT_ALL;LUA_COMPAT_5_1;LUA_COMPAT_5_2;_WIN64;XML_STATIC;WIN32;_WIN32;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;_CRT_STDIO_LEGACY_WIDE_SPECIFIERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\..\3rdparty\dxsdk\Include;..\..\..\..\..\src\osd;..\..\..\..\..\src\emu;..\..\..\..\..\src\devices;..\..\..\..\..\src\mame\shared;..\..\..\..\..\src\lib;..\..\..\..\..\src\lib\util;..\..\..\..\..\3rdparty;..\..\..\..\generated\mame\layout;..\..\..\..\..\3rdparty\asio\include;..\..\..\..\..\3rdparty\libflac\include;..\..\..\..\..\3rdparty\glm;..\..\..\..\..\3rdparty\libjpeg;..\..\..\..\..\3rdparty\rapidjson\include;..\..\..\..\..\3rdparty\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
-  <Lib>
-    <OutputFile>$(OutDir)hds.lib</OutputFile>
-    <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
-    <TargetMachine>MachineX64</TargetMachine>
-  </Lib>
+    <Lib>
+      <OutputFile>$(OutDir)hds.lib</OutputFile>
+      <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>

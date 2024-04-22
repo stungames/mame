@@ -445,7 +445,19 @@
     <None Include="..\..\..\..\..\src\frontend\mame\luaengine.ipp" />
     <None Include="..\..\..\..\..\src\frontend\mame\ui\defimg.ipp" />
     <None Include="..\..\..\..\..\src\frontend\mame\ui\toolbar.ipp" />
-  </ItemGroup>  
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\..\COPYING">
+      <FileType>Text</FileType>
+      <Command>@echo Converting COPYING...
+C:\msys64\mingw64\bin\python.exe ../../../../../scripts/build/file2lines.py  ../../../../../COPYING  ../../../../generated/emu/copying.ipp  copying_text
+</Command>
+      <Outputs>../../../../generated/emu/copying.ipp;%(Outputs)</Outputs>
+      <SubType>Designer</SubType>
+      <Message>
+      </Message>
+    </CustomBuild>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
