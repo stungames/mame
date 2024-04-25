@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "itech32.h"
+#include "render.h"
 #include <algorithm>
 
 
@@ -894,6 +895,260 @@ do {                                                \
 	}                                               \
 } while (0)
 
+void Save8BitBmp(const char* filename, const u8* src, const void* inpal, int palCount, int w, int h, bool pal16)
+{
+	static u8 palette[256 * 4];
+	FILE* f;
+
+	int padsize = (4 - (w % 4)) % 4;
+	int filesize = 54 + palCount * 4 + (w + padsize) * h;  //w is your image width, h is image height, both int
+
+	unsigned char bmpfileheader[14] = { 'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0 };
+	unsigned char bmpinfoheader[40] = { 40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 8,0 };
+	unsigned char bmppad[3] = { 0,0,0 };
+
+	bmpfileheader[2] = (unsigned char)(filesize);
+	bmpfileheader[3] = (unsigned char)(filesize >> 8);
+	bmpfileheader[4] = (unsigned char)(filesize >> 16);
+	bmpfileheader[5] = (unsigned char)(filesize >> 24);
+
+	int soffset = 54 + palCount * 4;
+
+	bmpfileheader[10] = (unsigned char)(soffset);
+	bmpfileheader[11] = (unsigned char)(soffset >> 8);
+	bmpfileheader[12] = (unsigned char)(soffset >> 16);
+	bmpfileheader[13] = (unsigned char)(soffset >> 24);
+
+	bmpinfoheader[4] = (unsigned char)(w);
+	bmpinfoheader[5] = (unsigned char)(w >> 8);
+	bmpinfoheader[6] = (unsigned char)(w >> 16);
+	bmpinfoheader[7] = (unsigned char)(w >> 24);
+	bmpinfoheader[8] = (unsigned char)(h);
+	bmpinfoheader[9] = (unsigned char)(h >> 8);
+	bmpinfoheader[10] = (unsigned char)(h >> 16);
+	bmpinfoheader[11] = (unsigned char)(h >> 24);
+	bmpinfoheader[32] = palCount == 256 ? 0 : palCount;
+
+	if (pal16)
+	{
+		u8* pal = palette;
+		u16* Palette555 = (u16*)inpal;
+
+		for (int i = 0; i < palCount; i++)
+		{
+			u16 pdata = Palette555[i];
+			*pal++ = ((pdata >> 10) & 0x1f) << 3;
+			*pal++ = ((pdata >> 5) & 0x1f) << 3;
+			*pal++ = ((pdata >> 0) & 0x1f) << 3;
+			*pal++ = 0;
+		}
+	}
+	else
+	{
+		u8* pal = palette;
+		u32* Palette8888 = (u32*)inpal;
+
+		for (int i = 0; i < palCount; i++)
+		{
+			u32 pdata = Palette8888[i];
+
+			*pal++ = ((pdata >> 0) & 0xff);
+			*pal++ = ((pdata >> 8) & 0xff);
+			*pal++ = ((pdata >> 16) & 0xff);
+			*pal++ = 0;
+		}
+	}
+
+
+	f = fopen(filename, "wb");
+	fwrite(bmpfileheader, 1, 14, f);
+	fwrite(bmpinfoheader, 1, 40, f);
+	fwrite(palette, 1, 4 * palCount, f);
+
+	for (int i = 0; i < h; i++)
+	{
+		fwrite(src + (w * (h - i - 1)), 1, w, f);
+		if (padsize) fwrite(bmppad, 1, padsize, f);
+	}
+	fclose(f);
+
+}
+
+#define ITECH32_4X_MODE 0
+#define MAX_SAVEOBJ_COUNT 4096
+#define MAX_4X_TEXTURES 1024
+
+u32 grom_saved_objects[MAX_SAVEOBJ_COUNT] = { 0 };
+u32 grom_saved_object_count = 0;
+
+u8 grom_save_buffer[512 * 512];
+
+int CheckBitmap(u32 adr)
+{
+	if (adr < 0x0080000 || adr > 0x00a00000) return -1;
+
+	for (size_t i = 0; i < grom_saved_object_count; i++)
+	{
+		if (adr == grom_saved_objects[i]) {
+			return i+1;
+		}
+	}
+
+	return 0;
+}
+
+void Save8BitBmpAdr(u32 adr, const void* inpal, int palCount, int w, int h, bool pal16)
+{
+	char filename[128];
+	sprintf(filename, "output/%08x.bmp", adr);
+	Save8BitBmp(filename, grom_save_buffer, inpal, palCount, w, h, pal16);
+	if (grom_saved_object_count < MAX_SAVEOBJ_COUNT) {
+		grom_saved_objects[grom_saved_object_count++] = adr;
+	}	
+}
+
+typedef struct
+{
+	uint8_t Header[12];         // File Header To Determine File Type
+} TGAHeader;
+
+typedef struct
+{
+	uint8_t header[6];          // Holds The First 6 Useful Bytes Of The File
+	uint32_t bytesPerPixel;           // Number Of BYTES Per Pixel (3 Or 4)
+	uint32_t imageSize;           // Amount Of Memory Needed To Hold The Image
+	uint32_t type;                // The Type Of Image, GL_RGB Or GL_RGBA
+	uint32_t Height;              // Height Of Image                 
+	uint32_t Width;               // Width Of Image              
+	uint32_t Bpp;             // Number Of BITS Per Pixel (24 Or 32)
+} TGA;
+
+static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
+static bitmap_argb32* tga_bitmaps[MAX_4X_TEXTURES] = { 0 };
+
+render_texture* itech32_state::map_gfx_texture(u32 adr, bitmap_argb32** bmp)
+{
+	int bmpresult = CheckBitmap(adr);
+
+	if (bmpresult < 0) return NULL;
+
+	if (bmpresult > 0) {
+		*bmp = tga_bitmaps[bmpresult-1];
+		return tga_textures[bmpresult-1];
+	}
+
+	FILE* f = 0;
+	char filename[128];
+	sprintf(filename, "C:/Projects/Mame/output/images4x/%08x.tga", adr);
+	f = fopen(filename, "rb");
+
+	if (f == 0) {
+		return NULL;
+	}
+
+	TGAHeader tgaheader;
+	TGA tga;
+
+	// Attempt To Read The File Header
+	if (fread(&tgaheader, sizeof(TGAHeader), 1, f) == 0)
+	{
+		return false;               // Return False If It Fails
+	}
+
+	// Attempt To Read Next 6 Bytes
+	if (fread(tga.header, sizeof(tga.header), 1, f) == 0)
+	{
+		return false;               // Return False
+	}
+
+	int ww = tga.header[1] * 256 + tga.header[0];   // Calculate Height
+	int hh = tga.header[3] * 256 + tga.header[2];   // Calculate The Width
+
+	int bits = tga.header[4];                // Calculate Bits Per Pixel
+	tga.Width = ww;              // Copy Width Into Local Structure
+	tga.Height = hh;                // Copy Height Into Local Structure
+	tga.Bpp = bits;
+	tga.bytesPerPixel = (tga.Bpp / 8);      // Calculate The BYTES Per Pixel
+	// Calculate Memory Needed To Store Image
+	tga.imageSize = (tga.bytesPerPixel * tga.Width * tga.Height);
+
+	uint8_t* pixels = new uint8_t[tga.Width * tga.Height * tga.bytesPerPixel];
+
+	if (bits == 32)
+	{
+		int pitch = tga.Width * tga.bytesPerPixel;
+
+		if (tga.header[5] & 0x20)
+		{
+			fread(pixels, 1, tga.Height * pitch, f);
+		}
+		else
+		{
+			// Attempt To Read All The Image Data			
+			int row = (tga.Height - 1) * pitch;
+
+			for (size_t i = 0; i < tga.Height; i++, row -= pitch)
+			{
+				fread(pixels + row, 1, pitch, f);
+			}
+		}
+
+	}
+	/*
+	for (int cswap = 0; cswap < (int)tga.imageSize; cswap += tga.bytesPerPixel)
+	{
+		// 1st Byte XOR 3rd Byte XOR 1st Byte XOR 3rd Byte
+		pixels[cswap] ^= pixels[cswap + 2] ^=
+			pixels[cswap] ^= pixels[cswap + 2];
+	}
+	*/
+
+	bitmap_argb32* bitmap = new bitmap_argb32((uint32_t*)pixels, ww, hh, ww);
+
+	render_texture* tex = machine().render().texture_alloc();
+
+	tex->set_bitmap(*bitmap, bitmap->cliprect(), TEXFORMAT_ARGB32);
+	fclose(f);
+	// Close The File
+
+	tga_bitmaps[grom_saved_object_count] = bitmap;
+	tga_textures[grom_saved_object_count] = tex;
+	grom_saved_objects[grom_saved_object_count++] = adr;
+
+	return tex;
+}
+
+int itech32_state::map_draw_4x(u32 adr, u16 flipx)
+{
+	bitmap_argb32* bmp = 0;
+	render_texture* tex = map_gfx_texture(adr, &bmp);
+
+	if (tex)
+	{
+		running_machine::dma_item item;
+		int width = VIDEO_TRANSFER_WIDTH;
+		int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
+		int sx = VIDEO_TRANSFER_X & m_vram_xmask;
+		int sy = ((VIDEO_TRANSFER_Y & 0xfff) << 8) & m_vram_ymask;
+
+		const bool is_shadow = false;
+
+		item.x = sx;
+		item.x1 = item.x + (flipx ? -width : width);
+		item.tex = tex;
+		item.flags = (flipx ? 0x01 : 0x00);
+		item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
+
+		item.y = sy - 512;
+		item.y1 = item.y + height;
+
+		machine().add_dma_item(item);
+		return 1;
+	}
+
+	return 0;
+}
+
 
 
 /*************************************
@@ -904,7 +1159,8 @@ do {                                                \
 
 inline void itech32_state::draw_rle_fast(u16 *base, u16 color)
 {
-	u8 *src = &m_grom[(m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % m_grom.length()];
+	u32 adr = (m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % m_grom.length();
+	u8 *src = &m_grom[adr];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
@@ -913,6 +1169,56 @@ inline void itech32_state::draw_rle_fast(u16 *base, u16 color)
 	int xleft, y, count = 0, val = 0, innercount;
 	int ydststep = VIDEO_DST_YSTEP;
 	int lclip, rclip;
+
+#if ITECH32_4X_MODE == 0
+	if (CheckBitmap(adr) == 0)
+	{
+		memset(grom_save_buffer, 0, width * height);
+
+		for (y = 0; y < height; y++)
+		{
+			u32 sp = y * width;
+			
+			/* loop until gone */
+			for (xleft = width; xleft > 0; )
+			{
+				/* load next RLE chunk if needed */
+				GET_NEXT_RUN(xleft, count, innercount, src);
+
+				/* run of literals */
+				if (val == -1)
+					while (innercount--)
+					{
+						int pixel = *src++;
+						if (pixel != transparent_pen) {
+							grom_save_buffer[sp] = pixel;
+						}
+						sp++;
+					}
+
+				/* run of non-transparent repeats */
+				else if (val != transparent_pen)
+				{
+					u8 pix8 = val;
+					while (innercount--) {
+						grom_save_buffer[sp++] = pix8;
+					}
+				}
+
+				/* run of transparent repeats */
+				else {
+					sp += innercount;
+				}
+
+			}
+		}
+
+		const rgb_t* PalData = m_palette->palette()->entry_list_raw() + color;
+		Save8BitBmpAdr(adr, PalData, 256, width, height, false);
+	}
+#elif ITECH32_4X_MODE == 1
+	if (map_draw_4x(adr, 0)) return;	
+#endif
 
 	/* determine clipping */
 	lclip = m_clip_rect.min_x - sx;
@@ -955,22 +1261,26 @@ inline void itech32_state::draw_rle_fast(u16 *base, u16 color)
 				while (innercount--)
 				{
 					int pixel = *src++;
-					if (pixel != transparent_pen)
+					if (pixel != transparent_pen) {
 						base[dstoffs & m_vram_mask] = color | pixel;
-					dstoffs++;
+					}
+					dstoffs++;					
 				}
 
 			/* run of non-transparent repeats */
 			else if (val != transparent_pen)
 			{
 				val |= color;
-				while (innercount--)
+				while (innercount--) {
 					base[dstoffs++ & m_vram_mask] = val;
+				}
 			}
 
 			/* run of transparent repeats */
-			else
+			else {
 				dstoffs += innercount;
+			}
+				
 		}
 
 		/* right clip */
@@ -981,7 +1291,13 @@ inline void itech32_state::draw_rle_fast(u16 *base, u16 color)
 
 inline void itech32_state::draw_rle_fast_xflip(u16 *base, u16 color)
 {
-	u8 *src = &m_grom[(m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % m_grom.length()];
+	u32 adr = (m_grom_bank | ((VIDEO_TRANSFER_ADDRHI & 0xff) << 16) | VIDEO_TRANSFER_ADDRLO) % m_grom.length();
+
+#if ITECH32_4X_MODE == 1
+	if (map_draw_4x(adr, 1)) return;
+#endif
+
+	u8 *src = &m_grom[adr];
 	int transparent_pen = (VIDEO_TRANSFER_FLAGS & XFERFLAG_TRANSPARENT) ? 0xff : -1;
 	int width = VIDEO_TRANSFER_WIDTH;
 	int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);

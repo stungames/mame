@@ -52,6 +52,9 @@ public:
 		m_soundbank(*this, "soundbank")
 	{ }
 
+	render_texture* map_gfx_texture(u32 adr, bitmap_argb32** bmp);
+	int map_draw_4x(u32 adr, u16 palette);
+
 	void base_devices(machine_config &config);
 	void via(machine_config &config);
 	void tourny(machine_config &config);
