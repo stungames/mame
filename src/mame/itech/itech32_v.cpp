@@ -981,15 +981,18 @@ void Save8BitBmp(const char* filename, const u8* src, const void* inpal, int pal
 
 }
 
+#define ITECH32_GROM_FILTER 0
 #define ITECH32_4X_MODE 1
-#define MAX_SAVEOBJ_COUNT 1024
+#define MAX_SAVEOBJ_COUNT 4096
 
 u32 grom_saved_objects[MAX_SAVEOBJ_COUNT] = { 0 };
 u32 grom_saved_object_count = 0;
 
 int CheckBitmap(u32 adr)
 {
+#if ITECH32_GROM_FILTER != 0
 	if (adr < 0x0080000 || adr > 0x00a00000) return -1;
+#endif
 
 	for (size_t i = 0; i < grom_saved_object_count; i++)
 	{
@@ -1004,6 +1007,16 @@ int CheckBitmap(u32 adr)
 #if ITECH32_4X_MODE == 0
 u8 grom_save_buffer[512 * 512];
 u32 grom_palette[256];
+
+void Save8BitBmpAdr(u32 adr, int w, int h)
+{
+	char filename[128];
+	sprintf(filename, "output/%08x.bmp", adr);
+	Save8BitBmp(filename, grom_save_buffer, grom_palette, 256, w, h, false);
+	if (grom_saved_object_count < MAX_SAVEOBJ_COUNT) {
+		grom_saved_objects[grom_saved_object_count++] = adr;
+	}
+}
 
 void SaveBitmap(u32 adr, u16 color, u8* src, int transparent_pen, int width, int height, const void* PalData)
 {
@@ -1050,23 +1063,16 @@ void SaveBitmap(u32 adr, u16 color, u8* src, int transparent_pen, int width, int
 
 			}
 		}
-
-		if (grom_saved_object_count == 0) {
+#if ITECH32_GROM_FILTER != 0
+		if (grom_saved_object_count == 0)
+#endif
+		{
 			memcpy(grom_palette, PalData, 256 * 4);
 		}
-		Save8BitBmpAdr(adr, grom_palette, 256, width, height, false);
+		Save8BitBmpAdr(adr, width, height);
 	}
 }
 
-void Save8BitBmpAdr(u32 adr, const void* inpal, int palCount, int w, int h, bool pal16)
-{
-	char filename[128];
-	sprintf(filename, "output/%08x.bmp", adr);
-	Save8BitBmp(filename, grom_save_buffer, inpal, palCount, w, h, pal16);
-	if (grom_saved_object_count < MAX_SAVEOBJ_COUNT) {
-		grom_saved_objects[grom_saved_object_count++] = adr;
-	}
-}
 #endif
 
 
@@ -1181,7 +1187,7 @@ render_texture* itech32_state::map_gfx_texture(u32 adr, bitmap_argb32** bmp)
 	return tex;
 }
 
-int itech32_state::map_draw_4x(u32 adr, u16 color, u16 flipx)
+int itech32_state::map_draw_4x(u32 adr, u16 color, u16 flipx, int ydstep)
 {
 	bitmap_argb32* bmp = NULL;
 	render_texture* tex = map_gfx_texture(adr, &bmp);
@@ -1190,19 +1196,29 @@ int itech32_state::map_draw_4x(u32 adr, u16 color, u16 flipx)
 	{
 		running_machine::dma_item item;
 		int width = VIDEO_TRANSFER_WIDTH;
-		int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT);
+		int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT) * ydstep /256;
 		int sx = VIDEO_TRANSFER_X & m_vram_xmask;
 		int sy = VIDEO_TRANSFER_Y & m_vram_xmask;
 
-		const bool is_shadow = false;
+		const bool is_shadow = color == 0x1b00;
 
-		item.x = sx + 56;
+		if (sx > 384)
+		{
+			short ssx = sx << 7;
+			item.x = ssx / 128 + 56;
+		}
+		else
+		{
+			item.x = sx + 56;
+		}
+
 		item.x1 = item.x + (flipx ? -width : width);
-		item.tex = is_shadow ? NULL : tex;
+		item.tex = tex;
 		item.flags = (flipx ? 0x01 : 0x00);
-		item.color = is_shadow ? 0xaa000000 : 0xffffffff;//Font shadows
+		item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
 
-		item.y = sy;
+		short ssy = sy << 7;
+		item.y = ssy / 128;
 		item.y1 = item.y + height;
 
 		machine().add_dma_item(item);
@@ -1237,7 +1253,7 @@ inline void itech32_state::draw_rle_fast(u16 *base, u16 color)
 	const rgb_t* PalData = m_palette->palette()->entry_list_raw() + color;
 	SaveBitmap(adr, color,src,transparent_pen,width,height, PalData);
 #elif ITECH32_4X_MODE == 1
-	if (map_draw_4x(adr, color,0)) return;	
+	if (map_draw_4x(adr, color,0,ydststep)) return;
 #endif
 
 	/* determine clipping */
@@ -1326,7 +1342,7 @@ inline void itech32_state::draw_rle_fast_xflip(u16 *base, u16 color)
 	const rgb_t* PalData = m_palette->palette()->entry_list_raw() + color;
 	SaveBitmap(adr, color, src, transparent_pen, width, height, PalData);
 #elif ITECH32_4X_MODE == 1
-	if (map_draw_4x(adr, color, 1)) return;
+	if (map_draw_4x(adr, color, 1, ydststep)) return;
 #endif	
 
 	/* determine clipping */

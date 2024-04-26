@@ -53,7 +53,7 @@ public:
 	{ }
 
 	render_texture* map_gfx_texture(u32 adr, bitmap_argb32** bmp);
-	int map_draw_4x(u32 adr, u16 palette, u16 flipx);
+	int map_draw_4x(u32 adr, u16 palette, u16 flipx,int ydstep);
 
 	void base_devices(machine_config &config);
 	void via(machine_config &config);
