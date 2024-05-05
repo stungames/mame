@@ -985,7 +985,7 @@ void Save8BitBmp(const char* filename, const u8* src, const void* inpal, int pal
 #define ITECH32_4X_MODE 1
 #define MAX_SAVEOBJ_COUNT 4096
 
-u32 grom_saved_objects[MAX_SAVEOBJ_COUNT] = { 0 };
+u32 *grom_saved_objects = NULL;
 u32 grom_saved_object_count = 0;
 
 int CheckBitmap(u32 adr)
@@ -993,6 +993,8 @@ int CheckBitmap(u32 adr)
 #if ITECH32_GROM_FILTER != 0
 	if (adr < 0x0080000 || adr > 0x00a00000) return -1;
 #endif
+
+	if (grom_saved_objects == NULL) grom_saved_objects = (u32*)calloc(MAX_SAVEOBJ_COUNT, 4);
 
 	for (size_t i = 0; i < grom_saved_object_count; i++)
 	{
@@ -1108,7 +1110,7 @@ render_texture* itech32_state::map_gfx_texture(u32 adr, bitmap_argb32** bmp)
 
 	FILE* f = 0;
 	char filename[128];
-	sprintf(filename, "C:/Projects/Mame/output/images4x/%08x.tga", adr);
+	sprintf(filename, "output/images4x/%08x.tga", adr);
 	f = fopen(filename, "rb");
 
 	if (f == 0) {
@@ -1189,6 +1191,8 @@ render_texture* itech32_state::map_gfx_texture(u32 adr, bitmap_argb32** bmp)
 
 int itech32_state::map_draw_4x(u32 adr, u16 color, u16 flipx, int ydstep)
 {
+	//0x0100,0x4000,0x2100 => Bars
+
 	bitmap_argb32* bmp = NULL;
 	render_texture* tex = map_gfx_texture(adr, &bmp);
 
@@ -1197,29 +1201,29 @@ int itech32_state::map_draw_4x(u32 adr, u16 color, u16 flipx, int ydstep)
 		running_machine::dma_item item;
 		int width = VIDEO_TRANSFER_WIDTH;
 		int height = ADJUSTED_HEIGHT(VIDEO_TRANSFER_HEIGHT) * ydstep /256;
-		int sx = VIDEO_TRANSFER_X & m_vram_xmask;
-		int sy = VIDEO_TRANSFER_Y & m_vram_xmask;
+		int sx = VIDEO_TRANSFER_X & 0xfff;
+		int sy = VIDEO_TRANSFER_Y & 0xfff;
 
 		const bool is_shadow = color == 0x1b00;
 
-		if (sx > 384)
-		{
-			short ssx = sx << 7;
-			item.x = ssx / 128 + 56;
-		}
-		else
-		{
-			item.x = sx + 56;
-		}
+		/* determine clipping */
+		int lclip = m_clip_rect.min_x - sx;
+		if (lclip < 0) lclip = 0;
+		int rclip = sx + width - m_clip_rect.max_x;
+		if (rclip < 0) rclip = 0;
 
-		item.x1 = item.x + (flipx ? -width : width);
-		item.tex = tex;
-		item.flags = (flipx ? 0x01 : 0x00);
-		item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
+		short ssx = sx << 6;
+		item.x = ssx / 64;
+
+		item.x1 = item.x + (flipx ? -width : width);		
 
 		short ssy = sy << 7;
 		item.y = ssy / 128;
 		item.y1 = item.y + height;
+
+		item.tex = tex;
+		item.flags = (flipx ? 0x01 : 0x00);
+		item.color = is_shadow ? 0xff000000 : 0xffffffff;
 
 		machine().add_dma_item(item);
 		return 1;

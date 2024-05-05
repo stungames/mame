@@ -1775,10 +1775,10 @@ bool screen_device::update_quads()
 				running_machine::dma_item& rct = machine().m_dma_items[ix];
 
 				m_container->add_quad(
-					(rct.x - 56.5f) / (float)(m_visarea.width()-1),
-					(rct.y ) / (float)m_visarea.height(),
-					(rct.x1 - 56.5f) / (float)(m_visarea.width()-1),
-					(rct.y1 ) / (float)m_visarea.height(),
+					(rct.x) / (float)(m_visarea.width()-1),
+					(rct.y) / (float)m_visarea.height(),
+					(rct.x1) / (float)(m_visarea.width()-1),
+					(rct.y1) / (float)m_visarea.height(),
 					rct.color,
 					rct.tex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA)|rct.flags);
 			}

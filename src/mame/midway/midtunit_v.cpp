@@ -1064,6 +1064,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 
 		item.color = 0xff000000 | rgbcolor;
 
+		item.x -= 56.5f; item.x1 -= 56.5f;
 		machine().add_dma_item(item);
 		skip_render = 1;
 
@@ -1109,6 +1110,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 					item.y1 = item.y + height;
 				}
 
+				item.x -= 56.5f; item.x1 -= 56.5f;
 				machine().add_dma_item(item);
 				midtunit_bg_drawn_bg[remap.map]++;
 			}
