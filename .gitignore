@@ -12,6 +12,7 @@
 /*
 /*/
 !mame.exe
+!*.ini
 !*.sln
 !/.github/
 !/android-project/
