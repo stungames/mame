@@ -207,6 +207,15 @@ void midtunit_video_device::device_start()
 	INIT_TEMPLATED_DMA_DRAW_GROUP(m_dma_draw_skip_noscale,   true,  false);
 	INIT_TEMPLATED_DMA_DRAW_GROUP(m_dma_draw_noskip_noscale, false, false);
 
+	m_mk2 = strcmp(m_machine_config.gamedrv().name, "mk2") == 0;
+	m_mk3 = strcmp(m_machine_config.gamedrv().name, "umk3") == 0;
+
+	if (m_mk3)
+	{
+		m_log_path = "C:/Projects/MK3Reboot/images";
+		m_log_png = true;
+	}
+
 	m_gfx_rom_large = false;
 }
 
@@ -711,22 +720,13 @@ typedef struct
 	uint32_t Bpp;             // Number Of BITS Per Pixel (24 Or 32)
 } TGA;
 
-typedef struct
-{
-	int16_t x, y;
-	uint16_t textures[2];
-	uint8_t map, mod;
-} REMAPPEDBLOCK;
-
-
-
 static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
 static bitmap_argb32* tga_bitmaps[MAX_4X_TEXTURES] = { 0 };
 static uint16_t mod_textures[256] = { 0 };
-static REMAPPEDBLOCK addr2texture[16 * 256 * 256] = { 0 };
 static uint16_t tga_texture_count = 0;
 static uint8_t gfx_remaps_loaded[8] = { 0 };
 static midtunit_video_device::BLOCKREMAP remapdata[MAX_REMAPS];
+static midtunit_video_device::REMAPPEDBLOCK addr2texture[16 * 256 * 256] = { 0 };
 int midtunit_bg_drawn_bg[16] = { 0 };
 int use_2x_bg = 0;
 
@@ -738,9 +738,11 @@ static void set_map_hardcoded(uint32_t addr, int16_t x, int16_t y, uint8_t flags
 	addr2texture[addr >> GFXOFFSET_SHIFT].mod = flags;
 }
 
-static REMAPPEDBLOCK* find_remap(uint32_t gfxoffset)
+midtunit_video_device::REMAPPEDBLOCK* midtunit_video_device::find_remap(uint32_t gfxoffset)
 {
 	REMAPPEDBLOCK* slot = &addr2texture[gfxoffset >> GFXOFFSET_SHIFT];
+
+	if (!m_mk2) return slot;
 
 	int bank = (gfxoffset >> 24) & 0x7;
 	if (gfx_remaps_loaded[bank] == 2) return slot;
@@ -844,16 +846,18 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, uint3
 		f = fopen(filename, "rb");
 	}
 	else {
-		if (palette) {
+		if (palette && m_mk2) {
 			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x_%04x.tga", gfxoffset, (int)rgb555color);
 			f = fopen(filename, "rb");
 		}
 
-		if (f == 0){
+		if (f == 0 && m_mk2){
 			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
 			f = fopen(filename, "rb");
+		}else if (f == 0 && m_mk3) {
+			sprintf(filename, "C:/Projects/MK3Reboot/images4x/%08x.tga", gfxoffset);
+			f = fopen(filename, "rb");
 		}
-		
 	}
 	
 	if (f == 0) {
@@ -1127,7 +1131,7 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 	}
 	
 	
-	if (m_log_png)
+	if (!skip_render && m_log_png)
 	{
 		if (command & 0x80)
 		{
@@ -1206,6 +1210,92 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(midxunit_video_device::scanline_update)
 		dest[x] = src[fulladdr++ & 0x1ff] & 0x7fff;
 }
 
+static void Write8BitBMP(const char* filename, const u8* src, const void* inpal, int palCount, int w, int h, bool pal16)
+{
+	static u8 palette[256 * 4];
+	FILE* f;
+
+	int padsize = (4 - (w % 4)) % 4;
+	int filesize = 54 + palCount * 4 + (w + padsize) * h;  //w is your image width, h is image height, both int
+
+	unsigned char bmpfileheader[14] = { 'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0 };
+	unsigned char bmpinfoheader[40] = { 40,0,0,0, 0,0,0,0, 0,0,0,0, 1,0, 8,0 };
+	unsigned char bmppad[3] = { 0,0,0 };
+
+	bmpfileheader[2] = (unsigned char)(filesize);
+	bmpfileheader[3] = (unsigned char)(filesize >> 8);
+	bmpfileheader[4] = (unsigned char)(filesize >> 16);
+	bmpfileheader[5] = (unsigned char)(filesize >> 24);
+
+	int soffset = 54 + palCount * 4;
+
+	bmpfileheader[10] = (unsigned char)(soffset);
+	bmpfileheader[11] = (unsigned char)(soffset >> 8);
+	bmpfileheader[12] = (unsigned char)(soffset >> 16);
+	bmpfileheader[13] = (unsigned char)(soffset >> 24);
+
+	bmpinfoheader[4] = (unsigned char)(w);
+	bmpinfoheader[5] = (unsigned char)(w >> 8);
+	bmpinfoheader[6] = (unsigned char)(w >> 16);
+	bmpinfoheader[7] = (unsigned char)(w >> 24);
+	bmpinfoheader[8] = (unsigned char)(h);
+	bmpinfoheader[9] = (unsigned char)(h >> 8);
+	bmpinfoheader[10] = (unsigned char)(h >> 16);
+	bmpinfoheader[11] = (unsigned char)(h >> 24);
+	bmpinfoheader[32] = palCount == 256 ? 0 : palCount;
+
+	if (pal16)
+	{
+		u8* pal = palette;
+		u16* Palette555 = (u16*)inpal;
+
+		for (int i = 0; i < palCount; i++)
+		{
+			u16 pdata = Palette555[i];
+			*pal++ = ((pdata >> 10) & 0x1f) << 3;
+			*pal++ = ((pdata >> 5) & 0x1f) << 3;
+			*pal++ = ((pdata >> 0) & 0x1f) << 3;
+			*pal++ = 0;
+		}
+	}
+	else
+	{
+		u8* pal = palette;
+		u32* Palette8888 = (u32*)inpal;
+
+		*pal++ = 0; *pal++ = 0;
+		*pal++ = 0; *pal++ = 0;
+
+		for (int i = 1; i < palCount; i++)
+		{
+			u32 pdata = Palette8888[i];
+
+			if ((pdata & 0xffffff) == 0) {
+				pdata = 0x01010101;
+			}
+
+			*pal++ = ((pdata >> 0) & 0xff);
+			*pal++ = ((pdata >> 8) & 0xff);
+			*pal++ = ((pdata >> 16) & 0xff);
+			*pal++ = 0;
+		}
+	}
+
+
+	f = fopen(filename, "wb");
+	fwrite(bmpfileheader, 1, 14, f);
+	fwrite(bmpinfoheader, 1, 40, f);
+	fwrite(palette, 1, 4 * palCount, f);
+
+	for (int i = 0; i < h; i++)
+	{
+		fwrite(src + (w * (h - i - 1)), 1, w, f);
+		if (padsize) fwrite(bmppad, 1, padsize, f);
+	}
+	fclose(f);
+
+}
+
 
 void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 {
@@ -1241,26 +1331,40 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	default: return;
 	}
 
-	emu_file file(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-
 	char name_buf[256];
-	snprintf(name_buf, 255, "%08x.png", raw_offset);
-	auto const filerr = file.open(name_buf);
-	if (filerr)
-	{
-		return;
-	}
+	snprintf(name_buf, 255, "%s/%08x.bmp", m_log_path.c_str(), raw_offset);
 
-	m_logged_rom[raw_offset >> 6] |= 1ULL << (raw_offset & 0x3f);
+	static u8 m_log_bitmap[256 * 256];
 
-	m_log_bitmap.allocate(m_dma_state.width, m_dma_state.height);
-	m_log_bitmap.fill(0);
+	memset(m_log_bitmap, 0, m_dma_state.width * m_dma_state.height);
 
 	uint8_t *base = m_dma_state.gfxrom;
 	uint32_t offset = m_dma_state.offset;
 	uint16_t pal = m_dma_state.palette;
 	uint16_t color = pal | m_dma_state.color;
 	int mask = (1 << bpp) - 1;
+
+
+	//P2 Palette redirect
+	static u16 P1Pal = 0;
+	static u16 P2Pal = 0;
+
+	if (P1Pal == 0 || P2Pal == 0)
+	{
+		if (P1Pal == 0 && raw_offset == 0x00a01bea)
+		{
+			P1Pal = color;
+		}
+		
+		if (P2Pal == 0 && raw_offset == 0x00c482fe)
+		{
+			P2Pal = color;
+		}
+
+		return;
+	}
+
+	m_logged_rom[raw_offset >> 6] |= 1ULL << (raw_offset & 0x3f);
 
 	/* loop over the height */
 	for (int y = 0; y < m_dma_state.height; y++)
@@ -1302,7 +1406,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		if (width > m_dma_state.width - m_dma_state.endskip)
 			width = m_dma_state.width - m_dma_state.endskip;
 
-		bitmap_rgb32::pixel_t *d = &m_log_bitmap.pix(y, ix);
+		u8 *d = &m_log_bitmap[y* m_dma_state.width + ix];
 
 		/* determine destination pointer */
 
@@ -1313,9 +1417,9 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 			if (Zero == NonZero)
 			{
 				if (Zero == PIXEL_COLOR)
-					*d = m_palette->palette()->entry_list_raw()[color];
+					*d = color;
 				else if (Zero == PIXEL_COPY)
-					*d = m_palette->palette()->entry_list_raw()[(EXTRACTGEN(mask)) | pal];
+					*d = EXTRACTGEN(mask);
 			}
 
 			/* otherwise, read the pixel and look */
@@ -1327,18 +1431,18 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 				if (pixel)
 				{
 					if (NonZero == PIXEL_COLOR)
-						*d = m_palette->palette()->entry_list_raw()[color];
+						*d = color;
 					else if (NonZero == PIXEL_COPY)
-						*d = m_palette->palette()->entry_list_raw()[pixel | pal];
+						*d = pixel;
 				}
 
 				/* zero pixel case */
 				else
 				{
 					if (Zero == PIXEL_COLOR)
-						*d = m_palette->palette()->entry_list_raw()[color];
+						*d = color;
 					else if (Zero == PIXEL_COPY)
-						*d = m_palette->palette()->entry_list_raw()[pal];
+						*d = pal;
 				}
 			}
 
@@ -1362,7 +1466,10 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		}
 	}
 
-	util::png_write_bitmap(file, nullptr, m_log_bitmap, 0, nullptr);
+
+	if (color == P2Pal) color = P1Pal;
+
+	Write8BitBMP(name_buf, m_log_bitmap, m_palette->palette()->entry_list_raw() + color, 256, m_dma_state.width, m_dma_state.height, false);
 
 	if (m_log_json)
 	{

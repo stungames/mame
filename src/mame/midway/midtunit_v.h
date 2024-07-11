@@ -169,8 +169,8 @@ protected:
 	std::string m_log_path;
 	bool m_log_png;
 	bool m_log_json;
+	bool m_mk2, m_mk3;
 	std::unique_ptr<uint64_t[]> m_logged_rom;
-	bitmap_argb32 m_log_bitmap;
 
 	void debug_init();
 	void debug_commands(const std::vector<std::string_view> &params);
@@ -186,6 +186,14 @@ public:
 		uint16_t map, flags;//12
 	};
 
+	typedef struct
+	{
+		int16_t x, y;
+		uint16_t textures[2];
+		uint8_t map, mod;
+	} REMAPPEDBLOCK;
+
+	REMAPPEDBLOCK* find_remap(uint32_t gfxoffset);
 	render_texture* map_gfx_texture(uint32_t gfxoffset, uint32_t palette, bitmap_argb32** outbitmap, BLOCKREMAP* remap);
 };
 
