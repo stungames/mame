@@ -1346,9 +1346,10 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 
 	//P2 Palette redirect
+	/*	
 	static u16 P1Pal = 0;
 	static u16 P2Pal = 0;
-
+	
 	if (P1Pal == 0 || P2Pal == 0)
 	{
 		if (P1Pal == 0 && raw_offset == 0x00a01bea)
@@ -1363,7 +1364,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 		return;
 	}
-
+	*/
 	m_logged_rom[raw_offset >> 6] |= 1ULL << (raw_offset & 0x3f);
 
 	/* loop over the height */
@@ -1467,7 +1468,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 	}
 
 
-	if (color == P2Pal) color = P1Pal;
+	//if (color == P2Pal) color = P1Pal;
 
 	Write8BitBMP(name_buf, m_log_bitmap, m_palette->palette()->entry_list_raw() + color, 256, m_dma_state.width, m_dma_state.height, false);
 

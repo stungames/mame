@@ -25,6 +25,7 @@
 !/roms/
 !/cfg/
 !/nvram/
+!/sta/
 !/hash/
 !/hlsl/
 !/keymaps/
