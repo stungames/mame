@@ -700,7 +700,7 @@ uint16_t midtunit_video_device::midtunit_dma_r(offs_t offset)
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
-#define MAX_4X_TEXTURES 1024
+#define MAX_4X_TEXTURES 2048
 #define MAX_REMAPS 2048
 #define GFXOFFSET_SHIFT 8
 
@@ -722,7 +722,6 @@ typedef struct
 
 static render_texture* tga_textures[MAX_4X_TEXTURES] = { 0 };
 static bitmap_argb32* tga_bitmaps[MAX_4X_TEXTURES] = { 0 };
-static uint16_t mod_textures[256] = { 0 };
 static uint16_t tga_texture_count = 0;
 static uint8_t gfx_remaps_loaded[8] = { 0 };
 static midtunit_video_device::BLOCKREMAP remapdata[MAX_REMAPS];
@@ -782,12 +781,6 @@ midtunit_video_device::REMAPPEDBLOCK* midtunit_video_device::find_remap(uint32_t
 			if (!use_2x_bg && remapdata[i].map) continue;
 
 			set_map_hardcoded(addr,remapdata[i].x, remapdata[i].y, (uint8_t)remapdata[i].flags);
-			/*
-			addr2texture[addr >> GFXOFFSET_SHIFT].x = remapdata[i].x;
-			addr2texture[addr >> GFXOFFSET_SHIFT].y = remapdata[i].y;
-			addr2texture[addr >> GFXOFFSET_SHIFT].map = (uint8_t)remapdata[i].map;
-			addr2texture[addr >> GFXOFFSET_SHIFT].mod = (uint8_t)remapdata[i].flags;
-			*/
 		}
 
 		gfx_remaps_loaded[bank] = 1;
@@ -820,7 +813,7 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, uint3
 
 	}	
 
-	uint16_t texid = fmap->map ? mod_textures[fmap->mod] : fmap->textures[palette];
+	uint16_t texid = fmap->textures[palette];
 	remap->x = fmap->x;
 	remap->y = fmap->y;
 	remap->map = fmap->map;
@@ -841,24 +834,19 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, uint3
 	FILE* f = 0;
 
 	char filename[128];
-	if (fmap->map && fmap->mod) {
-		sprintf(filename, "C:/Projects/MK2Reboot/images4x/Mod%d.tga", fmap->mod);
+
+	if (palette && m_mk2) {
+		sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x_%04x.tga", gfxoffset, (int)rgb555color);
 		f = fopen(filename, "rb");
 	}
-	else {
-		if (palette && m_mk2) {
-			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x_%04x.tga", gfxoffset, (int)rgb555color);
-			f = fopen(filename, "rb");
-		}
 
-		if (f == 0 && m_mk2){
-			sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
-			f = fopen(filename, "rb");
-		}else if (f == 0 && m_mk3) {
-			sprintf(filename, "C:/Projects/MK3Reboot/images4x/%08x.tga", gfxoffset);
-			f = fopen(filename, "rb");
-		}
+	if (f == 0 && m_mk2){
+		sprintf(filename, "C:/Projects/MK2Reboot/images4x/%08x.tga", gfxoffset);
+	}else if (f == 0 && m_mk3) {
+		sprintf(filename, "C:/Projects/MK3Reboot/images4x/%08x.tga", gfxoffset);		
 	}
+
+	f = fopen(filename, "rb");
 	
 	if (f == 0) {
 		fmap->textures[palette] = 0xffff;//Mark missing
@@ -931,11 +919,7 @@ render_texture* midtunit_video_device::map_gfx_texture(uint32_t gfxoffset, uint3
 
 	int texind = ++tga_texture_count;
 
-	if (fmap->map) {
-		mod_textures[fmap->mod] = texind;
-	} else {
-		fmap->textures[palette] = texind;
-	}	
+	fmap->textures[palette] = texind;
 	tga_textures[texind-1] = tex;
 	tga_bitmaps[texind - 1] = bitmap;
 	*outbitmap = bitmap;
@@ -1080,44 +1064,40 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 
 		if (tex)
 		{
-			if (remap.map == 0 || (!flipx && midtunit_bg_drawn_bg[remap.map] == 0))
-			{
-				running_machine::dma_item item;
+			running_machine::dma_item item;
 
-				int sdiv = remap.map ? 512 : 1024;
+			const int sdiv = 1024;
 
-				int width = (bmp->width() * (0x10000/m_dma_state.xstep)) / sdiv;
-				int height = (bmp->height() * (0x10000/m_dma_state.ystep)) / sdiv;
+			int width = (bmp->width() * (0x10000 / m_dma_state.xstep)) / sdiv;
+			int height = (bmp->height() * (0x10000 / m_dma_state.ystep)) / sdiv;
 
-				bool is_shadow = m_dma_state.palette == 0 && m_dma_state.color == 0xf;
+			bool is_shadow = m_dma_state.palette == 0 && m_dma_state.color == 0xf;
 
-				item.x = m_dma_state.xpos + (flipx ? remap.x : -remap.x);
-				short sx = item.x << 6;
-				item.x = sx / 64;
+			item.x = m_dma_state.xpos + (flipx ? remap.x : -remap.x);
+			short sx = item.x << 6;
+			item.x = sx / 64;
 
-				item.x1 = item.x + (flipx ? -width : width);
-				item.tex = tex;
-				item.flags = (flipx ? 0x01 : 0x00);
-				item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
+			item.x1 = item.x + (flipx ? -width : width);
+			item.tex = tex;
+			item.flags = (flipx ? 0x01 : 0x00);
+			item.color = is_shadow ? 0xff000000 : 0xffffffff;//Font shadows
 
-				if (m_dma_state.height == 1 && is_shadow) {
-					//Character shadow?					
-					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
-					short sy = item.y << 7;
-					item.y = sy / 128;
-					item.y1 = item.y + height / 4;
-				}
-				else {
-					item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y;
-					short sy = item.y << 7;
-					item.y = sy / 128;
-					item.y1 = item.y + height;
-				}
-
-				item.x -= 56.5f; item.x1 -= 56.5f;
-				machine().add_dma_item(item);
-				midtunit_bg_drawn_bg[remap.map]++;
+			if (m_dma_state.height == 1 && is_shadow) {
+				//Character shadow?					
+				item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y / 4;
+				short sy = item.y << 7;
+				item.y = sy / 128;
+				item.y1 = item.y + height / 4;
 			}
+			else {
+				item.y = m_dma_state.ypos - m_dma_state.topclip - remap.y;
+				short sy = item.y << 7;
+				item.y = sy / 128;
+				item.y1 = item.y + height;
+			}
+
+			item.x -= 56.5f; item.x1 -= 56.5f;
+			machine().add_dma_item(item);
 
 			skip_render = 1;
 		}
@@ -1129,9 +1109,25 @@ void midtunit_video_device::midtunit_dma_w(offs_t offset, uint16_t data, uint16_
 			skip_render = 1;
 		}
 	}
+
+	static u8 LogBmp = 0;
+
+	if (m_mk3)
+	{
+		//fight!
+		if (gfxoffset == 0x0b01c542)
+		{
+			LogBmp = 1;
+		}
+		else
+		//finish him!
+		if (gfxoffset == 0x0b025dfe)
+		{
+			LogBmp = 0;
+		}
+	}
 	
-	
-	if (!skip_render && m_log_png)
+	if (!skip_render && LogBmp)
 	{
 		if (command & 0x80)
 		{
@@ -1346,7 +1342,7 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 
 	//P2 Palette redirect
-	/*	
+	/*
 	static u16 P1Pal = 0;
 	static u16 P2Pal = 0;
 	
@@ -1364,7 +1360,9 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 		return;
 	}
+
 	*/
+	
 	m_logged_rom[raw_offset >> 6] |= 1ULL << (raw_offset & 0x3f);
 
 	/* loop over the height */

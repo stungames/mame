@@ -1739,8 +1739,6 @@ void screen_device::create_composited_bitmap()
 //  screen
 //-------------------------------------------------
 
-extern int midtunit_bg_drawn_bg[16];
-
 bool screen_device::update_quads()
 {	
 	// only update if live
@@ -1784,7 +1782,6 @@ bool screen_device::update_quads()
 			}
 
 			machine().m_dma_item_count = 0;
-			memset(midtunit_bg_drawn_bg, 0, sizeof(midtunit_bg_drawn_bg));
 		}
 	}
 
